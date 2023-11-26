@@ -28,35 +28,35 @@ Welcome to my portfolio project! This project is designed to help students creat
 ## Modifications:
 
 ### HTML (index.html):
-   **Header Section:**
-     - **Update the title/description in the relevant tag.**
-     - **Add your name in the header to be displayed in the relevant function.**
-     - **Update or add navigation links in the <nav> section.**
+**Header Section:**
+   - **Update the title/description in the relevant tag.**
+   - **Add your name in the header to be displayed in the relevant function.**
+   - **Update or add navigation links in the nav section.**
 
-   **Contacts Section:**
-     - Replace relevant tags with your personal information.
+**Contacts Section:**
+   - **Replace relevant tags with your personal information.**
 
-   **Projects Section:**
-     - Update project details, images, and links.
-     - You can add or remove projects as needed.
+**Projects Section:**
+   - **Update project details, images, and links.**
+   - **You can add or remove projects as needed.**
 
-   **Contact Section:**
-     - Update your contact information or social media links in relevant places.
+**Contact Section:**
+   - **Update your contact information or social media links in relevant places.**
 
 
 
 ### CSS (styles.css):
   **Styles:**
-    - Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in css/ directory.
+    - **Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in css/ directory.**
 
 
     
 ### JavaScript (script.js):
   **Scripts:**
-    - All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.
+    - **All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.**
     
   **Interactive Elements:**
-    - Add or modify JavaScript functions to enhance interactivity.
+    - **Add or modify JavaScript functions to enhance interactivity.**
 
 
 ### Contact:
