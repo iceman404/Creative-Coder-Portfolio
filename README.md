@@ -1,14 +1,14 @@
-# Creative Coder Portfolio
+# `Creative Coder Portfolio`
 
 Welcome to my portfolio project! This project is designed to help students create their own portfolios using HTML, CSS, and JavaScript. Feel free to use it as a starting point for your portfolio.
 
----
+--
 ## `Features`
 
 - **Responsive Design:** The portfolio is designed to be responsive and work well on various devices.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
----
+--
 ## `Getting Started`
 
 1. **Clone the Repository:**
@@ -20,10 +20,10 @@ Welcome to my portfolio project! This project is designed to help students creat
 3. **Open index.html in your Browser:**
    - Open the `index.html` file in your preferred web browser to view the portfolio.
 
----
-## Modifications
+--
+## `Modifications`
 
-### HTML (index.html)
+### `HTML (index.html)`
 
 #### Header Section
    - **Update the title/description in the relevant tag.**
@@ -40,12 +40,12 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Contact Section
    - **Update your contact information or social media links in relevant places.**
 
-### CSS (styles.css)
+### `CSS (styles.css)`
 
 #### Styles
    - **Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in the css/ directory.**
 
-### JavaScript (script.js)
+### `JavaScript (script.js)`
 
 #### Scripts
    - **All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.**
@@ -53,7 +53,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Interactive Elements
    - **Add or modify JavaScript functions to enhance interactivity.**
 
----
+--
 ## Contact
 
 If you have any questions or need further assistance, feel free to reach out:
@@ -63,6 +63,6 @@ If you have any questions or need further assistance, feel free to reach out:
 - **LinkedIn: [![Button](https://img.shields.io/badge/Linked-In-blue)](https://www.linkedin.com/in/john-subba-ic3man404/)**
 - **Twitter: [![Button](https://img.shields.io/badge/Twitter-blue)](https://twitter.com/ic3man404)**
 
----
+--
 
 Happy coding! 🚀
