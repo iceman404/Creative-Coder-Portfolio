@@ -9,14 +9,13 @@ Welcome to my portfolio project! This project is designed to help students creat
 - [Contact](#contact)
 
 ## Features
-
 - **Responsive Design:** The portfolio is designed to be responsive and work well on various devices.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
-## Getting Started
 
+## Getting Started
 1. **Clone the Repository:**
-   - git clone [https://github.com/your-username/your-portfolio.git](https://github.com/iceman404/Creative-Coder-Portfolio)
+   - git clone [https://github.com/iceman404/Creative-Coder-Portfolio.git](https://github.com/iceman404/Creative-Coder-Portfolio)
    
 2. **Navigate to the Project Directory:**
    - cd Creative-Coder-Portfolio
@@ -25,27 +24,32 @@ Welcome to my portfolio project! This project is designed to help students creat
    - Open the index.html file in your preferred web browser to view the portfolio.
 
 
+
 ## Modifications:
 
 ### HTML (index.html):
-**Header Section:**
-  - **Update the title/description in the relevant tag.**
-  - **Add your name in the header to be displayed in the relevant function.**
-  - **Update or add navigation links in the <nav> section.**
+   **Header Section:**
+     - **Update the title/description in the relevant tag.**
+     - **Add your name in the header to be displayed in the relevant function.**
+     - **Update or add navigation links in the <nav> section.**
 
-**Contacts Section:**
-  - Replace relevant tags with your personal information.
+   **Contacts Section:**
+     - Replace relevant tags with your personal information.
 
-**Projects Section:**
-  - Update project details, images, and links.
-  - You can add or remove projects as needed.
+   **Projects Section:**
+     - Update project details, images, and links.
+     - You can add or remove projects as needed.
 
-**Contact Section:**
-  - Update your contact information or social media links in relevant places.
+   **Contact Section:**
+     - Update your contact information or social media links in relevant places.
+
+
 
 ### CSS (styles.css):
   **Styles:**
     - Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in css/ directory.
+
+
     
 ### JavaScript (script.js):
   **Scripts:**
@@ -54,8 +58,9 @@ Welcome to my portfolio project! This project is designed to help students creat
   **Interactive Elements:**
     - Add or modify JavaScript functions to enhance interactivity.
 
+
 ### Contact:
-  - If you have any questions or need further assistance, feel free to reach out:
+**If you have any questions or need further assistance, feel free to reach out:**
 
    - **Name: [![Button](https://img.shields.io/badge/John-Subba-008491)](https://github.com/iceman404/iceman404/blob/main/AboutMe.md)**
    - **Email: [![Button](https://img.shields.io/badge/johnsubba404@gmail.com-09C4D0)](https://mail.google.com/mail/?view=cm&to=johnsubba404@gmail.com)**
