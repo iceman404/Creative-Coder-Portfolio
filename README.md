@@ -1,5 +1,5 @@
 # `Creative Coder Portfolio`
-
+---
 Welcome to my portfolio project! This project is designed to help students create their own portfolios using HTML, CSS, and JavaScript. Feel free to use it as a starting point for your portfolio.
 
 
