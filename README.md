@@ -3,13 +3,13 @@
 Welcome to my portfolio project! This project is designed to help students create their own portfolios using HTML, CSS, and JavaScript. Feel free to use it as a starting point for your portfolio.
 
 
-## `Features`
+## `Features:`
 
 - **Responsive Design:** The portfolio is designed to be responsive and work well on various devices.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
 
-## `Getting Started`
+## `Getting Started:`
 
 1. **Clone the Repository:**
    - `git clone https://github.com/iceman404/Creative-Coder-Portfolio.git`
@@ -21,7 +21,7 @@ Welcome to my portfolio project! This project is designed to help students creat
    - Open the `index.html` file in your preferred web browser to view the portfolio.
 
 
-## `Modifications`
+## `Modifications:`
 
 ### `HTML (index.html)`
 
@@ -40,10 +40,12 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Contact Section
    - **Update your contact information or social media links in relevant places.**
 
+
 ### `CSS (styles.css)`
 
 #### Styles
    - **Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in the css/ directory.**
+
 
 ### `JavaScript (script.js)`
 
@@ -54,7 +56,7 @@ Welcome to my portfolio project! This project is designed to help students creat
    - **Add or modify JavaScript functions to enhance interactivity.**
 
 
-## Contact
+## `Contact:`
 
 If you have any questions or need further assistance, feel free to reach out:
 
