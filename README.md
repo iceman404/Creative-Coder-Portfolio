@@ -57,7 +57,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Interactive Elements
    - **Add or modify JavaScript functions to enhance interactivity.**
 
-
+---
 ## `Contacts:`
 
 
