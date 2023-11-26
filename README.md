@@ -16,48 +16,48 @@ Welcome to my portfolio project! This project is designed to help students creat
 ## Getting Started
 
 1. **Clone the Repository:**
-   git clone [https://github.com/your-username/your-portfolio.git](https://github.com/iceman404/Creative-Coder-Portfolio)
+   - git clone [https://github.com/your-username/your-portfolio.git](https://github.com/iceman404/Creative-Coder-Portfolio)
    
 2. **Navigate to the Project Directory:**
-   cd Creative-Coder-Portfolio
+   - cd Creative-Coder-Portfolio
    
 3. **Open index.html in your Browser:**
-   Open the index.html file in your preferred web browser to view the portfolio.
+   - Open the index.html file in your preferred web browser to view the portfolio.
 
 
-Modifications:
+## Modifications:
 
-HTML (index.html)
-Header Section:
-  -Update the title in the <title> tag.
-  -Add your name or your project name in the <h1> tag.
-  -Update or add navigation links in the <nav> section.
+### HTML (index.html):
+**Header Section:**
+  - Update the title in the <title> tag.
+  - Add your name or your project name in the <h1> tag.
+  - Update or add navigation links in the <nav> section.
 
-About Me Section:
-  -Replace relevant tags with your personal information.
+**Contacts Section:**
+  - Replace relevant tags with your personal information.
 
-Projects Section:
-  -Update project details, images, and links.
-  -You can add or remove projects as needed.
+**Projects Section:**
+  - Update project details, images, and links.
+  - You can add or remove projects as needed.
 
-Contact Section:
-  -Update your contact information or social media links in relevant places.
+**Contact Section:**
+  - Update your contact information or social media links in relevant places.
 
-CSS (styles.css)
-  Styles:
-    -Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in css/ directory.
+### CSS (styles.css):
+  **Styles:**
+    - Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in css/ directory.
     
-JavaScript (script.js)
-  Scripts:
-    -All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.
+### JavaScript (script.js):
+  **Scripts:**
+    - All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.
     
-  Interactive Elements:
-    -Add or modify JavaScript functions to enhance interactivity.
+  **Interactive Elements:**
+    - Add or modify JavaScript functions to enhance interactivity.
 
-Contact:
-  -If you have any questions or need further assistance, feel free to reach out:
+### Contact:
+  - If you have any questions or need further assistance, feel free to reach out:
 
-Name: [John Subba]
-Email: [johnsubba404@gmail.com]
-LinkedIn: [Your LinkedIn Profile]
-Twitter: [Your Twitter Handle]
+**Name:** [![Button](https://img.shields.io/badge/John-Subba-008491)](https://github.com/iceman404/iceman404/blob/main/AboutMe.md)
+**Email:** [![Button](https://img.shields.io/badge/johnsubba404@gmail.com-09C4D0)](https://mail.google.com/mail/?view=cm&to=johnsubba404@gmail.com)
+**LinkedIn:** [![Button](https://img.shields.io/badge/Linked-In-blue)](https://www.linkedin.com/in/john-subba-ic3man404/)
+**Twitter:** [![Button](https://img.shields.io/badge/Twitter-blue)](https://twitter.com/ic3man404)
