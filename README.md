@@ -52,7 +52,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 
 #### Scripts
-   - **All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.**
+   - **All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory, and its app.js library in particle.js/ directory.**
 
 #### Interactive Elements
    - **Add or modify JavaScript functions to enhance interactivity.**
