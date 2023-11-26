@@ -49,6 +49,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 ### `JavaScript (script.js)`
 
+
 #### Scripts
    - **All functions are in internal scripts for ease of use, except for particle.js which is in the parent directory.**
 
@@ -57,6 +58,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 
 ## `Contact:`
+
 
 If you have any questions or need further assistance, feel free to reach out:
 
