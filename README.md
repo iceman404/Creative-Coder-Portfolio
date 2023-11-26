@@ -43,6 +43,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 ### `CSS (styles.css)`
 
+
 #### Styles
    - **Customize the styles to match your design preferences. All styles are internal for ease of customization, except the one used by particle.js which is in the css/ directory.**
 
@@ -57,7 +58,7 @@ Welcome to my portfolio project! This project is designed to help students creat
    - **Add or modify JavaScript functions to enhance interactivity.**
 
 
-## `Contact:`
+## `Contacts:`
 
 
 If you have any questions or need further assistance, feel free to reach out:
