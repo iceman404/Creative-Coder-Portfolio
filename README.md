@@ -12,7 +12,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 ## `Getting Started`
 
 1. **Clone the Repository:**
-   - `git clone [https://github.com/iceman404/Creative-Coder-Portfolio.git](https://github.com/iceman404/Creative-Coder-Portfolio)`
+   - `git clone https://github.com/iceman404/Creative-Coder-Portfolio.git`
    
 2. **Navigate to the Project Directory:**
    - `cd Creative-Coder-Portfolio`
