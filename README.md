@@ -2,11 +2,13 @@
 
 Welcome to my portfolio project! This project is designed to help students create their own portfolios using HTML, CSS, and JavaScript. Feel free to use it as a starting point for your portfolio.
 
+---
 ## Features
 
 - **Responsive Design:** The portfolio is designed to be responsive and work well on various devices.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
+---
 ## Getting Started
 
 1. **Clone the Repository:**
@@ -18,6 +20,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 3. **Open index.html in your Browser:**
    - Open the `index.html` file in your preferred web browser to view the portfolio.
 
+---
 ## Modifications
 
 ### HTML (index.html)
@@ -50,6 +53,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Interactive Elements
    - **Add or modify JavaScript functions to enhance interactivity.**
 
+---
 ## Contact
 
 If you have any questions or need further assistance, feel free to reach out:
