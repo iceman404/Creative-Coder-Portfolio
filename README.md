@@ -29,9 +29,9 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 ### HTML (index.html):
 **Header Section:**
-  - Update the title in the <title> tag.
-  - Add your name or your project name in the <h1> tag.
-  - Update or add navigation links in the <nav> section.
+  - **Update the title in the <title> tag.**
+  - **Add your name or your project name in the <h1> tag.**
+  - **Update or add navigation links in the <nav> section.**
 
 **Contacts Section:**
   - Replace relevant tags with your personal information.
@@ -57,7 +57,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 ### Contact:
   - If you have any questions or need further assistance, feel free to reach out:
 
-**Name:** [![Button](https://img.shields.io/badge/John-Subba-008491)](https://github.com/iceman404/iceman404/blob/main/AboutMe.md)
-**Email:** [![Button](https://img.shields.io/badge/johnsubba404@gmail.com-09C4D0)](https://mail.google.com/mail/?view=cm&to=johnsubba404@gmail.com)
-**LinkedIn:** [![Button](https://img.shields.io/badge/Linked-In-blue)](https://www.linkedin.com/in/john-subba-ic3man404/)
-**Twitter:** [![Button](https://img.shields.io/badge/Twitter-blue)](https://twitter.com/ic3man404)
+**Name: [![Button](https://img.shields.io/badge/John-Subba-008491)](https://github.com/iceman404/iceman404/blob/main/AboutMe.md)**
+**Email: [![Button](https://img.shields.io/badge/johnsubba404@gmail.com-09C4D0)](https://mail.google.com/mail/?view=cm&to=johnsubba404@gmail.com)**
+**LinkedIn: [![Button](https://img.shields.io/badge/Linked-In-blue)](https://www.linkedin.com/in/john-subba-ic3man404/)**
+**Twitter: [![Button](https://img.shields.io/badge/Twitter-blue)](https://twitter.com/ic3man404)**
