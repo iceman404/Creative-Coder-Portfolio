@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>You look lost | error 404</title>
+    <style>
+    
+      :root {
+        --body-font: "Hack", "Courier New", "Courier", monospace;
+        --body-text-align: center;
+        --h1-font: "Courier New", "Courier", monospace;
+        --body-background-color: #05806b;
+        --button-background-color: #fcfafa;
+        --button-color: #000000;
+        --button-hover-background-color: #000000;
+        --button-hover-color: #ffffff;
+        
+      }
+        body {
+          font-family: var(--body-font);
+          background-color: var(--body-background-color);
+          text-align: var(--body-text-align);
+        }
+        
+        h1 {
+          font-family: var(--h1-font);
+          font-size: 9vw;
+        }
+        
+        div {
+          border-style: none;
+          font-size: 2.5em;
+          word-spacing: 5px;
+          padding: 30px, 50px, 30px, 50px;
+          overflow: auto;
+          display: block;
+        }
+        
+        
+        button {
+          
+          width:80%;
+          max-width: 280px; /* Limit maximum width */
+          padding: 10px; /* Adjust padding for touch targets */
+          border: ridge;
+          background-color: var(--button-background-color);
+          color: var(--button-color);
+	      font-size: 20px;
+	      font-weight: bold;
+          cursor: pointer;
+          border-radius: 5px;
+  	    } 
+
+	    button:hover {
+	      background-color: var(--button-hover-background-color);
+	      color: var(--button-hover-color);
+  	      opacity: 0.7;
+	    }
+        
+        audio {
+          display: none; /* Hide the audio element */
+        }
+        
+        
+    </style>
+    
+    <script>
+    // Example code to goto main menu
+    function redirectHome(homeUrl) {
+      if (homeUrl !== "") {
+        window.location.href = homeUrl;
+      }
+    }
+    
+    // Function to play the audio when the page loads
+    function playAudio() {
+      var audio = document.getElementById('myAudio');
+      audio.play();
+    }
+    </script>
+    
+  </head>    
+  
+  <body onload="playAudio()"> <!-- Call the playAudio function on page load -->
+    <audio id="myAudio" controls autoplay>
+      <source src="404audio.MP3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    
+    <h1>ERROR 404!</h1>
+    
+    
+    <div>
+        <q><strong>Now, I wouldn't expect to find a man of your stature...
+        <br>
+        so far away from his stove on a morning as cold as this, Captain.
+        <br><br>
+        you uhh.. you lost?</strong></q><br><br>
+        <cite>John Fitzgerald (The Revenant)</cite>
+        
+    </div>
+    <br><br>
+    
+    <div>
+    <button onclick="redirectHome('https://www.iceman404.com')">Back to Home</button>
+    <button onclick="playAudio()">Really...?</button>
+    </div>
+    
+    
+  </body>    
+    
+    
+    
+</html>
