@@ -34,6 +34,7 @@ Welcome to my portfolio project! This project is designed to help students creat
    - **Replace relevant content with your personal information.**
 
 #### Projects Section
+   - **Project html files and screenshots are in the project-html-files and project-screenshots-files respectively.**
    - **Update project details, images, and links.**
    - **You can add or remove projects as needed.**
 
