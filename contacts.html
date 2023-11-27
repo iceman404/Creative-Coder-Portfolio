@@ -1,0 +1,335 @@
+<!--
+    The code in this website is licensed under the terms of the GNU General Public License (GPL).
+    You are free to modify and distribute this code, provided that you also distribute it under the GPL.
+    For more details, see: https://www.gnu.org/licenses/gpl-3.0.html
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta charset="utf-8">
+<link rel="stylesheet" media="screen" href="stylesload.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Contact | Your Name | your-alias</title>
+
+
+<style>
+    
+/* Hide the breadcrumb container */
+div[itemtype="http://schema.org/BreadcrumbList"] {
+  display: none;
+}
+
+/* Add CSS styles for the contacts page */
+/* Example styles for the header */
+  body {
+    font-family: Hack, Courier New, Courier, monospace;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.6;
+    background-image: url(./images/background/bg5.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #f2f2f2;
+    transition: background-color 0.3s ease;
+    align-items: center;
+    
+  }
+
+  header {
+    background-color: rgba(51, 51, 51, 0.8);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 30px;
+    width: 100%; /* Expand to the full width */
+  
+  }
+
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+  
+  }
+
+  .container {
+    max-width: 310px;
+    margin: 10px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  
+  }
+
+  .container img {
+    border-radius: 50%;
+    margin-right: 20px;
+    width: 190px;
+    height: 190px;
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  
+  }
+
+  p {
+    margin-bottom: 10px;
+  
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0px;
+    right: 10px;
+    left: 10px;
+    padding: 10px;
+    background-color: silver;
+    border-radius: 5px;
+    border-style: none;
+    border-color: red;
+    border-width: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+  }
+        
+  footer a {
+    text-decoration: none;
+    font-size: 2vw;
+    color: black;
+    font-weight: bold;
+  
+  }
+        
+  footer:hover {
+    text-decoration: none;
+    background-color: silver;
+  
+  }
+    
+  footer:hover a {
+    color: black;
+    font-weight: bold;
+  
+  }
+
+  .contact-button {
+    display: inline-block;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #000000;
+    background-color: transparent;
+    border: 2px groove red;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+  }
+
+  .contact-button:hover {
+    background-color: #0056b3;
+        
+  }
+  
+  .theme-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 16px;
+    font-family: Hack, Courier New, Courier, monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  
+  }
+
+  .theme-button:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+    
+  }
+
+  .dark-theme {
+    background-color: #333;
+    color: white;
+        
+  }
+
+  .dark-theme header {
+    background-color: rgba(0, 0, 0, 0.8);
+        
+  }
+
+  .dark-theme .container {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: green;
+        
+  }
+
+  .dark-theme h2 {
+    color: green;
+    font-size: 18px;
+    font-weight: bold;
+        
+  }
+
+  .dark-theme p {
+    color: green;
+    font-size: 16px;
+    font-weight: bold;
+        
+  }
+
+  .dark-theme .contact-button {
+    color: green;
+    font-size: 16px;
+    font-weight: bold;
+        
+  }
+
+  .dark-theme footer {
+    background-color: grey;
+        
+  }
+
+  .dark-theme footer a {
+    color: white;
+        
+  }
+        
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4px;
+  }
+  
+</style>
+
+<script>
+  function redirectToEmail1() {
+    window.open('https://mail.google.com/mail/?view=cm&to=your_email@mail.com', '_blank');
+  }
+
+  function toggleTheme() {
+    const body = document.querySelector('body');
+    body.classList.toggle('dark-theme');
+  }
+
+  function redirectToPhone() {
+    alert("Please manually enter the phone number in your phone's dialer: +977-1234567890");
+  }
+
+  function openInGoogleMaps() {
+    var address = "Kathmandu, Nepal";
+    var encodedAddress = encodeURIComponent(address);
+    var mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodedAddress;
+    window.open(mapUrl, '_blank');
+ }
+    
+</script>
+
+</head>
+
+
+<body class="dark-theme">
+
+<div itemscope itemtype="http://schema.org/BreadcrumbList">
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com">
+      <span itemprop="name">Home</span>
+    </a>
+    <meta itemprop="position" content="1" />
+  </span>
+  
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/bio">
+      <span itemprop="name">Bio</span>
+    </a>
+    <meta itemprop="position" content="2" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/contacts">
+      <span itemprop="name">Contact</span>
+    </a>
+    <meta itemprop="position" content="3" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/#projects">
+      <span itemprop="name">Projects</span>
+    </a>
+    <meta itemprop="position" content="4" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/skills">
+      <span itemprop="name">Skills</span>
+    </a>
+    <meta itemprop="position" content="5" />
+  </span>
+</div>
+
+
+
+<button class="theme-button" onclick="toggleTheme()">Toggle Theme</button>
+
+<header>
+  <h1>Contact Information</h1>
+</header>
+
+<div class="content">
+  <div class="container">
+    <h2>&#x25BC;More Info&#x25BC;</h2>
+      <p><button class="contact-button" onclick="redirectToEmail2()">Email Address</button>
+      </p>
+      
+      <p><button class="contact-button" onclick="redirectToPhone()">Call Now</button>
+      </p>
+      
+      <p><a href="https://github.com/" target="_blank"><button class="contact-button">GitHub</button></a>
+        <a href="https://www.youtube.com/" target="_blank"><button class="contact-button">YouTube</button></a>
+      </p>
+        
+      <p><button class="contact-button" onclick="openInGoogleMaps()">Location Open in Google Maps</button>
+      </p>
+      
+  </div>
+
+  <div class="container">
+    <img src="images/profile/puppy1.jpg" alt="Me">
+    <div class="button-container">
+      <a href="https://www.linkedin.com/" target="_blank"><button class="contact-button">LinkedIn</button></a>
+    </div>
+  </div>
+  
+</div>
+
+<footer>
+    <a href="index.html">Back to Main Page</a>
+</footer>
+</body>
+</html>
+

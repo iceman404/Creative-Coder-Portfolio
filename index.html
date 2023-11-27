@@ -1,0 +1,709 @@
+<!--
+    The code in this website is licensed under the terms of the GNU General Public License (GPL).
+    You are free to modify and distribute this code, provided that you also distribute it under the GPL.
+    For more details, see: https://www.gnu.org/licenses/gpl-3.0.html
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    
+  <!-- fav-icons -->    
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="canonical" href="https://your_domain.com" />
+  
+  <!-- Include Font Awesome CDN link in the head of your HTML -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- Other regular meta tags -->
+  <meta charset="utf-8">
+  <title>Your Name | your_alias</title>
+  <meta name="description" content="Portfolio of Your Name | your_alias">
+  <meta name="author" content="Your Name | your_alias" />
+  
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://your_domain.com/bio">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Your Name Bio | your-alias">
+  <meta property="og:description" content="Bio of Your Name | your-alias">
+  <meta property="og:image" content="https://your_domain.com/images/profile/main-profile.jpg">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="your_domain.com">
+  <meta property="twitter:url" content="https://your_domain.com/bio">
+  <meta name="twitter:title" content="Your Name Bio | your-alias">
+  <meta name="twitter:description" content="Portfolio Website of Your Name | your-alias">
+  <meta name="twitter:image" content="https://your_domain.com/images/profile/main-profile.jpg">
+  <meta name="twitter:site" content="@yourtwitterhandle">
+  <!-- Add other meta tags as needed -->
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- styles for particles.js library -->
+  <link rel="stylesheet" media="screen" href="css/style.css">
+  
+  
+   <!-- Add your JSON-LD script here -->
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Organization",
+      "url": "http://www.your_domain.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://www.your_domain.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+  
+  
+  
+<style>
+  /* Hide the breadcrumb container */
+div[itemtype="http://schema.org/BreadcrumbList"] {
+  display: none;
+}
+  
+/* Add CSS styles here */
+/* Example styles for the header and navigation bar */
+  header {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 50px;
+    font-family: Hack, "Courier New", Courier, monospace;
+	font-weight: bold;
+    min-height: 90px; /* Set a minimum height for the header */
+  }
+    
+  h1 {
+	font-size: 26px;
+	font-family: Hack, Courier New, Courier, monospace;
+	font-weight: bold;
+  }
+	
+  p {
+	font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	padding: 7px;
+	font-weight: bold;
+  }
+	
+  nav {
+    width: 100%;
+  	top: 30vh; /* Adjust this value to position the profile section */
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    background-color: black;
+  	z-index: 0;
+  }
+	
+  nav a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 22px;
+    text-decoration: none;
+    font-family: Hack, "Courier New", Courier, monospace;
+	font-size: 1.6vw;
+	font-weight: bold;
+  }
+    
+  nav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+    
+    
+/* For mobile devices (max-width 767px) */
+  @media only screen and (max-width: 440px) {
+    nav {
+      flex-direction: column; /* Change to a column layout for vertical alignment */
+      align-items: center; /* Center the navigation items vertically */
+      text-align: center; /* Center the text within the navigation items */
+    }
+
+    nav a {
+      padding: 10px 0; /* Adjust padding for better touch usability */
+    }
+      
+  }
+
+  .profile {
+    width: 80%;
+    position: absolute;    
+    top: 47vh; /* Adjust this value to position the profile section */
+    left: 10%;
+    right: 10% ;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+  }
+    
+  .profile div p {
+    font-size: 1.2em;
+  }
+    
+  .profile div h1 {
+    font-size: 1.7em;
+  }
+    
+  .profile img {
+    border-radius: 50%;
+    margin-right: 20px;
+    width: 20%;
+    height: 20%;
+  }
+    
+    
+  .project-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+  }
+
+  .project-item {
+    width: 300px;
+    margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    /*box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);*/
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .project-item img {
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .project-details {
+    padding: 10px;
+  }
+
+  h3 {
+    margin: 0 0 10px;
+  }
+
+  p {
+    margin: 0 0 15px;
+  }
+
+  .buttons {
+    text-align: center;
+  }
+
+  .buttons a {
+    display: inline-block;
+    width: 100px;
+    padding: 5px 10px;
+    margin: 5px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #fff;
+  }
+
+  .youtube-btn {
+    background-color: #c4302b;
+  }
+
+  .github-btn {
+    background-color: #333;
+  }
+    
+  .lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .lightbox-img {
+    max-width: 80%;
+    max-height: 80%;
+    margin: auto;
+    display: block;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+  }    
+    
+  .projects {
+    background-color: silver;
+    height: 70vh;
+    margin-top: 40px;
+    text-align: start;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-weight: bold;
+  }
+    
+  .transparent-box h2 {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 5px 10%;
+    display: inline-block;
+    background-color: silver;
+  }
+  
+  .button-description {
+    background-color: #286173;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 14px;
+	font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+    padding: 5px 10px;
+    margin: 5px, 5px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #fff;
+      
+  } 
+
+  .button-description:hover {
+  	opacity: 0.2;
+  } 
+
+/* Additional CSS for transparency effects #f2f2f2 */
+  body {
+    background-color: transparent;
+  }
+    
+  footer {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 0;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .footer-content .social-icons a {
+    margin: 0 5px;
+    color: #1e3050;
+    font-size: 1.5em;
+    vertical-align: middle;
+  }
+
+  .footer-content .copyright {
+    font-size: 1.4em;
+    font-family: "Courier New", monospace;
+    font-weight: middle; /* or the desired weight such as normal, bold, etc. */
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .transparent-box {
+    background-color: rgba(188, 231, 247, 0.7);
+    padding: 10px;
+    border-radius: 0px;
+    margin: 0px;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 16px;
+	font-weight: bold;
+    /*bottom: -190px;*/
+    box-sizing: border-box;
+    /*visibility: hidden;*/
+  }
+  
+  .transparent-box .button-top {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    bottom: 0;
+    display: inline-block;
+    float: right;
+  }
+    
+  .show-box {
+    visibility: visible;
+  }
+    
+  .theme-changer {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    bottom: 0;
+    display: inline-block;
+    float: right;
+  }
+    
+  .top-button {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    bottom: 0;
+    display: inline-block;
+    float: left;
+  }
+    
+  .dark-theme {
+    background-color: #000;
+    color: green;
+  }
+    
+  .dark-theme header {
+    background-color: #333;
+    color: green;
+  }
+    
+  .dark-theme .projects button {
+    padding: 9px;
+    border: none;
+    background-image: linear-gradient(-45deg, #FFA63D, #FF3D77, #338AFF);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 10%;
+  }
+    
+  .dark-theme nav a {
+    color: #000708;
+  }
+
+/* Cursor blinking animation */
+  .cursor {
+    display: inline-block;
+    animation: blinkCursor 0.7s infinite;
+  }
+
+  @keyframes blinkCursor {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
+    
+</style>
+</head>
+
+
+<body >
+    
+<div itemscope itemtype="http://schema.org/BreadcrumbList">
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://your_domain.com">
+      <span itemprop="name">Home</span>
+    </a>
+    <meta itemprop="position" content="1" />
+  </span>
+  
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://your_domain.com/bio">
+      <span itemprop="name">Bio</span>
+    </a>
+    <meta itemprop="position" content="2" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://your_domain.com/contacts">
+      <span itemprop="name">Contact</span>
+    </a>
+    <meta itemprop="position" content="3" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://your_domain.com/#projects">
+      <span itemprop="name">Projects</span>
+    </a>
+    <meta itemprop="position" content="4" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://your_domain.com/skills">
+      <span itemprop="name">Skills</span>
+    </a>
+    <meta itemprop="position" content="5" />
+  </span>
+</div>
+    
+    
+<header>
+  <div id="name-container">
+    <span id="name"></span><span id="cursor" class="cursor">|</span>
+  </div>
+</header>
+
+<nav style="background-color: grey;">
+  <a href="bio.html">Bio</a>
+  <a href="contacts.html">Contact</a>
+  <a href="#projects">Projects</a>
+  <a href="skills.html">Skills</a>
+</nav>
+
+<!-- particles.js container -->
+<div id="particles-js">
+<script src="./particles.js"></script>
+
+<div id="bio" class="profile">
+  <img src="images/profile/puppy1.jpg" alt="Your Name | your_alias ">
+    
+    
+  <div>
+    <h1><em>Your Name</em></h1> 
+    <p>&#x25A3;Programming languages: C/C++, Java, Python, SQL </p>
+    <p>&#x25A3;Web Development languages: HTML, CSS, JavaScript, PHP </p>
+    <p>&#x25A3;FrameWorks: Bootstrap, Tailwind, Angular, Vue, React, Express.js, Laravel, Django</p>
+    <p>&#x25A3;Tools/Platform: (x86/64 - Linux/Windows), Git/Github, Node.js </p>
+    <p>&#x25A3;Spoken Languages: English, Nepali</p>
+    <p>&#x25A3;Bachelor's in Information Technology</p>
+  </div>
+</div>
+</div>
+
+<div id="projects" class="transparent-box">
+  <h2>Project Showcase</h2>
+
+  <div class="project-container">
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="project-item">
+      <img src="project-screenshots-files/mira.jpeg" alt="Project 1" onclick="openLightbox('project-screenshots-files/mira.jpeg')">
+      <div class="project-details">
+        <button class="button-description" onclick="handleProjectSelection('project-html-files/project1.html')">Mira</button>
+        <p>Project in Embedded C.</p>
+        <div class="buttons">
+          <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
+          <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- More project items can be added similarly -->
+  </div>
+  
+  <div class="lightbox" onclick="closeLightbox()">
+    <span class="close-btn">&times;</span>
+    <img class="lightbox-img" src="" alt="Project Image">
+  </div>
+  
+</div>
+
+
+<div class="theme-changer">
+  <button class="button-description"  onclick="changeTheme()">Theme</button>
+</div>
+
+<div class="top-button">
+  <button class="button-description"  onclick="handleProjectSelection('#name-container')">Main Menu</button>
+</div>
+
+
+<footer>
+  <div class="footer-content">
+    <div class="social-icons">
+      <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook"></i></a>
+      <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.linkedin.com/in/" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <!-- Add other social media icons using Font Awesome classes -->
+    </div>
+    
+    <p class="copyright">&copy; 2023 iceman404 </p>
+  </div>
+</footer>
+<footer>
+  <div class="footer-content">
+    <p class="copyright">Designed by John Subba</p>
+  </div>
+</footer>
+
+
+<script>
+  // Add JavaScript code here (if needed)
+  // Example code to handle project selection
+  function handleProjectSelection(projectUrl) {
+    if (projectUrl !== "") {
+      window.location.href = projectUrl;
+    }
+  }
+    
+  function changeTheme() {
+    const body = document.getElementsByTagName('body')[0];
+    const particlesContainer = document.getElementById('particles-js');
+    body.classList.toggle('dark-theme');
+    if (body.classList.contains('dark-theme')) {
+      particlesContainer.style.backgroundColor = '#000000'; // Set the desired background color for dark theme
+    } else {
+      particlesContainer.style.backgroundColor = ''; // Remove the inline background color for light theme (fall back to CSS)
+    }
+  }
+    
+
+  // Typing effect for the name "Your_name"
+  const nameElement = document.getElementById('name');
+  const cursorElement = document.getElementById('cursor');
+  const nameText = "Your Name";
+  let charIndex = 0;
+  let showBox = false;
+    function type() {
+      nameElement.textContent = nameText.slice(0, charIndex);
+      charIndex++;
+      if (charIndex <= nameText.length) {
+        setTimeout(type, 100);
+      } else {
+        showBox = true;
+        toggleContainerBox();
+        charIndex = 0;
+        setTimeout(type, 2000);
+      }
+    }
+
+  function openLightbox(imageSrc) {
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImg = document.querySelector('.lightbox-img');
+
+    lightbox.style.display = 'flex';
+    lightboxImg.src = imageSrc;
+  }
+
+  function closeLightbox() {
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImg = document.querySelector('.lightbox-img');
+    lightbox.style.display = 'none';
+    lightboxImg.src = '';
+  }
+
+
+  function toggleContainerBox() {
+    const containerBox = document.querySelector('.transparent-box');
+    if (showBox) {
+      containerBox.classList.add('show-box');
+    } else {
+      containerBox.classList.remove('show-box');
+    }
+  }
+
+  function toggleCursor() {
+    cursorElement.classList.toggle('cursor');
+  }
+
+  window.onload = function() {
+    type();
+    setInterval(toggleCursor, 500);
+  };
+  
+</script>
+
+<!-- scripts -->
+<script src="particle.js/app.js"></script>
+
+</body>
+</html>

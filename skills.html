@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Your Creative Website</title>
+    <style>
+header {
+  background-color: #005c66;
+  color: white;
+  text-align: center;
+  position:fixed;
+  top: 7%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  font-family: Hack, "Courier New", Courier, monospace;
+  font-weight: bold;
+  min-height: 17vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+footer {
+  background-color: #005c66;
+  color: white;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2vh;
+  padding: 20px;
+  font-size: 24px;
+  font-family: Hack, "Courier New", Courier, monospace;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-button {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    bottom: 0;
+    display: inline-block;
+    float: left;
+    z-index: 3;
+  }
+
+.button-description {
+    background-color: #00b9cc;
+    font-family: Hack, Courier New, Courier, monospace;
+    font-size: 1.6em;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    width: 120px; /* Set a fixed width in pixels */
+    height: 47px; /* Set a fixed height in pixels */
+    padding: 5px 10px;
+    margin: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #002e33;
+    overflow: hidden;
+}
+
+.button-description span {
+    max-width: 100%; /* Set the max-width for the text */
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add this to show an ellipsis (...) if the text overflows */
+    white-space: nowrap; /* Prevent the text from wrapping */
+}
+
+  .button-description:hover {
+  	opacity: 0.2;
+  }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: scroll; /* Remove scroll bars */
+	    background-color: #000000; 
+        }
+
+        .tile-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100vw; /* Set width to 100% of viewport width */
+        }
+
+.tile {
+    width: 2.36vw;
+    height: 3.5vh;
+    margin: 1px; /* Adjust the margin as needed to create space between tiles */
+    padding: 0;
+    background-color: #00606a;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.5px solid #000;  /*Added black border */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+}
+
+/* Apply border to the margin 
+.tile + .tile {
+    margin-left: 0;
+    border-left: 0.2px solid rgba(0, 0, 0, 0.2); 
+}
+*/
+        .tile:hover, .tile.touch-hover  {
+            background-color: #06e8ff; /* Darker green on hover */
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
+            transform: translateY(-7px) translateX(-7px); /* Lift the tile slightly on hover */
+	    
+        }
+
+        .inner-tile {
+            transform: rotate(0deg); /* Initial rotation angle */
+            /* transition: transform 0.2s ease; */
+	    /*transform-style: preserve-3d; */
+            transition: transform 0.7s ease;
+        }
+
+
+
+        .tile:hover .inner-tile {
+            //transform: rotate(720deg); /* Rotate 360 degrees on hover */
+	    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
+            transform: translateY(-5px); /* Lift the tile slightly on hover */
+        }
+
+/* Transparent overlay */
+.overlay {
+    position: fixed;
+    top: 58.3%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+	background: rgba(253, 254, 254, 0.9);
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+	z-index: 2; /* Higher z-index to overlay on top of tiles */
+    max-height: 84vh; /* Set a maximum height for the overlay */
+    width: 82vw;
+    overflow: auto; /* Enable vertical scrolling */
+}
+    .overlay-content {
+	font-size: 1.9vw;
+	font-family: monospace;
+        text-align: center;
+        color: #000;
+        padding: 20px;
+        border-radius: 10px;
+        pointer-events: auto; /* Allow clicks to pass through the overlay content */
+    }
+
+    .overlay-content img {
+        width: 60px;
+        height: 60px;
+        border-radius: 10%;
+        margin-bottom: 4px;
+    }
+	
+
+    .overlay-content a {
+        color: #000;
+        text-decoration: none;
+        font-size: 18px;
+        display: block;
+        margin-bottom: 10px;
+        pointer-events: auto; /* Re-enable click events for links */
+    }
+
+    .skills-section {
+        display: flex;
+        flex-wrap: wrap; /* Added flex-wrap to allow items to wrap to the next line */
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .skills-column {
+        width: 48%;
+        text-align: left;
+        margin-bottom: 20px;
+	padding: 7px;
+        border-radius: 10px; /* Added border-radius for rounded corners */
+        box-shadow: 0 0 10px rgba(1, 1, 0, 0.2); /* Added box-shadow for a subtle border */
+
+    }
+
+   .progress-bar {
+    height: 4vh;
+    width: 70%;
+    background-color: #eafdff;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 4px; /* Increased margin */
+    margin-left:10px;
+    position: relative;
+}
+
+    .progress-bar span {
+        display: flex; /* Use flexbox for centering */
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        height: 100%;
+        border-radius: 15px;
+        position: absolute;
+        top: 0;
+        width: 0;
+        transition: width 1s ease;
+        line-height: 20px; /* Set line-height equal to the height of the progress bar */
+        text-align: center; /* Center the text horizontally */
+    }
+
+.progress-container {
+    display: flex;
+    align-items: center; /* Center vertically */
+}
+
+.programming-language {
+    width: 36vw; /* Adjust as needed */
+    height: auto; /* Set height to auto for dynamic content */
+    padding: 4px;
+    z-index: 3;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+    margin-bottom: 16px;
+}
+
+/*
+.programming-language:hover {
+        transform: rotateX(180deg);
+    }
+
+.flipper {
+    width: 34vw;
+    height: 17vh;
+    transform-style: preserve-3d;
+    transition: transform 0.7s ease;
+    margin: 4px; /* Added margin */
+}
+*/
+.page {
+    width: 100%;
+    height: auto; /* Set height to auto for dynamic content */
+    max-height: 30vh; /* Adjust as needed */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds the fixed height */
+    color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    background-color: #0094a3;
+    font-size: 1.4vw;
+    padding: 2px;
+    text-align: left;
+    margin: 4px;
+}
+
+/*
+        .page .back {
+            transform: rotateY(180deg);
+            background-color: #008d9b; /* Back page color */
+        }
+
+        .programming-language:hover .flipper {
+            transform: rotateY(180deg);
+        }
+
+*/
+
+
+    .programming-language span,
+    .spoken-languages span,
+    .frameworks span,
+    .tools-technologies span {
+        width: 0; /* Initial width for animation */
+        transition: width 1s ease;
+    }
+
+
+
+.programming-language .progress-bar {
+    backface-visibility: hidden; /* Prevent the back face from being visible during the animation */
+}
+
+
+/* Media query for screens below 880px */
+@media (max-width: 879px) {
+    .skills-column {
+        width: 100%; /* Full width for one skill box per row */
+    }
+
+    .programming-language {
+        width: 100%; /* Full width for responsive layout */
+    }
+
+    .page {
+        width: 100%;
+        height: auto; /* Allow the height to adjust based on content */
+        max-height: none; /* Remove any maximum height */
+    }
+}
+
+.code-block {
+    white-space: pre-wrap;
+    font-family: hack, monospace;
+    background-color: #F6E3B4; /* Set your desired background color */
+    border-radius: 10px; /* Optional: Add rounded corners */
+}
+
+.code-block p {
+    font-size: 1.4vw;
+    white-space: pre-wrap;
+    color: #000e10;
+}
+
+
+ @keyframes blinkCursor {
+      0% {
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+
+    </style>
+</head>
+<body>
+<header>
+    <div id="name-container">
+      <span id="name"></span><span id="cursor" class="cursor">|</span>
+    </div>
+  </header>   
+
+<div class="tile-container" id="tileContainer">
+<!-- Hardcoded tiles for performance. Using function to add child tiles will affect the responsiveness to some extent. -->
+
+<div class="tile"></div>
+<div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+<div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+        <!-- Add more tiles as needed -->
+</div>
+   
+ <!-- Transparent overlay -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-content">
+            <img src="images/profile/puppy1.jpg" alt="Your Photo">
+            <h2>🤓 Geek by nature | Programmer by choice</h2>
+            <p>Proficient in a range of programming languages and technologies, spanning from beginner to expert levels. Equipped with hands-on experience and a strong foundation in software development.</p>
+            <div class="skills-section">
+<!-- While writing skills in the code-block div put skills no more than 3 words or it will overflow horizontally. But vertically it will adapt. Reason? for responsiveness -->               
+<!-- Wrap each programming language in a shadow div -->
+<div class="skills-column programming-languages">
+	<h3>Programming Languages:</h3>
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/cpp.PNG" alt="Logo Name">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-standard template library
+&emsp;-metaprogramming
+
+</pre>
+</div>
+            		
+	</div>
+
+	
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/C.PNG" alt="Logo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 80%; background-color: #009688">80%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Network Programming
+&emsp;-Concurrency with Posix Threads
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/Python.PNG" alt="Logo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 95%; background-color: #009688">95%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Numpy, Pandas, Matplotlib
+&emsp;-Scikit, TensorFlow, PyTorch
+
+</pre>
+</div>
+	</div>
+    
+
+ </div>
+
+		
+<div class="skills-column tools-technologies">
+    <h3>Tools & Technologies:</h3>
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/github.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+            	<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-All Git/Github knowledge
+&emsp;-GitHub Actions
+
+</pre>
+</div>
+	</div>
+  
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/docker.PNG" alt="Logo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Multi-stage Builds 
+&emsp;-Network Security
+&emsp;-Docker-in-Docker
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/google_cloud.PNG" alt="logo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Log Analytics
+&emsp;-Streaming Live Tailing
+&emsp;-Bare-metal Solution, Metrics 
+&emsp;-Time Series,
+&emsp;-Resources in Cloud Monitoring
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/amazon_aws.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Microservices
+&emsp;-Serverless Compute with Lambda,
+&emsp;-Serverless event bus
+&emsp;-Amazon SQS, SNS, Kinesis Streams 
+
+</pre>
+</div>
+	</div>
+                
+</div>
+
+<div class="skills-column frameworks">
+    <h3>Frameworks:</h3>
+     <div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/django.PNG" alt="django Logo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-MVT
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/qt.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 60%; background-color: #009688">60%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Lorem ipsum dolor sit amet,
+&emsp;-Lorem ipsum dolor sit amet,
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="Python.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Lorem ipsum dolor sit amet,
+&emsp;-Lorem ipsum dolor sit amet,
+
+</pre>
+</div>
+	</div>
+
+</div>
+
+<div class="skills-column spoken-languages">
+	<h3>Other Technologies</h3>
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/chef.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Lorem ipsum dolor sit amet,
+&emsp;-Lorem ipsum dolor sit amet,
+
+</pre>
+</div>
+	</div>
+
+	<div class="programming-language">
+		<div class="progress-container">
+        		<img src="assets/icon-images/kubernetes.PNG" alt="Your Photo">
+    			<div class="progress-bar" id="programmingProgressBar">
+        		<span style="width: 90%; background-color: #009688">90%</span>
+    			</div>
+		</div>
+		<div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+
+&emsp;-Lorem ipsum dolor sit amet,
+&emsp;-Lorem ipsum dolor sit amet,
+
+</pre>
+</div>
+	</div>
+      
+</div>
+
+
+</div>
+      <span style="font-family: monospace; font-weight: bold;"><a href="./resume/ResumeTemplate.pdf" download="ResumeTemplate">Download Resume</a>
+
+      <!-- Add more links or content as needed -->
+</div>
+
+
+</div>
+
+
+<footer>
+    <div id="name-container">
+      <span></span>
+       
+    </div>
+</footer> 
+
+<div class="top-button">
+  <button class="button-description"  onclick="handleProjectSelection('index.html')"><span>Home</span></button>
+</div>
+
+<script>
+
+// Example code to handle project selection
+  function handleProjectSelection(projectUrl) {
+    if (projectUrl !== "") {
+      window.location.href = projectUrl;
+    }
+  }
+
+
+    // Typing effect for the name "Iceman404"
+const nameElement = document.getElementById('name');
+const cursorElement = document.getElementById('cursor');
+const nameTexts = ["Embedded-C Developer", "C++ Developer", "Java Developer", 
+"Python Developer", "DevOps Engineer", "Full-Stack Developer", "Software Developer", "AI Enthusiast",
+"Junior Data Scientist" ];
+let textIndex = 0;
+let charIndex = 0;
+
+function type() {
+  if (charIndex <= nameTexts[textIndex].length) {
+    nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
+    charIndex++;
+    setTimeout(type, 100);
+  } else {
+    cursorElement.style.visibility = 'visible';
+    setTimeout(erase, 2000);
+  }
+}
+
+function erase() {
+  if (charIndex >= 0) {
+    nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
+    charIndex--;
+    setTimeout(erase, 50);
+  } else {
+    textIndex++;
+    if (textIndex >= nameTexts.length) {
+      textIndex = 0;
+    }
+
+    cursorElement.style.visibility = 'hidden'; // Hide the cursor before changing text
+    setTimeout(() => {
+      nameElement.textContent = nameTexts[textIndex]; // Set the text content before typing starts
+      charIndex = 0; // Reset charIndex for the new text
+      type();
+    }, 100);
+  }
+}
+type();
+
+
+
+
+
+
+// Function to smoothly update the whole body background color gradient
+function updateBackgroundGradient(color1, color2, color3, color4, cycleDuration) {
+    var currentTime = new Date().getTime();
+    var progress = (currentTime % cycleDuration) / cycleDuration;
+
+    // Determine the color positions
+    var color1Position = (progress * 4) % 1;
+    var color2Position = (color1Position + 0.25) % 1; // 1/4th of the cycle
+    var color3Position = (color2Position + 0.25) % 1; // 2/4th of the cycle
+    var color4Position = (color3Position + 0.25) % 1; // 3/4th of the cycle
+
+    // Interpolate colors based on positions
+    var interpolatedColor1 = interpolateColor(color1, color2, color1Position);
+    var interpolatedColor2 = interpolateColor(color2, color3, color2Position);
+    var interpolatedColor3 = interpolateColor(color3, color4, color3Position);
+    var interpolatedColor4 = interpolateColor(color4, color1, color4Position);
+
+    // Apply gradient background
+    document.body.style.background = "linear-gradient(to right, " +
+        interpolatedColor1 + ", " +
+        interpolatedColor2 + ", " +
+        interpolatedColor3 + ", " +
+        interpolatedColor4 +
+        ")";
+
+    // Request next animation frame
+    requestAnimationFrame(function () {
+        updateBackgroundGradient(color1, color2, color3, color4, cycleDuration);
+    });
+}
+
+// Function to interpolate between two colors
+function interpolateColor(color1, color2, progress) {
+    var r1 = parseInt(color1.substring(1, 3), 16);
+    var g1 = parseInt(color1.substring(3, 5), 16);
+    var b1 = parseInt(color1.substring(5, 7), 16);
+
+    var r2 = parseInt(color2.substring(1, 3), 16);
+    var g2 = parseInt(color2.substring(3, 5), 16);
+    var b2 = parseInt(color2.substring(5, 7), 16);
+
+    var r = Math.round(r1 + (r2 - r1) * progress);
+    var g = Math.round(g1 + (g2 - g1) * progress);
+    var b = Math.round(b1 + (b2 - b1) * progress);
+
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+// Function to convert a component to a hex value
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+// Example usage:
+updateBackgroundGradient("#006400", "#008000", "#00FF00", "#7CFC00", 20000); // 20 seconds per cycle
+
+
+
+
+// Function to smoothly update the whole body background color gradient
+function updateBackgroundGradient() {
+    // Calculate gradient stops
+    var currentTime = new Date().getTime();
+    var cycleDuration = 20000; // 15 seconds per cycle
+    var progress = (currentTime % cycleDuration) / cycleDuration;
+
+    // Determine the color positions
+    var color1Position = (progress * 4) % 1;
+    var color2Position = (color1Position + 0.25) % 1; // 1/4th of the cycle
+    var color3Position = (color2Position + 0.25) % 1; // 2/4th of the cycle
+    var color4Position = (color3Position + 0.25) % 1; // 3/4th of the cycle
+
+    // Interpolate colors based on positions
+    var color1 = interpolateColor("#006400", "#008000", color1Position); // Dark Green to Green
+    var color2 = interpolateColor("#008000", "#00FF00", color2Position); // Green to Lime Green
+    var color3 = interpolateColor("#00FF00", "#7CFC00", color3Position); // Lime Green to Lawn Green
+    var color4 = interpolateColor("#7CFC00", "#006400", color4Position); // Lawn Green to Dark Green
+
+    // Apply gradient background
+    document.body.style.background = "linear-gradient(to right, " + color1 + ", " + color2 + ", " + color3 + ", " + color4 + ")";
+
+    // Request next animation frame
+    requestAnimationFrame(updateBackgroundGradient);
+}
+
+
+
+
+
+    </script>
+</body>
+</html>

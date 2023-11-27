@@ -1,0 +1,336 @@
+<!--
+    The code in this website is licensed under the terms of the GNU General Public License (GPL).
+    You are free to modify and distribute this code, provided that you also distribute it under the GPL.
+    For more details, see: https://www.gnu.org/licenses/gpl-3.0.html
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Other regular meta tags -->
+  <meta charset="utf-8">
+  <title>Your Name Bio | your-alias</title>
+  <meta name="description" content="Biography of Your Name | your-alias">
+  <meta name="author" content="Your Name Bio | your-alias" />
+  
+  <!-- HTML Meta Tags -->
+  <title>Your Name | your-alias</title>
+  <meta name="description" content="Portfolio Website of Your Name | your-alias">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://your_domain.com/bio">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Your Name Bio | your-alias">
+  <meta property="og:description" content="Bio of Your Name | your-alias">
+  <meta property="og:image" content="https://your_domain.com/images/profile/main-profile.jpg">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="your_domain.com">
+  <meta property="twitter:url" content="https://your_domain.com/bio">
+  <meta name="twitter:title" content="Your Name Bio | your-alias">
+  <meta name="twitter:description" content="Portfolio Website of Your Name | your-alias">
+  <meta name="twitter:image" content="https://your_domain.com/images/profile/main-profile.jpg">
+  <meta name="twitter:site" content="@yourtwitterhandle">
+  <!-- Add other meta tags as needed -->
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+
+<link rel="stylesheet" media="screen" href="stylesload.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Bio Page | Your Name | your-alias</title>
+
+  
+<style>
+  /* Hide the breadcrumb container */
+  div[itemtype="http://schema.org/BreadcrumbList"] {
+    display: none;
+  }
+  
+  body {
+    background-image: url(./images/background/bg9.jpg);
+    background-repeat: repeat-y;
+    background-size: 100%;
+    background-attachment: scroll;
+    background-color: black;
+    font-family: Hack, Courier New, Courier, monospace;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+  }
+    
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+    position: relative;
+  }
+    
+  h1 {
+    font-size: 44px;
+    margin-bottom: 20px;
+    color: white;
+  }
+    
+  p {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: green;
+    font-family: Hack, Courier New, Courier, monospace;
+    font-weight: bold;
+  }
+    
+  footer {
+    position: fixed;
+    bottom: 0px;
+    right: 10px;
+    left: 10px;
+    padding: 10px;
+    background-color: silver;
+    color: white;
+    border-radius: 5px;
+    border-style: none;
+    border-color: red;
+    border-width: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+    
+  footer a {
+    text-decoration: none;
+    font-size: 3vw;
+    color: black;
+    font-weight: bold;
+  }
+    
+  footer:hover {
+    text-decoration: none;
+    background-color: silver; 
+
+  }
+
+  footer:hover a {
+    color: black;
+    font-weight: bold;
+  }
+
+  .text-container {
+    font-size: 3vw;
+    margin-bottom: 10px;
+    color: green;
+    font-family: font-family: Hack, Courier New, Courier, monospace;
+    font-weight: bold;
+    white-space: pre-wrap; /* Preserve line breaks */
+    display: inline-block;
+  }
+    
+  .text-container-box {
+    width: 100%;    
+    max-height: 60vh; /* Adjust as needed */
+    overflow-y: auto;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffeeeb;
+    margin-bottom: 20px;
+      
+  }
+
+  .button-container {
+    position: sticky;
+    top: 10px;
+    /*transform: translateX(-50%);*/
+  }
+
+  .button {
+    display: inline-block;
+    font-size: 1.5vw;
+    background-color: #0f7787;
+    padding: 10px 10px;
+    border: 2px solid #0066cc;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 50px;
+    transition: background-color 0.5s ease;
+    transform: translateY(0);
+    width:40%;
+    max-width: 280px; /* Limit maximum width */
+    /*border: outset;*/
+    font-family: monospace, "Courier New", Courier ;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #c2f5fc;
+    cursor: pointer;
+    /*transition: background-color 0.3s ease;*/
+    margin: 5px;
+  }
+    
+  .button:hover {
+    transition: background-color 0.5s ease;
+    padding: 10px 10px;
+    transform : translateY(-0px);
+    background-color: #fff;
+    color: #0f7787;
+    border: solid 2px #0066cc;
+  }
+    
+  .typing-cursor {
+    display: inline-block;
+    animation: blink 1s infinite;
+    opacity: 1;
+  }
+    
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+    
+</style>
+  
+  
+<script>
+  var colors = ['#bd0029', '#584fe0', '#1896f0', '#13d1ed', '#0cf0e4', '#12dea1', '#0bd961', '#d9a90b'];
+  var fonts = ['monospace', 'courier-new', 'courier', 'hack'];
+  var currentColorIndex = 0;
+  var currentFontIndex = 0;
+
+  function cycleTextStyle() {
+    var textContainer = document.getElementById("textContainer");
+    
+    // Change text color
+    var color = colors[currentColorIndex];
+    textContainer.style.color = color;
+    currentColorIndex = (currentColorIndex + 1) % colors.length;
+
+    // Change font family
+    var fontFamily = fonts[currentFontIndex]; // Use a proper variable name without a hyphen
+    textContainer.style.fontFamily = fontFamily;
+    currentFontIndex = (currentFontIndex + 1) % fonts.length;
+  }
+
+
+  function speakText(text) {
+    const speechSynthesis = window.speechSynthesis;
+
+    // Check if speech synthesis is supported in the current browser
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.volume = 1.9;
+      speechSynthesis.speak(utterance);
+    } else {
+      // Handle the case where speech synthesis is not supported
+      alert('Speech synthesis is not supported in this browser.');
+    }
+  }
+
+  function typeText(element, text, delay, callback) {
+    var chars = text.split('');
+    var i = 0;
+    var interval = setInterval(function () {
+      if (i >= chars.length) {
+        clearInterval(interval);
+        if (callback) {
+          callback();
+        }
+          return;
+    }
+    element.innerHTML += chars[i];
+      i++;
+    }, delay);
+  }
+
+  function startTyping() {
+    var textContainer = document.getElementById("textContainer");
+    var cursorElement = document.createElement('span');
+    cursorElement.classList.add('typing-cursor');
+    cursorElement.innerHTML = '|';
+    var text = textContainer.innerHTML;
+    textContainer.innerHTML = '';
+    typeText(textContainer, text, 50, function () {
+      textContainer.appendChild(cursorElement);
+    });
+  }
+    
+</script>
+  
+</head>
+<body>
+    
+<div itemscope itemtype="http://schema.org/BreadcrumbList">
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com">
+      <span itemprop="name">Home</span>
+    </a>
+    <meta itemprop="position" content="1" />
+  </span>
+  
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/bio">
+      <span itemprop="name">Bio</span>
+    </a>
+    <meta itemprop="position" content="2" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/contacts">
+      <span itemprop="name">Contact</span>
+    </a>
+    <meta itemprop="position" content="3" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/#projects">
+      <span itemprop="name">Projects</span>
+    </a>
+    <meta itemprop="position" content="4" />
+  </span>
+
+  <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+    <a itemprop="item" href="http://iceman404.com/skills">
+      <span itemprop="name">Skills</span>
+    </a>
+    <meta itemprop="position" content="5" />
+  </span>
+</div>
+    
+
+<div class="container">
+  <h1>Bio Page</h1>
+  <div class="button-container">
+    <button class="button" onclick="speakText('Greetings, I am [Your Name]! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+')">Read Aloud</button>
+      <button class="button" onclick="cycleTextStyle()">Cycle Text-Style</button>
+  </div>
+  <br>
+      
+  <div class="text-container-box">
+    <div id="textContainer" class="text-container">Greetings, I am [Your Name]! "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+"</div>
+    </div>
+</div>
+
+<br><br>
+
+<footer>
+  <a href="index.html">Back to Main Page</a>
+</footer>
+
+<script>
+  window.onload = startTyping;
+</script>
+
+</body>
+</html>
