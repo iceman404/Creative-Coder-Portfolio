@@ -30,8 +30,8 @@ Welcome to my portfolio project! This project is designed to help students creat
    - **Add your name in the header to be displayed in the relevant function.**
    - **Update or add navigation links in the nav section.**
 
-#### Contacts Section
-   - **Replace relevant tags with your personal information.**
+#### Bio Section
+   - **Replace relevant content with your personal information.**
 
 #### Projects Section
    - **Update project details, images, and links.**
@@ -40,6 +40,13 @@ Welcome to my portfolio project! This project is designed to help students creat
 #### Contact Section
    - **Update your contact information or social media links in relevant places.**
 
+#### Skills Section
+   - **For changing the background color you can combine from a list of your 4 colors to give the glow effect from the margin gaps.**
+   - **For displaying the name typing effect you can add your desired names in the name lists.**
+   - **Hover tiles are hardcoded for increasing the responsiveness of page.**
+   - **Download Resume takes the pdf file from the resume directory.**
+   - **Update your skills in the skills.html file. Pre tag is used so when adding skills description put no more than 3 words in 1 line.**
+   - **Logos are in the assets directory.**
 
 ### `CSS (styles.css)`
 
@@ -62,6 +69,7 @@ Welcome to my portfolio project! This project is designed to help students creat
 
 
 If you have any questions or need further assistance, feel free to reach out:
+   Experience section is not added at this version. But it can be added as another nav link with experience html file.
 
 - **Name: [![Button](https://img.shields.io/badge/John-Subba-008491)](https://github.com/iceman404/iceman404/blob/main/AboutMe.md)**
 - **Email: [![Button](https://img.shields.io/badge/johnsubba404@gmail.com-09C4D0)](https://mail.google.com/mail/?view=cm&to=johnsubba404@gmail.com)**
