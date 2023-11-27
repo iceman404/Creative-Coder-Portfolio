@@ -1,0 +1,169 @@
+<!--
+    The code in this website is licensed under the terms of the GNU General Public License (GPL).
+    You are free to modify and distribute this code, provided that you also distribute it under the GPL.
+    For more details, see: https://www.gnu.org/licenses/gpl-3.0.html
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <title>Project in C | Your Name | your_alias</title>
+  
+<style>
+  /* Add CSS styles for the project1 page */
+  /* Example styles for the header */
+  body {
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	font-weight: bold;
+    line-height: 1.6;
+    background-color: #f2f2f2;
+    transition: background-color 0.3s ease;
+  }
+  
+  header {
+    background-color: rgba(51, 51, 51, 0.8);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 30px;
+  }
+    
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: transparent;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  }
+    
+  h2 {
+    font-family: Hack, Courier New, Courier, monospace;
+	font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  p {
+    margin-bottom: 10px;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	font-weight: bold;
+  }
+  
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  footer a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .theme-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .theme-button:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .dark-theme {
+    background-color: #333;
+    color: green;
+  }
+  
+  .dark-theme header {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .dark-theme .container {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: green;
+  }
+  
+  .dark-theme h2 {
+    color: green;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	font-weight: bold;
+  }
+    
+  .dark-theme p {
+    color: green;
+    font-family: Hack, Courier New, Courier, monospace;
+	font-size: 18px;
+	font-weight: bold;
+  }
+  
+  .dark-theme footer {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+  }
+  
+</style>
+
+
+<script>
+  // JavaScript function to toggle the theme
+  function toggleTheme() {
+    const body = document.querySelector('body');
+    body.classList.toggle('dark-theme');
+  }
+  
+</script>
+
+
+</head>
+<body>
+  <button class="theme-button" onclick="toggleTheme()">Toggle Theme</button>
+  <header>
+    <h1>Project in C</h1>
+  </header>
+  <div class="container">
+    <h2>Entrance Exam Software</h2>
+    <p>***********************************</p>
+    <ul>
+    <li> Abc semester project in C Programming language.</li><br>
+    <li> Console Based Application.</li><br>
+    <li> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><br>
+    <li> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li><br>
+    </ul>
+    <p>
+      <a href="https://github.com/" target="_blank">
+        <button>Github Link</button>
+      </a>
+    </p>
+    <p>***********************************</p>
+  </div>
+  
+  <footer>
+    <a href="../index.html">Back to Main Page</a>
+  </footer>
+  
+</body>
+</html>
