@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>http://iceman404.com</loc>
+        <loc>http://your_domain.com</loc>
         <priority>1</priority>
     </url>
     <url>
-        <loc>http://iceman404.com/bio</loc>
+        <loc>http://your_domain.com/bio</loc>
         <changefreq>always</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>http://iceman404.com/contact</loc>
+        <loc>http://your_domain.com/contact</loc>
         <changefreq>always</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>http://iceman404.com/skills</loc>
+        <loc>http://your_domain.com/skills</loc>
         <changefreq>always</changefreq>
         <priority>0.8</priority>
     </url>
