@@ -10,11 +10,11 @@ If you want the beauty of plain vanilla than you are at the right place.
 
 ## `Screenshots:`
 <span>
-<img src="./screenshots/0.png" width="400" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
-<img src="./screenshots/1.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
-<img src="./screenshots/2.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
-<img src="./screenshots/3.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
-<img src="./screenshots/4.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
+<img src="./screenshots/0.png" width="400" height="280" style="border-radius: 10px; box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; margin: 5px;">
+<img src="./screenshots/1.png" width="400" height="280" style="border-radius: 10px; box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; margin: 5px;">
+<img src="./screenshots/2.png" width="400" height="280" style="border-radius: 10px; box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; margin: 5px;">
+<img src="./screenshots/3.png" width="400" height="280" style="border-radius: 10px; box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; margin: 5px;">
+<img src="./screenshots/4.png" width="400" height="280" style="border-radius: 10px; box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; margin: 5px;">
 </span>
 
 ## `Getting Started:`
