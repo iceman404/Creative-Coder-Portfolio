@@ -9,13 +9,13 @@ If you want the beauty of plain vanilla than you are at the right place.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
 ## `Screenshots:`
-
+<span>
 <img src="./screenshots/0.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
 <img src="./screenshots/1.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
 <img src="./screenshots/2.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
 <img src="./screenshots/3.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
 <img src="./screenshots/4.png" width="420" height="280" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 5px;">
-
+</span>
 
 ## `Getting Started:`
 
