@@ -8,6 +8,9 @@ If you want the beauty of plain vanilla than you are at the right place.
 - **Responsive Design:** The portfolio is designed to be responsive and work well on various devices.
 - **Interactive Sections:** Use of JavaScript to add interactivity to your portfolio.
 
+## `Screenshots:`
+
+<img src="./screenshots/0.png" width="200" height="200">
 
 ## `Getting Started:`
 
