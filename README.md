@@ -10,7 +10,7 @@ If you want the beauty of plain vanilla than you are at the right place.
 
 ## `Screenshots:`
 
-<img src="./screenshots/0.png" width="720" height="480"><img src="./screenshots/1.png" width="720" height="480"><img src="./screenshots/2.png" width="720" height="480"><img src="./screenshots/3.png" width="720" height="480">
+<img src="./screenshots/0.png" width="420" height="280"><img src="./screenshots/1.png" width="420" height="280"><img src="./screenshots/2.png" width="420" height="280"><img src="./screenshots/3.png" width="420" height="280"><img src="./screenshots/4.png" width="420" height="280">
 
 ## `Getting Started:`
 
