@@ -37,12 +37,12 @@
 
 ### Why This Portfolio?
 
-- ✅ **Pure Vanilla**: No dependencies, no build process, just pure HTML, CSS, and JavaScript
-- ✅ **Fully Responsive**: Works seamlessly on desktop, tablet, and mobile devices
-- ✅ **SEO Optimized**: Includes proper meta tags, structured data, and breadcrumb navigation
-- ✅ **Performance Focused**: Lightweight and fast-loading
-- ✅ **Easy to Customize**: Well-organized code with clear comments
-- ✅ **Modern Design**: Beautiful UI with particle effects and smooth animations
+- **Pure Vanilla**: No dependencies, no build process, just pure HTML, CSS, and JavaScript
+- **Fully Responsive**: Works seamlessly on desktop, tablet, and mobile devices
+- **SEO Optimized**: Includes proper meta tags, structured data, and breadcrumb navigation
+- **Performance Focused**: Lightweight and fast-loading
+- **Easy to Customize**: Well-organized code with clear comments
+- **Modern Design**: Beautiful UI with particle effects and smooth animations
 
 ---
 
