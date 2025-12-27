@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Iceman404 Bio V11 | John Subba</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Bio page of John Subba (iceman404) - Learn about my journey, interests, and background in technology and AI.">
+<link rel="canonical" href="https://www.iceman404.com/bio" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.iceman404.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Bio",
+      "item": "https://www.iceman404.com/bio"
+    }
+  ]
+}
+</script>
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #111;
+    background-image: url('/images/profile/mine1.avif');
+    background-size: cover;
+    background-position: center;
+    color: #eee;
+    perspective: 1500px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 60px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #00ccdd;
+    text-align: center;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+    margin-bottom: 40px;
+  }
+
+  .bio-section {
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-left: 6px solid #cc241d;
+    border-radius: 16px;
+    font-size: 20px;
+    min-height: 120px;
+    transition: all 0.5s ease;
+    backdrop-filter: blur(8px) saturate(130%);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    transform-style: preserve-3d;
+  }
+
+  .bio-section:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-10px) rotateX(2deg) rotateY(2deg) scale(1.03);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+    border-left-color: #00ccdd;
+  }
+
+  .bio-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+    color: #ff9900;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .typing {
+    color: #000000;
+    font-weight: bold;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-shadow: 
+      0 0 5px rgba(255,255,255,202),
+      0 0 10px rgba(255,255,255,206),
+      0 0 15px rgba(255,255,255,204);
+   }
+
+
+  .typing::after {
+    content: '|';
+    animation: blink 1s step-start infinite;
+    color: #00ccdd;
+    font-weight: bold;
+    margin-left: 2px;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    font-size: 16px;
+  }
+
+  footer a {
+    color: #00ccdd;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+
+  footer a:hover { color: #ff9900; text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    .bio-section { font-size: 18px; padding: 15px; border-radius: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Once Upon a Time in the Life of Iceman404</h1>
+
+  <div class="bio-section"><h2>Who Am I?</h2><div id="typingEffect1" class="typing"></div></div>
+  <div class="bio-section"><h2>My Hidden Facts:</h2><div id="typingEffect2" class="typing"></div></div>
+  <div class="bio-section"><h2>Other Fun Files:</h2><div id="typingEffect3" class="typing"></div></div>
+  <div class="bio-section"><h2>In My Spare Time:</h2><div id="typingEffect4" class="typing"></div></div>
+  <div class="bio-section"><h2>My Favourite Quotes:</h2><div id="typingEffect5" class="typing"></div></div>
+
+  <footer><a href="/index">Back to Main Page</a></footer>
+</div>
+
+<script>
+const texts = [
+  { text: `Hi! I'm John, a lifelong learner and tech enthusiast who's main goal is to get deep into AI and technology!
+My passion for AI is so strong that I’ve tried to teach my quadcopter how to fly by sending more voltages as a form of punishment reward.
+I'm basically a lifelong learner, mostly because I keep forgetting what I learned last week. 😁`, id:"typingEffect1" },
+  { text: `I've logged 15,000 hours in Dota 2, most of which were spent farming and wondering who pressed the glyph and why my teammates can't read a map. 😁`, id:"typingEffect2" },
+  { text: `Oh, you know, I can recite the longest place name in the world: Taumatawhakatangihangakoauauotamateaturipukakapikimaungahoronukupokaiwhenuakitanatahu
+with my eyes closed.
+I can also solve a 3x3 Rubik's cube in under 2 minutes, both by color and spatial orientation too just using my bare hands 😉.
+And I have a thing for high IQs too.
+I once tried to impress someone by solving a Rubik’s Cube in under two minutes. They were impressed and I was relieved that I didn't mess it up. 😁`, id:"typingEffect3" },
+  { text: `In my spare time, I build custom neural networks for UAVs, for real-world applications.`, id:"typingEffect4" },
+  { text: `As my favorite philosopher once said: "If you can't dazzle them with brilliance, baffle them with nonsense" 😁`, id:"typingEffect5" }
+];
+
+const delay = 35;
+
+async function typeText({text, id}) {
+  const el = document.getElementById(id);
+  let i = 0;
+  return new Promise(resolve => {
+    function step() {
+      if (i < text.length) {
+        el.innerHTML += text[i] === "\n" ? "<br>" : text[i];
+        i++;
+        setTimeout(step, delay);
+      } else resolve();
+    }
+    step();
+  });
+}
+
+(async function runAll() {
+  for (let t of texts) await typeText(t);
+})();
+
+// Optional: Scroll effect for 3D tilt
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.bio-section').forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    const rotateX = ((rect.top/window.innerHeight)-0.5)*10;
+    const rotateY = ((rect.left/window.innerWidth)-0.5)*10;
+    sec.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+});
+</script>
+</body>
+</html>

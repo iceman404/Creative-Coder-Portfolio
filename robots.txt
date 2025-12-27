@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /private/          # Disallow private sections
+Disallow: /temp/             # Disallow temp folders
+
+# Allow everything else
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.iceman404.com/sitemap.xml

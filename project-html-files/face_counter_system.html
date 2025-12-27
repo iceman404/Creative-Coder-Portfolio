@@ -1,0 +1,319 @@
+<!--
+/* -----------------------------------------------
+/* Author: iceman404.com
+/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
+/* GitHub: https://github.com/iceman404/face_count_system (Placeholder)
+/* v1 - Face Count System and Buzzer Alert System
+/* ----------------------------------------------- */
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Face Count System & Buzzer Alert | John Subba | iceman404</title>
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://www.iceman404.com/project-html-files/face_counter_system" />
+  <meta name="description" content="Face Counter System and Buzzer Alert by John Subba (iceman404). Edge-ML project using ESP32 for real-time face detection and counting.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.iceman404.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Projects",
+        "item": "https://www.iceman404.com#projects"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Face Counter System",
+        "item": "https://www.iceman404.com/project-html-files/face_counter_system"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* Gruvbox Light Theme Colors */
+    :root {
+      --bg-light: #fbf1c7;
+      --container-bg: #ebdbb2;
+      --header-footer-bg: #d5c4a1;
+      --text-color: #3c3836;
+      --accent-color: #98971a;
+    }
+
+    /* Core Styling */
+    body {
+      font-family: 'Hack', 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.6;
+      background-color: var(--bg-light);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding: 20px;
+      margin: 0;
+    }
+
+    header {
+      background-color: rgba(51, 51, 51, 0.9);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 30px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 40px;
+      background: var(--container-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--text-color);
+      padding-bottom: 5px;
+    }
+
+    p, li {
+      font-size: 18px;
+    }
+
+    ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+
+    .highlight {
+      background-color: var(--text-color);
+      color: var(--accent-color);
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      background: var(--header-footer-bg);
+      border-radius: 10px;
+      box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+      color: var(--text-color);
+    }
+
+    footer a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: bold;
+    }
+
+    .theme-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      border: none;
+      background: var(--header-footer-bg);
+      color: var(--text-color);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .theme-button:hover {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    /* Button Styling */
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: var(--header-footer-bg);
+      color: var(--text-color);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    /* Dark Mode - All text turns green */
+    .dark-theme {
+      background-color: #3c3836;
+      color: green;
+    }
+
+    .dark-theme header,
+    .dark-theme .container {
+      background-color: #504945;
+      color: green;
+    }
+
+    .dark-theme footer {
+      background-color: #504945;
+      color: green;
+    }
+
+    .dark-theme .theme-button {
+      background: #504945;
+      color: green;
+    }
+
+    /* Responsive pre element */
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      background-color: #f6f6f6;
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+    }
+  </script>
+  
+</head>
+<body>
+  <button class="theme-button" onclick="toggleTheme()">Toggle Theme</button>
+
+  <header>
+    <h1>Face Count System &amp; Buzzer Alert System</h1>
+  </header>
+
+  <div class="container">
+    <h2>Project Overview</h2>
+    <p>This project involves a distributed system using <span class="highlight">ESP32 modules</span> to stream video, detect and count human faces, and trigger a buzzer when a set face count limit is reached. The system consists of three main components:</p>
+    <ul>
+      <li><strong>ESP32-CAM Module:</strong> Streams live video.</li>
+      <li><strong>Face Detection Server:</strong> Processes the video stream to count faces.</li>
+      <li><strong>Pocket ESP32 Module:</strong> Receives face count updates, shows it on an LED, and triggers a buzzer in real-time.</li>
+    </ul>
+
+    <h2>How It Works</h2>
+    <ul>
+      <li><strong>Video Streaming:</strong> The ESP32-CAM captures and streams live video to the Face Detection Server.</li>
+      <li><strong>Face Detection:</strong> The Face Detection Server processes the stream using face detection algorithms and counts the number of faces.</li>
+      <li><strong>Real-Time Updates:</strong> The Pocket ESP32 Module receives face count data and triggers the buzzer based on predefined conditions.</li>
+    </ul>
+
+    <h2>Technologies Used</h2>
+    <ul>
+      <li><strong>ESP32-CAM Module:</strong> For video capture and streaming.</li>
+      <li><strong>OpenCV:</strong> For face detection and image processing.</li>
+      <li><strong>Python/Node.js:</strong> For the Face Detection Server implementation.</li>
+      <li><strong>MQTT/HTTP:</strong> For communication between the Face Detection Server and Pocket ESP32 Module.</li>
+      <li><strong>Raspberry Pi/Computer:</strong> To run the Face Detection Server.</li>
+    </ul>
+
+    <h2>Project Components</h2>
+    <h3>ESP32-CAM (Video Stream)</h3>
+    <p><strong>Function:</strong> Streams live video feed.</p>
+    <ul>
+      <li><strong>Endpoints:</strong> <code>/</code> (provides video stream)</li>
+      <li><strong>Controls:</strong> Start Stream (starts video streaming)</li>
+    </ul>
+
+    <h3>Pocket ESP32 Module (Buzzer + LED Control)</h3>
+    <p><strong>Function:</strong> Controls buzzer and LED based on face count.</p>
+    <ul>
+      <li><strong>Endpoints:</strong> <code>/on</code>, <code>/off</code>, <code>/update_count</code></li>
+      <li><strong>Controls:</strong> Turn On/Off (toggles buzzer and LED)</li>
+    </ul>
+
+    <h3>Flask Face Count Server</h3>
+    <p><strong>Function:</strong> Processes video stream, performs face detection, and tracks faces.</p>
+    <ul>
+      <li><strong>Endpoints:</strong> <code>/video_feed</code> (provides video feed with face detection), <code>/counts</code> (returns count of detected faces)</li>
+      <li><strong>Web Interface:</strong> Real-time video feed and face count updates</li>
+    </ul>
+
+    <h2>Setup Instructions</h2>
+    <h3>ESP32-CAM Configuration</h3>
+    <ul>
+      <li>Update Wi-Fi credentials and upload the code via Arduino IDE.</li>
+      <li>Ensure the camera stream is accessible via HTTP.</li>
+    </ul>
+
+    <h3>ESP32 Server Configuration</h3>
+    <ul>
+      <li>Update Wi-Fi credentials and upload code via Arduino IDE.</li>
+      <li>Controls the buzzer and LED based on face count updates.</li>
+    </ul>
+
+    <h3>Flask Server Setup</h3>
+    <ul>
+      <li>Install required Python packages (Flask, OpenCV, MediaPipe, Requests, etc.).</li>
+      <li>Run <code>python server.py</code> to start the Flask server.</li>
+      <li>Access the web interface </li>
+    </ul>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>ESP32-CAM:</strong> Power on the camera module and connect via IP address to view the live feed.</li>
+      <li><strong>ESP32 Server:</strong> Send HTTP requests (<code>/on</code>, <code>/off</code>) to toggle the buzzer and LED. Check the serial monitor for the assigned IP.</li>
+      <li><strong>Flask Server:</strong> Monitor the live video feed and face count updates via the web interface or IP address.</li>
+    </ul>
+
+    <!-- Optional Button Container for GitHub/YouTube if needed -->
+    <div class="button-container">
+      <a href="https://github.com/iceman404/face_count_system" target="_blank">
+        <button>GitHub Repository</button>
+      </a>
+      <a href="https://www.youtube.com" target="_blank">
+        <button>YouTube Channel</button>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <a href="../index">Back to Main Page</a>
+  </footer>
+
+</body>
+</html>

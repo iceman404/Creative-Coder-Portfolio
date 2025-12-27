@@ -1,0 +1,217 @@
+<!--
+/* -----------------------------------------------
+/* Author: iceman404.com
+/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
+/* GitHub: https://github.com/iceman404/esp32_openhardware_drone
+/* v1 - ESP32 Open Hardware Drone
+/* ----------------------------------------------- */
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>ESP32 Open Hardware Drone | John Subba | iceman404</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://www.iceman404.com/project-html-files/open_hardware_drone" />
+  <meta name="description" content="ESP32 Open Hardware Drone by John Subba (iceman404). Custom UAV project with ESP32 microcontroller and open hardware design.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.iceman404.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Projects",
+        "item": "https://www.iceman404.com#projects"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Open Hardware Drone",
+        "item": "https://www.iceman404.com/project-html-files/open_hardware_drone"
+      }
+    ]
+  }
+  </script>
+  
+  <style>
+    /* Core Styling */
+    body {
+      font-family: 'Hack', 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.6;
+      background-color: #f2f2f2;
+      color: #000;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: rgba(51, 51, 51, 0.9);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 30px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 5px;
+    }
+    
+    p, li {
+      font-size: 18px;
+    }
+    
+    ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+    
+    .highlight {
+      background-color: #222;
+      color: green;
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+    
+    footer a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    
+    .theme-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      border: none;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 5px;
+    }
+    
+    .theme-button:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Dark Mode */
+    .dark-theme {
+      background-color: #111;
+      color: green;
+    }
+    
+    .dark-theme header,
+    .dark-theme .container {
+      background-color: #222;
+    }
+    
+    .dark-theme footer {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+    }
+  </style>
+  
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+    }
+  </script>
+  
+</head>
+<body>
+  <button class="theme-button" onclick="toggleTheme()">Toggle Theme</button>
+
+  <header>
+    <h1>ESP32 Open Hardware Drone</h1>
+  </header>
+
+  <div class="container">
+    <h2>Project Overview</h2>
+    <p>
+      The <span class="highlight">ESP-32 Open Hardware Drone</span> project leverages the power of the ESP32 microcontroller to create an advanced, fully customizable drone system. Built on a robust 330 frame, this drone is equipped with four <strong>1000KVA BLDC motors</strong> paired with <strong>8-inch propellers</strong>, ensuring high performance and stability in flight.
+    </p>
+
+    <h2>Key Features</h2>
+    <ul>
+      <li><strong>High-Performance Flight:</strong> Uses four 1000KVA BLDC motors with 8-inch propellers for exceptional thrust and maneuverability.</li>
+      <li><strong>Robust Frame:</strong> Built on a sturdy 330 frame that provides durability and stability.</li>
+      <li><strong>ESP32 Integration:</strong> Utilizes the ESP32 microcontroller for advanced flight control, telemetry, and IoT connectivity.</li>
+      <li><strong>Open Hardware:</strong> Fully open-source design for easy customization, upgrades, and community collaboration.</li>
+      <li><strong>Modular Design:</strong> Allows for integration of additional sensors and modules for extended functionalities such as GPS, obstacle avoidance, and real-time video streaming.</li>
+    </ul>
+
+    <h2>How It Works</h2>
+    <ul>
+      <li><strong>Flight Control:</strong> The ESP32 processes sensor data and controls motor speed via electronic speed controllers (ESCs) to stabilize the drone.</li>
+      <li><strong>Communication:</strong> Wireless connectivity enables real-time telemetry, remote control, and data exchange with ground stations or mobile devices.</li>
+      <li><strong>Power Management:</strong> Efficient power distribution ensures optimal performance of motors and onboard electronics.</li>
+    </ul>
+
+    <h2>Technologies Used</h2>
+    <ul>
+      <li><strong>ESP32 Microcontroller:</strong> For flight control, sensor integration, and wireless communication.</li>
+      <li><strong>BLDC Motors:</strong> Four high-power 1000KVA brushless DC motors for robust flight performance.</li>
+      <li><strong>Propellers:</strong> 8-inch propellers designed for optimal lift and efficiency.</li>
+      <li><strong>Open Hardware Framework:</strong> Fully customizable design enabling modifications and enhancements.</li>
+      <li><strong>Additional Sensors (Optional):</strong> GPS, IMU, and obstacle detection modules for enhanced autonomy.</li>
+    </ul>
+
+    <h2>License</h2>
+    <p>This project is licensed under the <strong>MIT License</strong>.</p>
+
+    <p>
+      <a href="https://github.com/iceman404/esp32_openhardware_drone" target="_blank">
+        <button>GitHub Repository</button>
+      </a>
+    </p>
+  </div>
+
+  <footer>
+    <a href="../index">Back to Main Page</a>
+  </footer>
+
+</body>
+</html>

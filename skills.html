@@ -1,0 +1,983 @@
+<!--
+/* -----------------------------------------------
+/* Author: iceman404.com
+/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
+/* Original GitHub: https://github.com/iceman404/Creative-Coder-Portfolio
+/* How to use? Check the GitHub README
+/* v1
+/* -----------------------------------------------
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="canonical" href="https://www.iceman404.com/skills" />
+  <title>Skills? Oh, You Mean My expertise... Ok | John Subba | iceman404</title>
+  <meta
+    name="description"
+    content="Here's a list of things I'm awesome at, ranging from tech to overthinking. What do I bring to the table (besides humor and a questionable amount of coffee consumption)? Guess what, You have to find it out yourself..."
+  >
+  <meta name="author" content="John Subba | iceman404" />
+  <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
+  <style>
+    :root {
+      --header-height: 12vh;
+      --footer-height: 1.2vh;
+      --content-padding: 2vh;
+      --primary-color: #005c66;
+      --secondary-color: #00b9cc;
+      --accent-color: #06e8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: scroll;
+      background: 
+        linear-gradient(135deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%) -50px 0,
+        linear-gradient(225deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%) -50px 0,
+        linear-gradient(315deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%);
+      background-size: 100px 100px;
+      background-color: #f8fdff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Enhanced Real Raindrops - Slower and More Visible */
+    body {
+      background-color: #001a1f;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .raindrop {
+      position: fixed;
+      width: 3px; /* Slightly wider */
+      height: 25px; /* Longer raindrops */
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0, 184, 204, 0.9), /* More opaque */
+        rgba(0, 184, 204, 0.7)  /* More visible */
+      );
+      border-radius: 0 0 3px 3px;
+      animation: rainFall linear forwards;
+      z-index: 0;
+      pointer-events: none;
+      filter: drop-shadow(0 0 2px rgba(0, 184, 204, 0.5)); /* Glow effect */
+    }
+
+    .raindrop::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      border-radius: 0 0 3px 3px;
+    }
+
+    .raindrop::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-500%);
+      width: 6px; /* Larger ripple */
+      height: 6px;
+      background: rgba(0, 184, 204, 0.6);
+      border-radius: 50%;
+      animation: ripple 5s ease-out forwards; /* Slower ripple */
+      opacity: 0;
+      box-shadow: 0 0 8px rgba(0, 184, 204, 0.8); /* Ripple glow */
+    }
+
+    @keyframes rainFall {
+      to { 
+        transform: translateY(100vh);
+        opacity: 0.7; /* Fade out slightly at the end */
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: translateX(-50%) scale(0);
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateX(-50%) scale(3);
+        opacity: 0;
+      }
+    }
+
+    /* Enhanced static background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(90deg, transparent 10px, #abced4 10px, #abced4 12px, transparent 12px),
+        linear-gradient(#eee .1em, transparent .1em);
+      background-size: 100% 1.2em;
+      background-color: #f8fdff;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Rest of your existing CSS remains the same */
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      font-family: Hack, "Courier New", Courier, monospace;
+      font-weight: bold;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #name-container {
+      font-size: clamp(1rem, 3vw, 2rem);
+      display: flex;
+      align-items: center;
+    }
+
+    .cursor {
+      animation: blinkCursor 1s infinite;
+    }
+
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: var(--footer-height);
+      z-index: 10;
+    }
+
+    .top-button {
+      position: fixed;
+      top: calc(var(--header-height) + 10px);
+      left: 10px;
+      z-index: 11;
+    }
+
+    .button-description {
+      background: linear-gradient(145deg, var(--secondary-color), var(--primary-color));
+      font-family: Hack, Courier New, Courier, monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-block;
+      width: 110px;
+      height: 40px;
+      padding: 8px 12px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 20px;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button-description:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(145deg, var(--accent-color), var(--secondary-color));
+    }
+
+    /* Floating Tech Icons Background */
+    .floating-tech {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .tech-icon {
+      position: absolute;
+      font-size: 24px;
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+
+    /* Transparent overlay */
+    .overlay {
+      position: fixed;
+      top: calc(var(--header-height) + var(--content-padding));
+      bottom: calc(var(--footer-height) + var(--content-padding));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(253, 254, 254, 0.6);
+      box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+        rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+        rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+      z-index: 2;
+      width: 84vw;
+      overflow: auto;
+      border-radius: 10px;
+    }
+
+    .overlay-content {
+      font-size: clamp(0.9rem, 1.7vw, 1.5rem);
+      font-family: monospace;
+      text-align: center;
+      color: #000;
+      padding: 20px;
+      border-radius: 10px;
+      pointer-events: auto;
+      position: relative;
+      z-index: 3;
+    }
+
+    .overlay-content img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10%;
+      margin-bottom: 4px;
+    }
+
+    .overlay-content a {
+      color: #000;
+      text-decoration: none;
+      font-size: 18px;
+      display: block;
+      margin-bottom: 10px;
+      pointer-events: auto;
+    }
+
+    .skills-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .skills-column {
+      width: 48%;
+      text-align: left;
+      margin-bottom: 20px;
+      padding: 7px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(1, 1, 0, 0.2);
+    }
+
+    .progress-bar {
+      height: 1.4vh;
+      width: 70%;
+      background-color: #eafdff;
+      border-radius: 15px;
+      overflow: hidden;
+      margin-bottom: 4px;
+      margin-left: 10px;
+      position: relative;
+    }
+
+    .progress-bar span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      border-radius: 15px;
+      position: absolute;
+      top: 0;
+      width: 0;
+      transition: width 1s ease;
+      line-height: 20px;
+      text-align: center;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .programming-language {
+      width: 100%;
+      height: auto;
+      padding: 4px;
+      z-index: 3;
+      border-radius: 10px;
+      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
+        rgba(0, 0, 0, 0.22) 0px 15px 12px;
+      margin-bottom: 16px;
+      position: relative;
+      background: white;
+    }
+
+    .page {
+      width: 100%;
+      height: auto;
+      max-height: 30vh;
+      overflow-y: auto;
+      color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      background-color: #0094a3;
+      font-size: clamp(0.8rem, 1.4vw, 1.2rem);
+      padding: 2px;
+      text-align: left;
+      margin: 4px;
+    }
+
+    .code-block {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-family: hack, monospace;
+      background-color: #F6E3B4;
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .code-block p {
+      font-size: clamp(0.8rem, 1.4vw, 1.2rem);
+      color: #000e10;
+    }
+
+    /* Desktop hover effects - remove media query restrictions */
+    .programming-language:hover {
+      transform: translateY(-8px) rotate(1deg);
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 184, 204, 0.4),
+        inset 0 0 15px rgba(255, 255, 255, 0.8);
+      z-index: 4;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+      border: 1px solid rgba(0, 184, 204, 0.3);
+    }
+
+    /* Glow effect on hover */
+    .programming-language:hover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 10px;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 184, 204, 0.1) 0%,
+        transparent 50%,
+        rgba(6, 232, 255, 0.1) 100%
+      );
+      z-index: -1;
+    }
+
+    /* Paper texture effect on hover */
+    .programming-language:hover .code-block {
+      background-color: #F9F0D9;
+    }
+
+    /* Progress bar enhancement on hover */
+    .programming-language:hover .progress-bar span {
+      box-shadow: 0 0 10px rgba(0, 184, 204, 0.6);
+    }
+
+    /* Add the media query for mobile responsiveness */
+    @media (max-width: 879px) {
+      .skills-column {
+        width: 100%;
+      }
+
+      .programming-language {
+        width: 100%;
+        height: auto;
+        padding: 4px;
+        z-index: 3;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
+          rgba(0, 0, 0, 0.22) 0px 15px 12px;
+        margin-bottom: 16px;
+        position: relative;
+        background: white;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        transform: translateY(0) rotate(0deg);
+      }
+
+      /* Mobile touch support - simplified */
+      .programming-language:active {
+        transform: translateY(-4px) rotate(0.5deg);
+        box-shadow: 
+          0 10px 20px rgba(0, 0, 0, 0.25),
+          0 0 15px rgba(0, 184, 204, 0.3);
+        transition: transform 0.1s ease;
+      }
+
+      .page {
+        width: 100%;
+        height: auto;
+        max-height: none;
+      }
+      
+      .overlay {
+        width: 95vw;
+        top: calc(var(--header-height) + 5px);
+        bottom: calc(var(--footer-height) + 5px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .overlay-content {
+        padding: 10px;
+      }
+      
+      .skills-column {
+        padding: 5px;
+      }
+    }
+
+    @keyframes blinkCursor {
+      0% {
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.iceman404.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Skills",
+          "item": "https://www.iceman404.com/skills"
+        }
+      ]
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div id="name-container">
+      <span id="name"></span>
+      <span id="cursor" class="cursor">|</span>
+    </div>
+  </header>
+  
+  <div class="top-button">
+    <button class="button-description" onclick="handleProjectSelection('/index')">
+      <span>Home</span>
+    </button>
+  </div>
+  
+  <!-- Floating Tech Icons Background -->
+  <div class="floating-tech" id="floatingTech"></div>
+  
+  <!-- Raindrops Container -->
+  <div id="raindropsContainer"></div>
+  
+  <!-- Transparent overlay -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-content">
+      <img src="images/profile/puppy1.avif" alt="John Subba | iceman404 | Photo">
+      <h2>🤓 Geek by nature | Programmer by choice</h2>
+      <p>Proficient in a range of programming languages and technologies, spanning from beginner to expert levels. Equipped with hands-on experience and a strong foundation in software development.</p>
+      <div class="skills-section">
+        <!-- Programming Languages Section -->
+        <div class="skills-column programming-languages">
+          <h3>Programming Languages:</h3>
+          <!-- C++ -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/cpp.png" alt="C++ Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- Advanced OOP & Patterns
+- Template Metaprogramming
+- STL & Custom Containers
+- Concurrency & Threads
+- Modern C++ (11/14/17/20)
+- Memory & Performance Tuning
+- Cross-platform Build Tools
+- Low-Level System Calls</pre>
+            </div>
+          </div>
+          <!-- C -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/c.png" alt="C Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 80%; background-color: #009688">80%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- Pointers & Mem Mgmt
+- Kernel & Syscalls
+- Writing LKMs & Debug
+- POSIX Threads & Sync
+- Driver Dev & Real-time
+- Network Sockets (Raw/BSD)
+- IPC (FIFO, Shared Mem)
+- Low-latency Optimization</pre>
+            </div>
+          </div>
+          <!-- Python -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/python.png" alt="Python Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 95%; background-color: #009688">95%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- Numpy & Pandas
+- AsyncIO & Scripting
+- Flask/Requests for APIs
+- Unit Testing & Coverage
+- Data Wrangling & ETL
+- Virtualenv & Packaging
+- CLI Tools & Automation</pre>
+            </div>
+          </div>
+          <!-- SQL -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/sql.png" alt="SQL Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 95%; background-color: #009688">95%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- DB Schema & Normal Forms
+- Complex Joins & Subqueries
+- Stored Proc & Triggers
+- Index Tuning & Partitioning
+- Window Functions & OLAP
+- Data Warehousing & Marts
+- Backup & Recovery Plans</pre>
+            </div>
+          </div>
+        </div>
+
+        <!--AI Technologies Section -->
+        <div class="skills-column tools-technologies">
+          <h3>AI Technologies:</h3>
+          <!-- ML -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/ml.png" alt="Machine Learning">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 85%; background-color: #009688">85%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+ML Algos & Skills:
+- Supervised (Lin/Log Reg)
+- Unsupervised (KMeans/DBSCAN)
+- SVM, KNN, Random Forest
+- Cross-val & Hyperparam Tuning
+- PCA, t-SNE Dimension Reduct</pre>
+            </div>
+          </div>
+          <!-- DL -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/dl.png" alt="Deep Learning">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 80%; background-color: #009688">80%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+DL Algos & Skills:
+- CNN (ResNet/VGG)
+- RNN (LSTM/GRU)
+- GANs & Variational AEs
+- Transformer (BERT-style)
+- Transfer Learning & Fine-tune</pre>
+            </div>
+          </div>
+          <!-- CV -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/cv.png" alt="Computer Vision">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 75%; background-color: #009688">75%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+CV Algos & Skills:
+- Img Classification (MobileNet)
+- Object Detection (SSD/YOLO)
+- Image Seg (Mask R-CNN)
+- Real-time Video & OpenCV
+- Data Aug & Preprocessing</pre>
+            </div>
+          </div>
+          <!-- NLP -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/nlp.png" alt="Natural Language Processing">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 80%; background-color: #009688">80%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+NLP Algos & Skills:
+- Tokenization & Stemming
+- Seq2Seq (Machine Translation)
+- Transformers (BERT/GPT)
+- Summarization & QnA
+- Sentiment & Topic Model</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frameworks Section -->
+        <div class="skills-column frameworks">
+          <h3>Other Technologies:</h3>
+
+          <!-- Git/GitHub -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/github.png" alt="Github Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- Git Flow & Branch Strat
+- GitHub Actions & CI
+- Merge & Rebase Tactics
+- Git Hooks & Automation
+- Handling Large Repos</pre>
+            </div>
+          </div>
+
+          <!-- Python-based frameworks (Flask/FastAPI) -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/restful.png" alt="RESTful Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Knowledge about:
+- Flask & FastAPI
+- RESTful Arch & JWT
+- Async Endpoints
+- OAuth & Security
+- ORM & Data Models</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Technologies Section -->
+        <div class="skills-column spoken-languages">
+          <h3>Cloud Technologies</h3>
+          <!-- GCP -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/google_cloud.png" alt="GCP Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+GCP Knowledge:
+- Compute Eng, Cloud Run
+- GKE & Cloud Functions
+- BigQuery & DataProc
+- Pub/Sub & Dataflow
+- Load Balancing & VPC</pre>
+            </div>
+          </div>
+          <!-- Azure -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/azure.png" alt="Azure Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 85%; background-color: #009688">85%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Azure Knowledge:
+- App Svcs & Functions
+- Azure DevOps & Pipelines
+- Cosmos DB & Table APIs
+- AKS & Container Instances
+- Monitoring & Security</pre>
+            </div>
+          </div>
+          <!-- AWS -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/amazon_aws.png" alt="AWS Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+AWS Knowledge:
+- EC2, Lambda & ECS
+- S3 & CloudFormation
+- IAM, Cognito & ALB
+- Auto-scaling & Alarms
+- EKS & Containerization</pre>
+            </div>
+          </div>
+          <!-- Docker -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/docker.png" alt="Docker Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+Docker Knowledge:
+- Dockerfiles & Multi-stage
+- Image Optimization
+- Compose & Swarm
+- Container Security
+- CI/CD Integration</pre>
+            </div>
+          </div>
+          <!-- Kubernetes -->
+          <div class="programming-language">
+            <div class="progress-container">
+              <img src="assets/icon-images/kubernetes.png" alt="Kubernetes Logo">
+              <div class="progress-bar" id="programmingProgressBar">
+                <span style="width: 90%; background-color: #009688">90%</span>
+              </div>
+            </div>
+            <div class="code-block">
+<pre><b>Level</b>: intermediate or above
+K8s Knowledge:
+- Cluster Mgmt & Scaling
+- Helm Charts & Operators
+- Ingress & Networking
+- Observability (Prom/Grafana)
+- Secrets & ConfigMaps</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span style="font-family: monospace; font-weight: bold;">
+        <a href="./resume/John-Resume.pdf" download="John-Resume">Download Resume</a>
+      </span>
+    </div>
+  </div>
+  
+  <footer>
+    <div id="name-container">
+      <span></span>
+    </div>
+  </footer>
+  
+  <script>
+    // Example code to handle project selection
+    function handleProjectSelection(projectUrl) {
+      if (projectUrl !== "") {
+        window.location.href = projectUrl;
+      }
+    }
+
+    // Create floating tech icons
+    function createFloatingTech() {
+      const container = document.getElementById('floatingTech');
+      const techIcons = ['{}', '[]', '()', '<>', ';', '=', '+', '#', '$', '%', '&', '*'];
+      
+      for (let i = 0; i < 30; i++) {
+        const icon = document.createElement('div');
+        icon.className = 'tech-icon';
+        icon.textContent = techIcons[Math.floor(Math.random() * techIcons.length)];
+        icon.style.left = Math.random() * 100 + 'vw';
+        icon.style.animationDelay = Math.random() * 20 + 's';
+        icon.style.fontSize = (Math.random() * 20 + 12) + 'px';
+        container.appendChild(icon);
+      }
+    }
+    
+    // Typing effect for the name
+    const nameElement = document.getElementById('name');
+    const cursorElement = document.getElementById('cursor');
+    const nameTexts = [
+      "Embedded-C Developer",
+      "C++ Developer",
+      "Kernel Specialist",
+      "Python Developer",
+      "SQL Expert",
+      "ML Practitioner",
+      "Deep Learning Guru",
+      "Computer Vision Engineer",
+      "GPU Engineer",
+      "NLP Enthusiast",
+      "Cloud Strategist",
+    ];
+    let textIndex = 0;
+    let charIndex = 0;
+
+    function type() {
+      if (charIndex <= nameTexts[textIndex].length) {
+        nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
+        charIndex++;
+        setTimeout(type, 100);
+      } else {
+        cursorElement.style.visibility = 'visible';
+        setTimeout(erase, 2000);
+      }
+    }
+
+    function erase() {
+      if (charIndex >= 0) {
+        nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
+        charIndex--;
+        setTimeout(erase, 50);
+      } else {
+        textIndex++;
+        if (textIndex >= nameTexts.length) {
+          textIndex = 0;
+        }
+        cursorElement.style.visibility = 'hidden';
+        setTimeout(() => {
+          nameElement.textContent = nameTexts[textIndex];
+          charIndex = 0;
+          type();
+        }, 100);
+      }
+    }
+
+    // Enhanced Raindrops animation - Slower and more visible
+    function createRaindrops() {
+      const container = document.getElementById('raindropsContainer');
+      const maxDrops = 40; // Slightly fewer drops for better visibility
+      
+      // Clean up finished raindrops
+      const existingDrops = container.querySelectorAll('.raindrop');
+      if (existingDrops.length > maxDrops) {
+        for (let i = 0; i < existingDrops.length - maxDrops; i++) {
+          if (existingDrops[i].parentNode) {
+            existingDrops[i].parentNode.removeChild(existingDrops[i]);
+          }
+        }
+      }
+      
+      // Create new raindrops
+      const dropsToCreate = Math.min(2, maxDrops - container.children.length);
+      
+      for (let i = 0; i < dropsToCreate; i++) {
+        setTimeout(() => {
+          const drop = document.createElement('div');
+          drop.className = 'raindrop';
+          
+          // Random position with slower animation
+          drop.style.left = Math.random() * 800 + 'vw';
+          drop.style.animationDuration = (Math.random() * 2 + 6) + 's'; // 3-5 seconds (slower)
+          
+          container.appendChild(drop);
+          
+          // Remove the drop after animation completes
+          drop.addEventListener('animationend', () => {
+            if (drop.parentNode) {
+              drop.parentNode.removeChild(drop);
+            }
+          });
+        }, i * 400); // Slower creation rate
+      }
+    }
+    
+    // Start enhanced rain animation
+    function startRain() {
+      // Initial creation
+      createRaindrops();
+      
+      // Continue creating raindrops at slower intervals
+      setInterval(createRaindrops, 500);
+    }
+
+    // Initialize the page
+    window.addEventListener('load', function() {
+      createFloatingTech();
+      startRain();
+      type();
+    });
+  </script>
+</body>
+</html>

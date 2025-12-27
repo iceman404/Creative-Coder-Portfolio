@@ -1,0 +1,213 @@
+<!--
+/* -----------------------------------------------
+/* Author: iceman404.com
+/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
+/* GitHub: https://github.com/iceman404/fine_tuning_resnet50
+/* v1 - Fine-Tuning with ResNet50
+/* ----------------------------------------------- */
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Fine-Tuning ResNet50 | John Subba | iceman404</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://www.iceman404.com/project-html-files/fine_tuning_resnet50" />
+  <meta name="description" content="Fine-Tuning with ResNet50 by John Subba (iceman404). Deep learning project for transfer learning and image classification.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.iceman404.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Projects",
+        "item": "https://www.iceman404.com#projects"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Fine-Tuning ResNet50",
+        "item": "https://www.iceman404.com/project-html-files/fine_tuning_resnet50"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* Core Styling */
+    body {
+      font-family: 'Hack', 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.6;
+      background-color: #f2f2f2;
+      color: #000;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding: 20px;
+    }
+
+    header {
+      background-color: rgba(51, 51, 51, 0.9);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 30px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 5px;
+    }
+
+    p, li {
+      font-size: 18px;
+    }
+
+    ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+
+    .highlight {
+      background-color: #222;
+      color: green;
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    footer a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .theme-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      border: none;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 5px;
+    }
+
+    .theme-button:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Dark Mode */
+    .dark-theme {
+      background-color: #111;
+      color: green;
+    }
+
+    .dark-theme header,
+    .dark-theme .container {
+      background-color: #222;
+    }
+
+    .dark-theme footer {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+    }
+  </style>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+    }
+  </script>
+</head>
+<body>
+  <button class="theme-button" onclick="toggleTheme()">Toggle Theme</button>
+
+  <header>
+    <h1>Fine-Tuning with ResNet50</h1>
+  </header>
+
+  <div class="container">
+    <h2>Project Overview</h2>
+    <p>
+      This project, <span class="highlight">Fine-Tuning-using-ResNet50</span>, demonstrates a comprehensive approach to classifying flower images using a pre-trained ResNet50 model. 
+      Despite not reaching 95%+ accuracy, the model achieves around <strong>88% accuracy</strong> without significant overfitting, making it a practical solution for flower classification.
+    </p>
+
+    <h2>Introduction</h2>
+    <p>
+      ResNet50 is known for its deep residual learning framework, which leverages skip (residual) connections to tackle vanishing gradients and handle large model depth. 
+      In this project, the <strong>102 Flower Dataset</strong> is used to showcase how effective fine-tuning can be, even with moderate hardware resources.
+    </p>
+
+    <h2>Objective</h2>
+    <ul>
+      <li><strong>Data Preparation:</strong> Load and preprocess flower images (102 categories).</li>
+      <li><strong>Model Definition:</strong> Modify the ResNet50 model to handle multi-class classification.</li>
+      <li><strong>Training &amp; Validation:</strong> Optimize accuracy while preventing overfitting.</li>
+      <li><strong>Evaluation:</strong> Assess the model's performance on a validation set.</li>
+    </ul>
+
+    <h2>Methodology</h2>
+    <ul>
+      <li><strong>Data Loading &amp; Preprocessing:</strong> Split dataset into training, validation, and test sets. Apply transformations (resizing, normalization, augmentation).</li>
+      <li><strong>Model Customization:</strong> Replace the final fully connected layer of ResNet50 to match the number of flower categories. Incorporate dropout for regularization.</li>
+      <li><strong>Training &amp; Optimization:</strong> Use a learning rate scheduler, define a suitable loss function, and implement automatic mixed precision (AMP) to optimize GPU memory usage.</li>
+      <li><strong>Evaluation &amp; Early Stopping:</strong> Track validation performance, apply early stopping to prevent overfitting, and save the best model.</li>
+    </ul>
+
+    <h2>License</h2>
+    <p>This project is licensed under the <strong>MIT License</strong>.</p>
+
+    <p>
+      <a href="https://github.com/iceman404/fine_tuning_resnet50" target="_blank">
+        <button>GitHub Repository</button>
+      </a>
+    </p>
+  </div>
+
+  <footer>
+    <a href="../index">Back to Main Page</a>
+  </footer>
+</body>
+</html>

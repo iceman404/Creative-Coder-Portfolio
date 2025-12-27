@@ -1,0 +1,177 @@
+<!--Contacts of iceman404-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Preload for Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    
+    <!-- Favicon and Manifest -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href="https://www.iceman404.com/contacts" />
+
+    
+    <!-- Meta tags for SEO and responsive design -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Contact page for John Subba (iceman404) - Get in touch with me for any queries. Drop me a message, whether it’s for collaboration or you just want to say Hi." />
+    
+    <!-- Stylesheet for the page -->
+    <link rel="stylesheet" media="screen" href="stylesload.css" />
+    
+    <title>Contact Info for the Brave and the Curious... Just kidding... | John Subba | iceman404 </title>
+    <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
+    
+    <style>
+      
+      body {
+        font-family: 'Hack', 'Courier New', Courier, monospace;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 1.6;
+        margin: 0;
+        background: url(./images/background/bg41.avif) no-repeat center center fixed;
+        background-size: cover;
+        color: #333;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 20px;
+        box-shadow: rgb(0, 0, 0) 0px -50px 100px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        max-width: 800px;
+        margin: auto;
+      }
+      .profilePic {
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+      }
+      .title {
+        font-size: 30px;
+        margin-bottom: 20px;
+      }
+      .socialLinks {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .socialIcon {
+        font-size: 40px;
+        color: #333;
+        transition: color 0.3s;
+      }
+      .socialIcon:hover {
+        color: #0077b5; /* LinkedIn color on hover */
+      }
+      .contactForm {
+        width: 100%;
+        max-width: 600px;
+      }
+      .formBox {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+      .input:focus {
+        border-color: #0077b5;
+      }
+      .submit {
+        height: 50px;
+        font-size: 18px;
+        width: 100%;
+        background-color: #0077b5;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .submit:hover {
+        background-color: #005582;
+      }
+      /* Mobile Optimization */
+      @media only screen and (max-width: 600px) {
+        body {
+          font-size: 16px;
+        }
+        .container {
+          padding: 10px;
+        }
+        .socialIcon {
+          font-size: 30px;
+        }
+      }
+    </style>
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.iceman404.com"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Contacts",
+              "item": "https://www.iceman404.com/contacts"
+            }
+          ]
+        }
+      </script>
+
+  </head>
+
+  <body>
+
+    <div class="container">
+      <img src="./images/profile/puppy1.avif" alt="Profile Picture" class="profilePic" />
+      <h1 class="title">Contact Me</h1>
+
+      <!-- Social links with aria-label for accessibility -->
+      <div class="socialLinks">
+        <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" aria-label="LinkedIn Profile">
+          <i class="fa fa-linkedin-square socialIcon" aria-hidden="true"></i>
+        </a>
+        <a href="https://x.com/ic3man404" target="_blank" aria-label="X (formerly Twitter) Profile">
+          <i class="fa fa-twitter socialIcon" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <!-- Contact form with Formspree -->
+      <form class="contactForm" action="https://formspree.io/f/myzgrejq" method="POST">
+        <div class="formBox">
+          <input type="text" name="firstName" class="input" placeholder="First Name" required />
+          <input type="text" name="lastName" class="input" placeholder="Last Name" required />
+          <input type="email" name="email" class="input" placeholder="Email" required />
+          <input type="tel" name="phone" class="input" placeholder="Phone No." pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" />
+          <textarea name="message" class="input" placeholder="Write a message to me..." required></textarea>
+          <button type="submit" class="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
