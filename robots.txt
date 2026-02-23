@@ -1,9 +1,24 @@
 User-agent: *
-Disallow: /private/          # Disallow private sections
-Disallow: /temp/             # Disallow temp folders
-
-# Allow everything else
 Allow: /
 
-# Sitemap location
+# Disallow private sections (if any)
+Disallow: /private/
+Disallow: /temp/
+
+# Allow all project pages
+Allow: /project-html-files/
+
+# Sitemap location - CRITICAL for Google indexing
 Sitemap: https://www.iceman404.com/sitemap.xml
+
+# Crawl-delay (optional, helps prevent overload)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0

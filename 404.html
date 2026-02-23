@@ -1,108 +1,368 @@
-<!--This is custom error 404 page for iceman404-->
-
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="canonical" href="https://www.iceman404.com/" />
-
-    
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    
-    <title>You look lost | error 404 | John Subba | iceman404 </title>
-    
-    <style>    
-      :root {
-        --body-font: "Hack", "Courier New", "Courier", monospace;
-        --body-text-align: center;
-        --h1-font: "Courier New", "Courier", monospace;
-        --body-background-color: #05806b;
-        --button-background-color: #fcfafa;
-        --button-color: #000000;
-        --button-hover-background-color: #000000;
-        --button-hover-color: #ffffff;
-      }
-      body {
-        font-family: var(--body-font);
-        background-color: var(--body-background-color);
-        text-align: var(--body-text-align);
-      }  
-      h1 {
-        font-family: var(--h1-font);
-        font-size: 9vw;
-      }  
-      div {
-        border-style: none;
-        font-size: 2.5em;
-        word-spacing: 5px;
-        padding: 30px, 50px, 30px, 50px;
-        overflow: auto;
-        display: block;
-      }  
-      button {   
-        width:70%;
-        max-width: 270px; /* Limit maximum width */
-        padding: 10px; /* Adjust padding for touch targets */
-        border: ridge;
-        background-color: var(--button-background-color);
-        color: var(--button-color);
-	font-size: 15px;
-	font-weight: bold;
-        cursor: pointer;
-        border-radius: 5px;
-      } 
-      button:hover {
-	background-color: var(--button-hover-background-color);
-	color: var(--button-hover-color);
-  	opacity: 0.7;
-      }      
-      audio {
-        display: none; /* Hide the audio element */
-      }  
-    </style>
-    
-    <script>
-      // Example code to goto main menu
-      function redirectHome(homeUrl) {
-        if (homeUrl !== "") {
-          window.location.href = homeUrl;
-        }
-      }
-    
-      // Function to play the audio when the page loads
-      function playAudio() {
-        var audio = document.getElementById('myAudio');
-        audio.play();
-      }
-    </script>
-  </head>    
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    Author: iceman404 (John Subba)
+    Last Modified: 2026-02-24
+  -->
+  <title>404 - Page Not Found | ICEMAN404</title>
+  <meta name="description" content="404 Error - The page you're looking for doesn't exist. Return to ICEMAN404 portfolio.">
+  <meta name="author" content="iceman404" />
+  <meta name="last-modified" content="2026-02-24" />
   
-  <body onload="playAudio()"> <!-- Call the playAudio function on page load -->
-    <audio id="myAudio" controls autoplay>
-      <source src="404audio.MP3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-    
-    <h1>ERROR 404!</h1>
-    
-    <div>
-      <q><strong>Now, I wouldn't expect to find a man of your stature...
-      <br>
-        so far away from his stove on a morning as cold as this, Captain.
-      <br><br>
-        you uhh.. you lost?</strong></q><br><br>
-      <cite>John Fitzgerald (The Revenant)</cite>  
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://www.iceman404.com/404" />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Three.js -->
+  <script>
+    if (typeof THREE === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      document.head.appendChild(script);
+    }
+  </script>
+  
+  <!-- Path Helper -->
+  <script src="js/path-helper.js"></script>
+  <!-- Protection -->
+  <script src="js/protection.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #0a0f11;
+      color: #e0f4f7;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .background-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 10;
+      position: relative;
+      padding: 40px 20px;
+      max-width: 800px;
+    }
+
+    .error-code {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(80px, 20vw, 200px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54, #4a9ba8);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 8s ease infinite;
+      margin-bottom: 20px;
+      letter-spacing: 10px;
+      text-shadow: 0 0 40px rgba(74, 155, 168, 0.5);
+      line-height: 1;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .error-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #4a9ba8;
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .error-message {
+      font-size: clamp(16px, 2vw, 20px);
+      color: #b0d4d9;
+      margin-bottom: 40px;
+      line-height: 1.8;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quote {
+      background: rgba(10, 15, 17, 0.8);
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 40px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 40px rgba(74, 155, 168, 0.2);
+    }
+
+    .quote-text {
+      font-size: clamp(16px, 2vw, 20px);
+      color: #e0f4f7;
+      font-style: italic;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .quote-author {
+      font-size: clamp(14px, 1.5vw, 18px);
+      color: #4a9ba8;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .quote-author::before {
+      content: '— ';
+    }
+
+    .button-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .btn {
+      padding: 16px 32px;
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      color: #e0f4f7;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      box-shadow: 0 6px 25px rgba(74, 155, 168, 0.5);
+      transform: translateY(-3px);
+      border-color: #4a9ba8;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+    }
+
+    .btn:not(a) {
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    audio {
+      display: none;
+    }
+
+    /* 3D Animation Container */
+    #error-3d {
+      width: 100%;
+      height: 300px;
+      margin: 40px 0;
+      position: relative;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .button-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background-grid"></div>
+  
+  <div class="container fade-in">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-message">
+      The page you're looking for doesn't exist or has been moved. 
+      You seem to have wandered into uncharted territory.
+    </p>
+
+    <div class="quote">
+      <p class="quote-text">
+        "Now, I wouldn't expect to find a man of your stature so far away from his stove on a morning as cold as this, Captain. You uhh... you lost?"
+      </p>
+      <p class="quote-author">John Fitzgerald (The Revenant)</p>
     </div>
-    <br><br>
-    
-    <div>
-      <button onclick="redirectHome('https://www.iceman404.com')">Back to Home</button>
-      <button onclick="playAudio()">Really...?</button>
+
+    <div id="error-3d"></div>
+
+    <div class="button-container">
+      <a href="/" class="btn primary">Back to Home</a>
+      <button onclick="playAudio()" class="btn">Really?</button>
     </div>
-  </body>        
+  </div>
+
+  <audio id="error-audio" preload="auto">
+    <source src="404audio.MP3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // Play audio function
+    function playAudio() {
+      const audio = document.getElementById('error-audio');
+      if (audio) {
+        audio.play().catch(error => {
+          console.log('Audio play failed:', error);
+        });
+      }
+    }
+    // Create 3D error visualization
+    function init3DError() {
+      if (typeof THREE === 'undefined') {
+        setTimeout(init3DError, 100);
+        return;
+      }
+
+      const container = document.getElementById('error-3d');
+      if (!container) return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / 300, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      
+      renderer.setSize(container.clientWidth, 300);
+      renderer.setClearColor(0x000000, 0);
+      container.appendChild(renderer.domElement);
+
+      // Create broken/glitched geometry
+      const geometry = new THREE.BoxGeometry(2, 2, 2);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x4a9ba8,
+        emissive: 0x001122,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.8
+      });
+
+      const cubes = [];
+      for (let i = 0; i < 5; i++) {
+        const cube = new THREE.Mesh(geometry, material.clone());
+        cube.position.set(
+          (Math.random() - 0.5) * 4,
+          (Math.random() - 0.5) * 2,
+          (Math.random() - 0.5) * 4
+        );
+        cube.rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+        scene.add(cube);
+        cubes.push(cube);
+      }
+
+      // Add lights
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+      scene.add(ambientLight);
+      
+      const pointLight = new THREE.PointLight(0x4a9ba8, 1, 100);
+      pointLight.position.set(0, 0, 5);
+      scene.add(pointLight);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        cubes.forEach((cube, i) => {
+          cube.rotation.x += 0.01 + i * 0.002;
+          cube.rotation.y += 0.01 + i * 0.003;
+          cube.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / 300;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, 300);
+      });
+    }
+
+    // Initialize 3D scene
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init3DError);
+    } else {
+      init3DError();
+    }
+  </script>
+</body>
 </html>

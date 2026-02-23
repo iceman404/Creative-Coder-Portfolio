@@ -5,75 +5,104 @@
 /* Original GitHub: https://github.com/iceman404/Creative-Coder-Portfolio
 /* How to use? Check the GitHub README
 /* v1
+/* Last Modified: 2026-02-24
 /* -----------------------------------------------
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!--
+    Author: iceman404 (John Subba)
+    Last Modified: 2026-02-24
+  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="author" content="iceman404" />
+  <meta name="last-modified" content="2026-02-24" />
   <link rel="canonical" href="https://www.iceman404.com/skills" />
-  <title>Skills? Oh, You Mean My expertise... Ok | John Subba | iceman404</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <title>Skills | AR/VR & CV Engineer | John Subba | iceman404</title>
   <meta
     name="description"
-    content="Here's a list of things I'm awesome at, ranging from tech to overthinking. What do I bring to the table (besides humor and a questionable amount of coffee consumption)? Guess what, You have to find it out yourself..."
+    content="Technical expertise of John Subba (iceman404) - AR/VR & Computer Vision Engineer. Programming languages, AI technologies, cloud platforms, and systems-level engineering skills."
   >
   <meta name="author" content="John Subba | iceman404" />
   <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
+  <!-- Three.js for 3D AR effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Path Helper -->
+  <script src="js/path-helper.js"></script>
+  <!-- Protection -->
+  <script src="js/protection.js"></script>
   <style>
     :root {
       --header-height: 12vh;
       --footer-height: 1.2vh;
       --content-padding: 2vh;
-      --primary-color: #005c66;
-      --secondary-color: #00b9cc;
-      --accent-color: #06e8ff;
+      --primary-color: #1a4d54;
+      --secondary-color: #2d7a87;
+      --accent-color: #4a9ba8;
     }
 
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
-      overflow: scroll;
-      background: 
-        linear-gradient(135deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%) -50px 0,
-        linear-gradient(225deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%) -50px 0,
-        linear-gradient(315deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%),
-        linear-gradient(45deg, rgba(0, 92, 102, 0.1) 25%, transparent 25%);
-      background-size: 100px 100px;
-      background-color: #f8fdff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Enhanced Real Raindrops - Slower and More Visible */
-    body {
-      background-color: #001a1f;
+      overflow-x: hidden;
+      background: #0a0f11;
+      color: #e0f4f7;
       position: relative;
-      overflow: hidden;
+      min-height: 100vh;
     }
 
+    .background-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #three-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.3;
+    }
+
+    /* Raindrops effect - AR theme */
     .raindrop {
       position: fixed;
-      width: 3px; /* Slightly wider */
-      height: 25px; /* Longer raindrops */
+      width: 3px;
+      height: 25px;
       background: linear-gradient(
         to bottom,
         transparent,
-        rgba(0, 184, 204, 0.9), /* More opaque */
-        rgba(0, 184, 204, 0.7)  /* More visible */
+        rgba(74, 155, 168, 0.9),
+        rgba(74, 155, 168, 0.7)
       );
       border-radius: 0 0 3px 3px;
       animation: rainFall linear forwards;
       z-index: 0;
       pointer-events: none;
-      filter: drop-shadow(0 0 2px rgba(0, 184, 204, 0.5)); /* Glow effect */
+      filter: drop-shadow(0 0 2px rgba(74, 155, 168, 0.5));
     }
 
     .raindrop::before {
@@ -85,7 +114,7 @@
       height: 100%;
       background: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0.3),
+        rgba(224, 244, 247, 0.3),
         transparent
       );
       border-radius: 0 0 3px 3px;
@@ -96,20 +125,20 @@
       position: absolute;
       bottom: 0;
       left: 50%;
-      transform: translateX(-500%);
-      width: 6px; /* Larger ripple */
+      transform: translateX(-50%);
+      width: 6px;
       height: 6px;
-      background: rgba(0, 184, 204, 0.6);
+      background: rgba(74, 155, 168, 0.6);
       border-radius: 50%;
-      animation: ripple 5s ease-out forwards; /* Slower ripple */
+      animation: ripple 5s ease-out forwards;
       opacity: 0;
-      box-shadow: 0 0 8px rgba(0, 184, 204, 0.8); /* Ripple glow */
+      box-shadow: 0 0 8px rgba(74, 155, 168, 0.8);
     }
 
     @keyframes rainFall {
       to { 
         transform: translateY(100vh);
-        opacity: 0.7; /* Fade out slightly at the end */
+        opacity: 0.7;
       }
     }
 
@@ -127,27 +156,11 @@
       }
     }
 
-    /* Enhanced static background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        linear-gradient(90deg, transparent 10px, #abced4 10px, #abced4 12px, transparent 12px),
-        linear-gradient(#eee .1em, transparent .1em);
-      background-size: 100% 1.2em;
-      background-color: #f8fdff;
-      z-index: 0;
-      pointer-events: none;
-    }
 
     /* Rest of your existing CSS remains the same */
     header {
-      background-color: var(--primary-color);
-      color: white;
+      background: linear-gradient(135deg, rgba(26, 77, 84, 0.9), rgba(45, 122, 135, 0.8));
+      color: #e0f4f7;
       text-align: center;
       position: fixed;
       top: 0;
@@ -158,9 +171,11 @@
       align-items: center;
       justify-content: center;
       z-index: 10;
-      font-family: Hack, "Courier New", Courier, monospace;
-      font-weight: bold;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      box-shadow: 0 2px 20px rgba(74, 155, 168, 0.3);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(74, 155, 168, 0.3);
     }
 
     #name-container {
@@ -174,8 +189,8 @@
     }
 
     footer {
-      background-color: var(--primary-color);
-      color: white;
+      background: linear-gradient(135deg, rgba(26, 77, 84, 0.9), rgba(45, 122, 135, 0.8));
+      color: #e0f4f7;
       text-align: center;
       position: fixed;
       bottom: 0;
@@ -183,6 +198,8 @@
       width: 100%;
       height: var(--footer-height);
       z-index: 10;
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(74, 155, 168, 0.3);
     }
 
     .top-button {
@@ -193,10 +210,12 @@
     }
 
     .button-description {
-      background: linear-gradient(145deg, var(--secondary-color), var(--primary-color));
-      font-family: Hack, Courier New, Courier, monospace;
-      font-size: 1rem;
-      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-block;
       width: 110px;
@@ -205,22 +224,25 @@
       text-align: center;
       text-decoration: none;
       border-radius: 20px;
-      color: white;
-      border: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: #e0f4f7;
+      border: 1px solid rgba(74, 155, 168, 0.5);
+      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .button-description:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(145deg, var(--accent-color), var(--secondary-color));
+      box-shadow: 0 6px 20px rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      border-color: #4a9ba8;
     }
 
-    /* Floating Tech Icons Background */
+    /* Floating Tech Icons Background - Updated for AR theme */
     .floating-tech {
       position: fixed;
       top: 0;
@@ -234,8 +256,10 @@
     .tech-icon {
       position: absolute;
       font-size: 24px;
-      opacity: 0.1;
+      opacity: 0.15;
+      color: #4a9ba8;
       animation: float 20s infinite linear;
+      text-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
     }
 
     @keyframes float {
@@ -247,49 +271,78 @@
       }
     }
 
-    /* Transparent overlay */
+    /* Transparent overlay - Updated for AR theme */
     .overlay {
       position: fixed;
       top: calc(var(--header-height) + var(--content-padding));
       bottom: calc(var(--footer-height) + var(--content-padding));
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(253, 254, 254, 0.6);
-      box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
-        rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
-        rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+      background: rgba(10, 15, 17, 0.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 50px rgba(74, 155, 168, 0.3);
+      border: 2px solid rgba(74, 155, 168, 0.3);
       z-index: 2;
       width: 84vw;
+      max-width: 1400px;
       overflow: auto;
-      border-radius: 10px;
+      border-radius: 20px;
     }
 
     .overlay-content {
       font-size: clamp(0.9rem, 1.7vw, 1.5rem);
-      font-family: monospace;
+      font-family: 'Roboto', sans-serif;
       text-align: center;
-      color: #000;
-      padding: 20px;
-      border-radius: 10px;
+      color: #e0f4f7;
+      padding: 30px;
+      border-radius: 20px;
       pointer-events: auto;
       position: relative;
       z-index: 3;
     }
 
     .overlay-content img {
-      width: 60px;
-      height: 60px;
-      border-radius: 10%;
-      margin-bottom: 4px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid rgba(74, 155, 168, 0.5);
+      box-shadow: 0 0 20px rgba(74, 155, 168, 0.4);
+    }
+
+    .overlay-content h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #4a9ba8;
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .overlay-content p {
+      color: #b0d4d9;
+      margin-bottom: 25px;
+      line-height: 1.6;
     }
 
     .overlay-content a {
-      color: #000;
+      color: #4a9ba8;
       text-decoration: none;
       font-size: 18px;
-      display: block;
-      margin-bottom: 10px;
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      background: rgba(26, 77, 84, 0.3);
+      transition: all 0.3s ease;
       pointer-events: auto;
+    }
+
+    .overlay-content a:hover {
+      color: #2d7a87;
+      border-color: #4a9ba8;
+      box-shadow: 0 0 20px rgba(74, 155, 168, 0.3);
+      transform: translateY(-2px);
     }
 
     .skills-section {
@@ -303,20 +356,33 @@
       width: 48%;
       text-align: left;
       margin-bottom: 20px;
-      padding: 7px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(1, 1, 0, 0.2);
+      padding: 15px;
+      border-radius: 15px;
+      background: rgba(26, 77, 84, 0.2);
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    .skills-column h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: #4a9ba8;
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      margin-bottom: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .progress-bar {
-      height: 1.4vh;
-      width: 70%;
-      background-color: #eafdff;
+      height: 10px;
+      width: 85%;
+      background-color: rgba(26, 77, 84, 0.5);
       border-radius: 15px;
-      overflow: hidden;
+      overflow: visible;
       margin-bottom: 4px;
       margin-left: 10px;
       position: relative;
+      border: 1px solid rgba(74, 155, 168, 0.3);
     }
 
     .progress-bar span {
@@ -324,15 +390,20 @@
       align-items: center;
       justify-content: center;
       height: 100%;
+      min-height: 10px;
       border-radius: 15px;
       position: absolute;
       top: 0;
       width: 0;
       transition: width 1s ease;
-      line-height: 20px;
+      line-height: 10px;
       text-align: center;
-      color: white;
-      font-size: 0.8rem;
+      color: #e0f4f7;
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      box-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
+      white-space: nowrap;
     }
 
     .progress-container {
@@ -343,14 +414,16 @@
     .programming-language {
       width: 100%;
       height: auto;
-      padding: 4px;
+      padding: 15px;
       z-index: 3;
-      border-radius: 10px;
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
-        rgba(0, 0, 0, 0.22) 0px 15px 12px;
-      margin-bottom: 16px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
       position: relative;
-      background: white;
+      background: rgba(26, 77, 84, 0.3);
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
     }
 
     .page {
@@ -372,27 +445,35 @@
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow-wrap: break-word;
-      font-family: hack, monospace;
-      background-color: #F6E3B4;
+      font-family: 'Roboto', monospace;
+      background-color: rgba(10, 15, 17, 0.6);
       border-radius: 10px;
-      padding: 8px;
+      padding: 12px;
+      border: 1px solid rgba(74, 155, 168, 0.2);
+      color: #b0d4d9;
+      font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+      line-height: 1.6;
     }
 
-    .code-block p {
-      font-size: clamp(0.8rem, 1.4vw, 1.2rem);
-      color: #000e10;
+    .code-block pre {
+      margin: 0;
+      color: #b0d4d9;
     }
 
-    /* Desktop hover effects - remove media query restrictions */
+    .code-block b {
+      color: #4a9ba8;
+      font-weight: 700;
+    }
+
+    /* Desktop hover effects - AR theme */
     .programming-language:hover {
-      transform: translateY(-8px) rotate(1deg);
+      transform: translateY(-5px);
       box-shadow: 
-        0 15px 30px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(0, 184, 204, 0.4),
-        inset 0 0 15px rgba(255, 255, 255, 0.8);
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(74, 155, 168, 0.4);
       z-index: 4;
-      background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
-      border: 1px solid rgba(0, 184, 204, 0.3);
+      background: rgba(26, 77, 84, 0.5);
+      border-color: #4a9ba8;
     }
 
     /* Glow effect on hover */
@@ -403,24 +484,25 @@
       left: 0;
       right: 0;
       bottom: 0;
-      border-radius: 10px;
+      border-radius: 15px;
       background: linear-gradient(
         135deg,
-        rgba(0, 184, 204, 0.1) 0%,
+        rgba(74, 155, 168, 0.1) 0%,
         transparent 50%,
-        rgba(6, 232, 255, 0.1) 100%
+        rgba(74, 155, 168, 0.1) 100%
       );
       z-index: -1;
     }
 
-    /* Paper texture effect on hover */
+    /* Code block enhancement on hover */
     .programming-language:hover .code-block {
-      background-color: #F9F0D9;
+      background-color: rgba(10, 15, 17, 0.8);
+      border-color: rgba(74, 155, 168, 0.4);
     }
 
     /* Progress bar enhancement on hover */
     .programming-language:hover .progress-bar span {
-      box-shadow: 0 0 10px rgba(0, 184, 204, 0.6);
+      box-shadow: 0 0 15px rgba(74, 155, 168, 0.8);
     }
 
     /* Add the media query for mobile responsiveness */
@@ -432,26 +514,27 @@
       .programming-language {
         width: 100%;
         height: auto;
-        padding: 4px;
+        padding: 12px;
         z-index: 3;
-        border-radius: 10px;
-        box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
-          rgba(0, 0, 0, 0.22) 0px 15px 12px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         margin-bottom: 16px;
         position: relative;
-        background: white;
+        background: rgba(26, 77, 84, 0.3);
+        border: 1px solid rgba(74, 155, 168, 0.3);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: pointer;
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0);
       }
 
-      /* Mobile touch support - simplified */
+      /* Mobile touch support - AR theme */
       .programming-language:active {
-        transform: translateY(-4px) rotate(0.5deg);
+        transform: translateY(-3px);
         box-shadow: 
-          0 10px 20px rgba(0, 0, 0, 0.25),
-          0 0 15px rgba(0, 184, 204, 0.3);
+          0 8px 20px rgba(0, 0, 0, 0.4),
+          0 0 20px rgba(74, 155, 168, 0.4);
         transition: transform 0.1s ease;
+        border-color: #4a9ba8;
       }
 
       .page {
@@ -519,10 +602,15 @@
   </header>
   
   <div class="top-button">
-    <button class="button-description" onclick="handleProjectSelection('/index')">
+    <a href="/" class="button-description">
       <span>Home</span>
-    </button>
+    </a>
   </div>
+  
+  <div class="background-grid"></div>
+  
+  <!-- Three.js 3D Background -->
+  <div id="three-bg"></div>
   
   <!-- Floating Tech Icons Background -->
   <div class="floating-tech" id="floatingTech"></div>
@@ -534,7 +622,7 @@
   <div class="overlay" id="overlay">
     <div class="overlay-content">
       <img src="images/profile/puppy1.avif" alt="John Subba | iceman404 | Photo">
-      <h2>🤓 Geek by nature | Programmer by choice</h2>
+      <h2> 🤓 Geek by nature | Programmer by choice</h2>
       <p>Proficient in a range of programming languages and technologies, spanning from beginner to expert levels. Equipped with hands-on experience and a strong foundation in software development.</p>
       <div class="skills-section">
         <!-- Programming Languages Section -->
@@ -545,7 +633,7 @@
             <div class="progress-container">
               <img src="assets/icon-images/cpp.png" alt="C++ Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -566,7 +654,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/c.png" alt="C Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background-color: #009688">80%</span>
+                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
               </div>
             </div>
             <div class="code-block">
@@ -587,7 +675,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/python.png" alt="Python Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 95%; background-color: #009688">95%</span>
+                <span style="width: 95%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">95%</span>
               </div>
             </div>
             <div class="code-block">
@@ -607,7 +695,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/sql.png" alt="SQL Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 95%; background-color: #009688">95%</span>
+                <span style="width: 95%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">95%</span>
               </div>
             </div>
             <div class="code-block">
@@ -632,7 +720,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/ml.png" alt="Machine Learning">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 85%; background-color: #009688">85%</span>
+                <span style="width: 85%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">85%</span>
               </div>
             </div>
             <div class="code-block">
@@ -650,7 +738,7 @@ ML Algos & Skills:
             <div class="progress-container">
               <img src="assets/icon-images/dl.png" alt="Deep Learning">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background-color: #009688">80%</span>
+                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
               </div>
             </div>
             <div class="code-block">
@@ -668,7 +756,7 @@ DL Algos & Skills:
             <div class="progress-container">
               <img src="assets/icon-images/cv.png" alt="Computer Vision">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 75%; background-color: #009688">75%</span>
+                <span style="width: 75%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">75%</span>
               </div>
             </div>
             <div class="code-block">
@@ -686,7 +774,7 @@ CV Algos & Skills:
             <div class="progress-container">
               <img src="assets/icon-images/nlp.png" alt="Natural Language Processing">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background-color: #009688">80%</span>
+                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
               </div>
             </div>
             <div class="code-block">
@@ -710,7 +798,7 @@ NLP Algos & Skills:
             <div class="progress-container">
               <img src="assets/icon-images/github.png" alt="Github Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -729,7 +817,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/restful.png" alt="RESTful Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -752,7 +840,7 @@ Knowledge about:
             <div class="progress-container">
               <img src="assets/icon-images/google_cloud.png" alt="GCP Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -770,7 +858,7 @@ GCP Knowledge:
             <div class="progress-container">
               <img src="assets/icon-images/azure.png" alt="Azure Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 85%; background-color: #009688">85%</span>
+                <span style="width: 85%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">85%</span>
               </div>
             </div>
             <div class="code-block">
@@ -788,7 +876,7 @@ Azure Knowledge:
             <div class="progress-container">
               <img src="assets/icon-images/amazon_aws.png" alt="AWS Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -806,7 +894,7 @@ AWS Knowledge:
             <div class="progress-container">
               <img src="assets/icon-images/docker.png" alt="Docker Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -824,7 +912,7 @@ Docker Knowledge:
             <div class="progress-container">
               <img src="assets/icon-images/kubernetes.png" alt="Kubernetes Logo">
               <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background-color: #009688">90%</span>
+                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
               </div>
             </div>
             <div class="code-block">
@@ -846,9 +934,6 @@ K8s Knowledge:
   </div>
   
   <footer>
-    <div id="name-container">
-      <span></span>
-    </div>
   </footer>
   
   <script>
@@ -924,10 +1009,12 @@ K8s Knowledge:
       }
     }
 
-    // Enhanced Raindrops animation - Slower and more visible
+    // Enhanced Raindrops animation - AR theme
     function createRaindrops() {
       const container = document.getElementById('raindropsContainer');
-      const maxDrops = 40; // Slightly fewer drops for better visibility
+      if (!container) return;
+      
+      const maxDrops = 40;
       
       // Clean up finished raindrops
       const existingDrops = container.querySelectorAll('.raindrop');
@@ -948,8 +1035,8 @@ K8s Knowledge:
           drop.className = 'raindrop';
           
           // Random position with slower animation
-          drop.style.left = Math.random() * 800 + 'vw';
-          drop.style.animationDuration = (Math.random() * 2 + 6) + 's'; // 3-5 seconds (slower)
+          drop.style.left = Math.random() * 100 + 'vw';
+          drop.style.animationDuration = (Math.random() * 2 + 6) + 's';
           
           container.appendChild(drop);
           
@@ -959,23 +1046,93 @@ K8s Knowledge:
               drop.parentNode.removeChild(drop);
             }
           });
-        }, i * 400); // Slower creation rate
+        }, i * 400);
       }
     }
     
-    // Start enhanced rain animation
+    // Start rain animation
     function startRain() {
-      // Initial creation
       createRaindrops();
-      
-      // Continue creating raindrops at slower intervals
       setInterval(createRaindrops, 500);
+    }
+
+    // Initialize Three.js 3D background
+    function init3DBackground() {
+      if (typeof THREE === 'undefined') return;
+      
+      const container = document.getElementById('three-bg');
+      if (!container) return;
+      
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+      
+      camera.position.z = 5;
+      
+      // Create floating skill icons in 3D space
+      const icons = ['C++', 'Python', 'ML', 'CV', 'AR', 'VR', 'AI', 'GPU'];
+      const meshes = [];
+      
+      icons.forEach((icon, i) => {
+        const geometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x4a9ba8,
+          emissive: 0x2d7a87,
+          emissiveIntensity: 0.3,
+          transparent: true,
+          opacity: 0.6
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 5
+        );
+        mesh.userData = { speed: Math.random() * 0.02 + 0.01 };
+        scene.add(mesh);
+        meshes.push(mesh);
+      });
+      
+      // Add ambient light
+      const ambientLight = new THREE.AmbientLight(0x4a9ba8, 0.5);
+      scene.add(ambientLight);
+      
+      // Add point light
+      const pointLight = new THREE.PointLight(0x4a9ba8, 0.5, 100);
+      pointLight.position.set(5, 5, 5);
+      scene.add(pointLight);
+      
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        meshes.forEach(mesh => {
+          mesh.rotation.x += mesh.userData.speed;
+          mesh.rotation.y += mesh.userData.speed;
+          mesh.position.y += Math.sin(Date.now() * 0.001 + mesh.position.x) * 0.001;
+        });
+        
+        renderer.render(scene, camera);
+      }
+      
+      // Handle resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      
+      animate();
     }
 
     // Initialize the page
     window.addEventListener('load', function() {
       createFloatingTech();
       startRain();
+      init3DBackground();
       type();
     });
   </script>

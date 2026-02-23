@@ -14,9 +14,9 @@ particlesJS.load('particles-js', 'particles.json', function() {
 particlesJS('particles-js',
   
   {
-    "particles": {
-      "number": {
-        "value": 80,
+      "particles": {
+        "number": {
+          "value": 50, // Reduced from 80 for better performance
         "density": {
           "enable": true,
           "value_area": 800

@@ -1,893 +1,1216 @@
-<!--
-/* -----------------------------------------------
-/* Author: iceman404.com
-/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
-/* Original GitHub: https://github.com/iceman404/Creative-Coder-Portfolio
-/* How to use? Check the GitHub README
-/* v1
-/* ----------------------------------------------- */ -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- fav-icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="canonical" href="https://www.iceman404.com" />
-    <!-- Include Font Awesome CDN link in the head of your HTML -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Other regular meta tags -->
-    <meta charset="utf-8">
-    <title>A Short and Sweet Index to My Portfolio Website | John Subba | iceman404 </title>
-    <meta name="description" content="Portfolio of John Subba | iceman404 | It is slightly more organized as compared to my room and will either help you or confuse you in the most enlightening way possible.">
-    <meta name="author" content="John Subba | iceman404" />
-    <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://www.iceman404.com">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="John Subba | iceman404 - Portfolio">
-    <meta property="og:description" content="Explore the works, skills, and mind of John Subba aka iceman404. A deep dive into AI, security, and systems engineering.">
-    <meta property="og:image" content="https://www.iceman404.com/images/profile/main-profile.avif">
-    <!-- Alt Text: "Profile image of John Subba, known as iceman404" -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <!-- styles for particles.js library -->
-    <link rel="stylesheet" media="screen" href="css/style.css">
-    <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
-    <!-- Add your JSON-LD script here -->
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.iceman404.com"
-        }
-      ]
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICEMAN404 | AR/VR & Computer Vision Engineer | John Subba</title>
+  <meta name="description" content="Portfolio of John Subba | iceman404 - World-class AR/VR and Computer Vision Engineer. Explore cutting-edge projects, real-time CV demos, and systems-level expertise.">
+  <meta name="author" content="iceman404" />
+  <meta name="last-modified" content="2026-02-24" />
+  
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="canonical" href="https://www.iceman404.com" />
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Three.js -->
+  <script>
+    if (typeof THREE === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      script.onload = () => console.log('Three.js loaded');
+      document.head.appendChild(script);
     }
-    </script>
+  </script>
+  
+  <!-- SEO & Performance Scripts -->
+  <script src="js/path-helper.js"></script>
+  <script src="js/seo-helper.js"></script>
+  <script src="js/site-navigation.js"></script>
+  <script src="js/performance-monitor.js"></script>
+  <script src="js/error-handler.js"></script>
+  <script src="js/theme-manager.js"></script>
+  <script src="js/lazy-load.js"></script>
+  <script src="js/protection.js"></script>
+  
+  <!-- Three.js Scene & Effects -->
+  <script src="js/three-scene.js"></script>
+  <script src="js/signature-effects.js"></script>
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.iceman404.com"
+      }
+    ]
+  }
+  </script>
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "url": "https://www.iceman404.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://www.iceman404.com/search?q={search_term_string}",
-        "query-input": {
-          "@type": "PropertyValueSpecification",
-          "valueRequired": "https://schema.org/True"
-        }
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://www.iceman404.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.iceman404.com/search?q={search_term_string}",
+      "query-input": {
+        "@type": "PropertyValueSpecification",
+        "valueRequired": "https://schema.org/True"
       }
     }
-    </script>
+  }
+  </script>
 
-    
-    <style>
-      
-      /* Add CSS styles here */
-      /* Example styles for the header and navigation bar */
-      header {
-        background-color: #333;
-        color: white;
-        padding: 20px;
-        text-align: center;
-        font-size: 50px;
-        font-family: Hack, "Courier New", Courier, monospace;
-        font-weight: bold;
-        min-height: 44px;
-        position: relative;
-        z-index: 100;
-        /* Set a minimum height for the header */
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #0a0f11;
+      color: #e0f4f7;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .background-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 15, 17, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(74, 155, 168, 0.3);
+      z-index: 1000;
+      padding: 15px 0;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    nav .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      min-height: 30px;
+    }
+
+    nav .logo-text {
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    nav .logo-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: #4a9ba8;
+      margin-left: 4px;
+      animation: blinkCursor 0.7s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blinkCursor {
+      0%, 50% {
+        opacity: 1;
       }
-
-      h1 {
-        font-size: 26px;
-        font-family: Hack, Courier New, Courier, monospace;
-        font-weight: bold;
+      51%, 100% {
+        opacity: 0;
       }
+    }
 
-      p {
-        font-family: Hack, Courier New, Courier, monospace;
-        font-size: 18px;
-        padding: 7px;
-        font-weight: bold;
-      }
+    nav .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
 
-      nav {
-        width: 100%;
-        position: relative;
-        display: flex;
-        align-items: left;
-        justify-content: left;
-        background-color: black;
-        z-index: 20;
-      }
+    nav .nav-links a {
+      color: #e0f4f7;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
 
-      nav a {
-        float: left;
-        display: block;
-        color: white;
-        text-align: center;
-        padding: 14px 22px;
-        text-decoration: none;
-        font-family: Hack, "Courier New", Courier, monospace;
-        font-size: 0.7em;
-        font-weight: bold;
-      }
+    nav .nav-links a::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #4a9ba8, #2d7a87);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
 
-      nav a:hover {
-        background-color: #ddd;
-        color: black;
-      }
+    nav .nav-links a:hover {
+      color: #4a9ba8;
+    }
 
-      /* For mobile devices (max-width 767px) 
-        @media only screen and (max-width: 440px) {
-          nav {
-            align-items: flex-wrap;
-            text-align: left; 
-          }
-      
-          nav a {
-            padding: 10px 0; 
-          }
-            
-        }
-      */
-      .profile {
-        width: 80%;
-        position: absolute;
-        top: 15vh;
-        /* Adjust this value to position the profile section */
-        left: 10%;
-        right: 10%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: transparent;
-        min-height: 90px;
-        z-index: 10;
-      }
+    nav .nav-links a:hover::before {
+      width: 80%;
+    }
 
-      .profile div {
-        display: flex;
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding-top: 80px;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 10;
+      position: relative;
+      max-width: 1200px;
+      padding: 0 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(36px, 8vw, 96px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54, #4a9ba8);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 8s ease infinite;
+      margin-bottom: 20px;
+      letter-spacing: 4px;
+      text-shadow: 0 0 40px rgba(74, 155, 168, 0.5);
+      line-height: 1.2;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero .subtitle {
+      font-size: clamp(18px, 2.5vw, 32px);
+      color: #4a9ba8;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+    }
+
+    .hero .tagline {
+      font-size: clamp(14px, 1.5vw, 20px);
+      color: #b0d4d9;
+      font-weight: 400;
+      max-width: 800px;
+      margin: 0 auto 50px;
+      line-height: 1.8;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn {
+      padding: 16px 32px;
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      color: #e0f4f7;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .hero-btn:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      box-shadow: 0 6px 25px rgba(74, 155, 168, 0.5);
+      transform: translateY(-3px);
+      border-color: #4a9ba8;
+    }
+
+    .hero-btn.primary {
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+    }
+
+    .hero-btn.primary:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+    }
+
+    /* Profile Section */
+    .profile-section {
+      padding: 100px 20px;
+      position: relative;
+      z-index: 5;
+      background: rgba(10, 15, 17, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .profile-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 40px;
+      align-items: center;
+      background: rgba(10, 15, 17, 0.8);
+      padding: 50px;
+      border-radius: 20px;
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      box-shadow: 0 0 40px rgba(74, 155, 168, 0.2);
+    }
+
+    .profile-img {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 4px solid rgba(74, 155, 168, 0.5);
+      box-shadow: 0 0 30px rgba(74, 155, 168, 0.4);
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .profile-img:hover {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    .profile-info h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      color: #4a9ba8;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .profile-info .real-name {
+      font-size: 20px;
+      color: #b0d4d9;
+      margin-bottom: 30px;
+      font-style: italic;
+    }
+
+    .accordion {
+      margin-bottom: 15px;
+      background: rgba(26, 77, 84, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .accordion:hover {
+      border-color: rgba(74, 155, 168, 0.6);
+      box-shadow: 0 0 20px rgba(74, 155, 168, 0.2);
+    }
+
+    .accordion h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      color: #4a9ba8;
+      padding: 20px 25px;
+      cursor: pointer;
+      margin: 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .accordion h3::after {
+      content: '+';
+      font-size: 24px;
+      color: #4a9ba8;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion.active h3::after {
+      transform: rotate(45deg);
+    }
+
+    .panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: rgba(10, 15, 17, 0.6);
+    }
+
+    .accordion.active .panel {
+      max-height: 1000px;
+    }
+
+    .panel-content {
+      padding: 0 25px 20px;
+      color: #e0f4f7;
+      line-height: 1.8;
+    }
+
+    .panel-content p {
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .panel-content b {
+      color: #4a9ba8;
+      font-weight: 700;
+    }
+
+    /* Projects Section */
+    .projects-section {
+      padding: 100px 20px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .projects-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .projects-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      letter-spacing: 3px;
+    }
+
+    .projects-header p {
+      font-size: 18px;
+      color: #b0d4d9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .project-card {
+      background: rgba(10, 15, 17, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      transition: all 0.4s ease;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(74, 155, 168, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+
+    .project-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(74, 155, 168, 0.6);
+      box-shadow: 0 10px 40px rgba(74, 155, 168, 0.4);
+    }
+
+    .project-card:hover::before {
+      opacity: 1;
+    }
+
+    .project-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .project-card:hover .project-image {
+      transform: scale(1.05);
+    }
+
+    .project-details {
+      padding: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .project-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      color: #4a9ba8;
+      margin-bottom: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .project-description {
+      color: #b0d4d9;
+      font-size: 14px;
+      margin-bottom: 20px;
+      min-height: 20px;
+      line-height: 1.6;
+    }
+
+    .project-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .project-btn {
+      flex: 1;
+      padding: 10px 20px;
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      color: #e0f4f7;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .project-btn:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      border-color: #4a9ba8;
+      transform: translateY(-2px);
+    }
+
+    .project-btn.youtube {
+      background: linear-gradient(135deg, #c4302b, #a02020);
+      border-color: rgba(196, 48, 43, 0.5);
+    }
+
+    .project-btn.youtube:hover {
+      background: linear-gradient(135deg, #a02020, #c4302b);
+      border-color: #c4302b;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 50px rgba(74, 155, 168, 0.5);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      font-size: 40px;
+      color: #4a9ba8;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(10, 15, 17, 0.8);
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(74, 155, 168, 0.2);
+      border-color: #4a9ba8;
+      transform: rotate(90deg);
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(10, 15, 17, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(74, 155, 168, 0.3);
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .social-icons a {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(26, 77, 84, 0.3);
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      color: #4a9ba8;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .social-icons a:hover {
+      background: rgba(74, 155, 168, 0.2);
+      border-color: #4a9ba8;
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 5px 20px rgba(74, 155, 168, 0.4);
+    }
+
+    .copyright {
+      color: #b0d4d9;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* Scroll to Top Button */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      border-radius: 50%;
+      color: #e0f4f7;
+      font-size: 20px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
+    }
+
+    .scroll-top.visible {
+      display: flex;
+    }
+
+    .scroll-top:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      transform: translateY(-5px);
+      box-shadow: 0 6px 25px rgba(74, 155, 168, 0.5);
+    }
+
+    /* Particles Container */
+    #particles-js {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      nav .nav-container {
+        padding: 0 20px;
         flex-direction: column;
-        /* Stack items vertically */
-        align-items: flex-start;
-        /* Align items to the left */
+        gap: 15px;
       }
 
-      .profile div p {
-        font-size: 1.2em;
-        margin: 0;
-        /* Reset margin */
-      }
-
-      .profile div h1 {
-        font-size: 1.7em;
-        margin: 0;
-        /* Reset margin */
-      }
-
-      .profile img {
-        border-radius: 50%;
-        margin-right: 20px;
-        width: 20%;
-        height: auto;
-        /* Maintain aspect ratio */
-      }
-
-      @media (max-width: 768px) {
-        header {
-          padding: 15px 10px;
-          font-size: 32px;
-          min-height: 40px;
-        }
-
-        nav {
-          flex-wrap: wrap;
-        }
-
-        nav a {
-          padding: 10px 15px;
-          font-size: 0.65em;
-        }
-
-        .profile {
-          width: 95%;
-          left: 2.5%;
-          right: 2.5%;
-          top: 9vh;
-          max-height: 120vh;
-          height: auto;
-          min-height: 200px;
-          overflow-y: auto;
-          padding: 15px;
-          box-sizing: border-box;
-          flex-direction: column;
-          position: absolute;
-          z-index: 15;
-        }
-
-        .profile img {
-          width: 35%;
-          margin-right: 0;
-          margin-bottom: 15px;
-        }
-
-        .profile div {
-          align-items: center;
-          width: 100%;
-          text-align: center;
-        }
-
-        .profile div h1 {
-          font-size: 1.3em;
-          margin-bottom: 10px;
-        }
-
-        .transparent-box {
-          margin-top: 0;
-          padding: 20px 10px;
-          z-index: 5;
-          position: relative;
-        }
-
-        #particles-js {
-          min-height: 120vh;
-          height: 120vh;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .transparent-box h2 {
-          font-size: 28px;
-          padding: 10px 20px;
-          margin-bottom: 20px;
-        }
-
-        .project-container {
-          padding: 10px;
-        }
-
-        .project-item {
-          width: 100%;
-          max-width: 350px;
-          margin: 15px auto;
-        }
-      }
-
-      .project-container {
-        display: flex;
+      nav .nav-links {
+        gap: 15px;
         flex-wrap: wrap;
-        justify-content: space-around;
-        padding: 20px;
-        max-width: 1400px;
+        justify-content: center;
+      }
+
+      nav .nav-links a {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .hero {
+        padding-top: 120px;
+      }
+
+      .profile-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .profile-img {
         margin: 0 auto;
       }
 
-      .project-item {
-        width: 300px;
-        margin: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      .project-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
-      .project-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3), 0 12px 30px 0 rgba(0, 0, 0, 0.25);
+      .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
       }
 
-      .project-item img {
+      .hero-btn {
         width: 100%;
-        display: block;
-        border-bottom: 1px solid #ccc;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .hero h1 {
+        font-size: 32px;
+        letter-spacing: 2px;
       }
 
-      .project-details {
-        padding: 10px;
-      }
-
-      h3 {
-        margin: 0 0 10px;
-      }
-
-      p {
-        margin: 0 0 15px;
-      }
-
-      .buttons {
-        text-align: center;
-      }
-
-      .buttons a {
-        display: inline-block;
-        width: 100px;
-        padding: 5px 10px;
-        margin: 5px;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 5px;
-        color: #fff;
-      }
-
-      .youtube-btn {
-        background-color: #c4302b;
-      }
-
-      .github-btn {
-        background-color: #333;
-      }
-
-      .lightbox {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-      }
-
-      .lightbox-img {
-        max-width: 80%;
-        max-height: 80%;
-        margin: auto;
-        display: block;
-      }
-
-      .close-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 30px;
-        color: #fff;
-        cursor: pointer;
-      }
-
-      .projects {
-        background-color: silver;
-        height: 70vh;
-        margin-top: 40px;
-        text-align: start;
-        font-family: Hack, Courier New, Courier, monospace;
-        font-weight: bold;
-      }
-
-      .transparent-box h2 {
-        font-size: 40px;
-        font-weight: bold;
-        margin: 0 auto 30px auto;
-        padding: 15px 30px;
-        display: block;
-        text-align: center;
-        background-color: silver;
-        width: fit-content;
-        border-radius: 5px;
-      }
-
-      .button-description {
-        background-color: #286173;
-        font-family: Hack, Courier New, Courier, monospace;
-        font-size: 12px;
-        font-weight: bold;
-        cursor: pointer;
-        display: inline-block;
-        min-width: 140px; /* Ensures a good default width on small screens */
-        max-width: 200px; /* Allows expansion on larger screens */
-        width: auto; /* Makes width dynamic between min and max */
-        padding: 8px 12px; /* Slightly increased for better spacing */
-        margin: 5px; /* Proper spacing between buttons */
-        text-align: center;
-        text-decoration: none;
-        border-radius: 5px;
-        color: #fff;
-        white-space: nowrap; /* Prevents wrapping */
-        overflow: hidden; /* Hides overflow text */
-        text-overflow: ellipsis; /* Adds "..." if the text is too long */
-        transition: all 0.3s ease-in-out; /* Smooth animation on resize */
-      }
-      
-      /* Ensuring responsiveness on different screen sizes */
-      @media (max-width: 480px) {
-        .button-description {
-          min-width: 120px; /* Adjusts for smaller screens */
-          font-size: 11px; /* Slightly reduces font size for smaller devices */
-        }
-      }
-      
-      .button-description:hover {
-        opacity: 0.8;
-        background-color: #34889c; /* Slightly lighter on hover */
-      }
-
-      /* Additional CSS for transparency effects #f2f2f2 */
-      body {
-        background-color: transparent;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      #particles-js {
-        width: 100%;
-        height: 100vh;
-        position: relative;
-        z-index: 1;
-      }
-
-      footer {
-        background-color: rgba(255, 255, 255, 0.8);
-        padding: 5px 0;
-        height: 50px;
-        text-align: center;
-        transition: background-color 0.3s ease;
-      }
-
-      .footer-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .footer-content .social-icons a {
-        margin: 0 5px;
-        color: #1e3050;
-        font-size: 1.1em;
-        vertical-align: middle;
-      }
-
-      .footer-content .copyright {
-        font-size: 1.1em;
-        font-family: "Courier New", monospace;
-        font-weight: middle;
-        /* or the desired weight such as normal, bold, etc. */
-        color: #333;
-        margin-top: 20px;
-      }
-
-      .transparent-box {
-        background-color: rgba(188, 231, 247, 0.7);
-        padding: 40px 20px;
-        border-radius: 0px;
-        margin: 0;
-        position: relative;
-        width: 100%;
-        min-height: 100vh;
-        font-family: Hack, Courier New, Courier, monospace;
-        font-size: 16px;
-        font-weight: bold;
-        box-sizing: border-box;
-        z-index: 5;
-      }
-
-      .transparent-box .button-top {
-        position: -webkit-sticky;
-        /* Safari */
-        position: sticky;
-        bottom: 0;
-        display: inline-block;
-        float: right;
-      }
-
-      .show-box {
-        visibility: visible;
-      }
-
-      .theme-changer {
-        position: -webkit-sticky;
-        /* Safari */
-        position: sticky;
-        bottom: 0;
-        display: inline-block;
-        float: right;
-      }
-
-      .top-button {
-        position: -webkit-sticky;
-        /* Safari */
-        position: sticky;
-        bottom: 0;
-        display: inline-block;
-        float: left;
-      }
-
-      .dark-theme {
-        background-color: #000;
-        color: green;
-      }
-
-      .dark-theme header {
-        background-color: #333;
-        color: green;
-      }
-
-      .dark-theme .projects button {
-        padding: 9px;
-        border: none;
-        background-image: linear-gradient(-45deg, #FFA63D, #FF3D77, #338AFF);
-        color: white;
+      .hero .subtitle {
         font-size: 14px;
-        cursor: pointer;
-        border-radius: 10%;
       }
 
-      .dark-theme nav a {
-        color: #000708;
+      .profile-container {
+        padding: 20px 15px;
       }
 
-      /* Cursor blinking animation */
-      .cursor {
-        display: inline-block;
-        animation: blinkCursor 0.7s infinite;
-        margin-left: 0;
-        padding-left: 0;
+      .project-card {
+        border-radius: 15px;
       }
+    }
 
-      #name-container {
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Smooth Scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Fade-in Animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
       }
-
-      #name-container span {
-        display: inline;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
+    }
 
-      #name {
-        margin-right: 0;
-        padding-right: 0;
-      }
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+  </style>
+</head>
 
-      #cursor {
-        margin-left: 2px;
-        padding-left: 0;
-      }
+<body>
+  <div class="background-grid"></div>
 
-      @keyframes blinkCursor {
-        0% {
-          opacity: 0;
-        }
-
-        50% {
-          opacity: 1;
-        }
-
-        100% {
-          opacity: 0;
-        }
-      }
-
-      .accordion {
-        margin-bottom: 10px;
-      }
-
-      .panel {
-        padding: 0 18px;
-        display: none;
-        background-color: rgba(255, 255, 255, 0.1);
-        /* Transparent background for panel */
-        color: #000;
-        /* White font for readability */
-        border-radius: 5px;
-        overflow: hidden;
-        margin-bottom: 10px;
-        font-family: monospace;
-      }
-
-      .panel p {
-        margin: 10px 0;
-      }
-
-      .active,
-      .accordion:hover {
-        background-color: #ddd;
-        color: black;
-      }
-    </style>
-  </head>
-  
-  <body>
-    <header>
-      <div id="name-container">
-        <span id="name"></span>
-        <span id="cursor" class="cursor">|</span>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <span class="logo-text" id="nav-logo-text"></span>
+        <span class="logo-cursor" id="nav-logo-cursor"></span>
       </div>
-    </header>
-    <nav style="background-color: grey;">
-      <a href="/bio">Bio</a>
-      <a href="/contacts">Contact</a>
-      <a href="#projects">Projects</a>
-      <a href="/skills">Skills</a>
-    </nav>
-    <!-- particles.js container -->
-    <div id="particles-js">
-      <script src="./particles.js"></script>
-      <div id="bio" class="profile">
-        <img src="images/profile/puppy1.avif" alt="Profile image of John Subba, known as iceman404">
-        <div class="info-container">
-          <h1>
-            <em>Real Name: John Subba</em>
-          </h1>
-          <div class="accordion">
-            <h2>Technical Skills</h2>
-            <div class="panel">
-              <p>&#x25A3; <b>Core Programming languages:</b> C, C++, Python and SQL </p>
-              <p>&#x25A3; <b>ML/DL/NLP/CV Frameworks:</b> Tensorflow, Pytorch, Scikit-Learn, NLTK, OpenCV and Transformers(Hugging Face) </p>
-              <p>&#x25A3; <b>Reinforcement Learning:</b> Gymnasium and Stable Baseline </p>
-              <p>&#x25A3; <b>Version Control and Collaboration:</b> Git/Github/Gitlab, Jupyter, Google Colab and Kaggle </p>
-              <p>&#x25A3; <b>Cloud Platforms:</b> GCP and AWS </p>
-              <p>&#x25A3; <b>Deployment Tools:</b> Docker, Kubernetes and MLflow </p>
-              <p>&#x25A3; <b>Microcontrollers:</b> Espressif SoCs and Raspberry-Pi-Pico </p>
+      <ul class="nav-links">
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="/contacts">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div id="particles-js"></div>
+    <div class="hero-content fade-in">
+      <h1 id="hero-name">ICEMAN404</h1>
+      <p class="subtitle">GPU-Accelerated Computer Vision Engineer</p>
+      <p class="tagline">Building the future of immersive technology through cutting-edge computer vision, augmented reality, and systems-level engineering expertise.</p>
+      <div class="hero-buttons">
+        <a href="/bio" class="hero-btn primary">Explore Bio</a>
+        <a href="#projects" class="hero-btn">View Projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile Section -->
+  <section class="profile-section">
+    <div class="profile-container fade-in">
+      <img src="images/profile/puppy1.avif" alt="John Subba | iceman404" class="profile-img">
+      <div class="profile-info">
+        <h2>John Subba</h2>
+        <p class="real-name">Real Name: John Subba</p>
+        
+        <div class="accordion">
+          <h3>Technical Skills</h3>
+          <div class="panel">
+            <div class="panel-content">
+              <p><b>Core Programming Languages:</b> C, C++, Python, SQL</p>
+              <p><b>ML/DL/NLP/CV Frameworks:</b> TensorFlow, PyTorch, Scikit-Learn, NLTK, OpenCV, Transformers (Hugging Face)</p>
+              <p><b>Reinforcement Learning:</b> Gymnasium, Stable Baselines</p>
+              <p><b>Version Control & Collaboration:</b> Git/GitHub/GitLab, Jupyter, Google Colab, Kaggle</p>
+              <p><b>Cloud Platforms:</b> GCP, AWS</p>
+              <p><b>Deployment Tools:</b> Docker, Kubernetes, MLflow</p>
+              <p><b>Microcontrollers:</b> Espressif SoCs, Raspberry Pi Pico</p>
             </div>
           </div>
-          <div class="accordion">
-            <h2>Personal Info</h2>
-            <div class="panel">
-              <p>&#x25A3; <b>Spoken Languages:</b> English, Nepali and Hindi </p>
-              <p>&#x25A3; <b>Education:</b> Bachelor's in Information Technology </p>
-              <p>&#x25A3; <b>Hobbies:</b> Open-source UAVs </p>
+        </div>
+
+        <div class="accordion">
+          <h3>Personal Info</h3>
+          <div class="panel">
+            <div class="panel-content">
+              <p><b>Spoken Languages:</b> English, Nepali, Hindi</p>
+              <p><b>Education:</b> Bachelor's in Information Technology</p>
+              <p><b>Hobbies:</b> Open-source UAVs</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div id="projects" class="transparent-box">
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="projects-section">
+    <div class="projects-header fade-in">
       <h2>Project Showcase</h2>
-      <div class="project-container">
-        <div class="project-item">
-          <img src="project-screenshots-files/mira.avif" alt="MIRA" onclick="openLightbox('project-screenshots-files/mira.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/mira')">MIRA</button>
-            <p id="project1-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/watch?v=Ln1M1jYKkDc" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/MIRA" target="_blank" class="github-btn">GitHub</a>
-            </div>
+      <p>Cutting-edge projects demonstrating expertise in AR/VR, Computer Vision, Embedded Systems, and AI/ML</p>
+    </div>
+
+    <div class="project-grid">
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/mira.avif" alt="MIRA" class="project-image" onclick="openLightbox('project-screenshots-files/mira.avif')">
+        <div class="project-details">
+          <h3 class="project-title">MIRA</h3>
+          <p class="project-description" id="project1-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/mira" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/watch?v=Ln1M1jYKkDc" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/mira" target="_blank" class="project-btn">GitHub</a>
           </div>
         </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/lora_geofencing.avif" alt="LORA Geofencing" onclick="openLightbox('project-screenshots-files/lora_geofencing.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/lora_geofencing')">LORA Geofencing</button>
-            <p id="project2-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/esp32_lora_geofencing" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/java_project.avif" alt="VisionGuardianCommander" onclick="openLightbox('project-screenshots-files/java_project.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/vision_guardian_commander')">VisionGuardianCommander</button>
-            <p id="project3-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/watch?v=xlK7uBWht90" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/visionguardiancommander" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/facemusic_mood.avif" alt="Facemood Music Player" onclick="openLightbox('project-screenshots-files/facemusic_mood.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/facemood_music_player')">Facemood Music Player</button>
-            <p id="project4-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/facemood_music_player" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/facecounter_server.avif" alt="Face Counter System" onclick="openLightbox('project-screenshots-files/facecounter_server.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/face_counter_system')">Face Counter System</button>
-            <p id="project5-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/esp32-face-counter-system" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/resnet50_finetuning.avif" alt="CFine-Tuning with Resnet50" onclick="openLightbox('project-screenshots-files/resnet50_finetuning.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/fine_tuning_resnet50')">Fine-Tuning with Resnet50</button>
-            <p id="project6-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/iceman404/Fine-Tuning-using-Resnet50" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/redis_clone.avif" alt="Advanced Redis Clone" onclick="openLightbox('project-screenshots-files/redis_clone.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/advanced_redis_clone')">Advanced Redis Clone</button>
-            <p id="project7-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <div class="project-item">
-          <img src="project-screenshots-files/esp32_drone.avif" alt="Open Hardware Drone" onclick="openLightbox('project-screenshots-files/esp32_drone.avif')">
-          <div class="project-details">
-            <button class="button-description" onclick="handleProjectSelection('project-html-files/open_hardware_drone')">Open Hardware Drone</button>
-            <p id="project8-description"></p>
-            <div class="buttons">
-              <a href="https://www.youtube.com/" target="_blank" class="youtube-btn">YouTube</a>
-              <a href="https://github.com/" target="_blank" class="github-btn">GitHub</a>
-            </div>
-          </div>
-        </div>
-        <!-- More project items can be added similarly -->
       </div>
-      <div class="lightbox" onclick="closeLightbox()">
-        <span class="close-btn">&times;</span>
-        <img class="lightbox-img" src="" alt="Project Image">
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/lora_geofencing.avif" alt="LORA Geofencing" class="project-image" onclick="openLightbox('project-screenshots-files/lora_geofencing.avif')">
+        <div class="project-details">
+          <h3 class="project-title">LORA Geofencing</h3>
+          <p class="project-description" id="project2-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/lora_geofencing" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/esp32_lora_geofencing" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/java_project.avif" alt="VisionGuardianCommander" class="project-image" onclick="openLightbox('project-screenshots-files/java_project.avif')">
+        <div class="project-details">
+          <h3 class="project-title">VisionGuardianCommander</h3>
+          <p class="project-description" id="project3-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/vision_guardian_commander" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/watch?v=xlK7uBWht90" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/visionguardiancommander" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/facemusic_mood.avif" alt="Facemood Music Player" class="project-image" onclick="openLightbox('project-screenshots-files/facemusic_mood.avif')">
+        <div class="project-details">
+          <h3 class="project-title">Facemood Music Player</h3>
+          <p class="project-description" id="project4-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/facemood_music_player" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/facemoodmusicplayer" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/facecounter_server.avif" alt="Face Counter System" class="project-image" onclick="openLightbox('project-screenshots-files/facecounter_server.avif')">
+        <div class="project-details">
+          <h3 class="project-title">Face Counter System</h3>
+          <p class="project-description" id="project5-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/face_counter_system" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/esp32-face-counter-system" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/resnet50_finetuning.avif" alt="Fine-Tuning with ResNet50" class="project-image" onclick="openLightbox('project-screenshots-files/resnet50_finetuning.avif')">
+        <div class="project-details">
+          <h3 class="project-title">Fine-Tuning with ResNet50</h3>
+          <p class="project-description" id="project6-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/fine_tuning_resnet50" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/iceman404/fine_tuning_resnet50" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/redis_clone.avif" alt="Advanced Redis Clone" class="project-image" onclick="openLightbox('project-screenshots-files/redis_clone.avif')">
+        <div class="project-details">
+          <h3 class="project-title">Advanced Redis Clone</h3>
+          <p class="project-description" id="project7-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/advanced_redis_clone" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <img src="project-screenshots-files/esp32_drone.avif" alt="Open Hardware Drone" class="project-image" onclick="openLightbox('project-screenshots-files/esp32_drone.avif')">
+        <div class="project-details">
+          <h3 class="project-title">Open Hardware Drone</h3>
+          <p class="project-description" id="project8-description"></p>
+          <div class="project-buttons">
+            <a href="project-html-files/open_hardware_drone" class="project-btn">View Details</a>
+            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
+            <a href="https://github.com/" target="_blank" class="project-btn">GitHub</a>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="theme-changer">
-      <button class="button-description" onclick="changeTheme()">Theme</button>
+
+    <div class="lightbox" onclick="closeLightbox()">
+      <span class="close-btn">&times;</span>
+      <img class="lightbox-img" src="" alt="Project Image">
     </div>
-    <div class="top-button">
-      <button class="button-description" onclick="handleProjectSelection('#name-container')">Main Menu</button>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="social-icons">
+        <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+        <a href="https://www.x.com/" target="_blank" aria-label="Twitter">
+          <i class="fab fa-x-twitter"></i>
+        </a>
+        <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/" target="_blank" aria-label="LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2024 iceman404 | Designed by John Subba</p>
     </div>
-    <footer>
-      <div class="footer-content">
-        <div class="social-icons">
-          <a href="https://www.facebook.com/" target="_blank">
-            <i class="fab fa-facebook"></i>
-          </a>
-          <a href="https://www.x.com/" target="_blank">
-            <i class="fab fa-x-twitter"></i>
-          </a>
-          <a href="https://www.instagram.com/" target="_blank">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a href="https://www.linkedin.com/in/" target="_blank">
-            <i class="fab fa-linkedin"></i>
-          </a>
-          <!-- Add other social media icons using Font Awesome classes -->
-        </div>
-        <p class="copyright">&copy; 2023 iceman404 </p>
-      </div>
-    </footer>
-    <footer>
-      <div class="footer-content">
-        <p class="copyright">Designed by John Subba</p>
-      </div>
-    </footer>
-    <script>
-      var acc = document.getElementsByClassName("accordion");
-      var i;
-      for (i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var panel = this.nextElementSibling;
-          if (panel.style.display === "block") {
-            panel.style.display = "none";
+  </footer>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-top" onclick="scrollToTop()" aria-label="Scroll to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Scripts -->
+  <script src="particles.js"></script>
+  <script src="particle.js/app.js"></script>
+  <script src="js/particles-limiter.js"></script>
+
+  <script>
+    // Continuous typing effect for navigation logo
+    const navLogoElement = document.getElementById('nav-logo-text');
+    const navLogoCursor = document.getElementById('nav-logo-cursor');
+    const navLogoText = "ICEMAN404";
+    let navLogoCharIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 120;
+    let pauseTime = 2000; // Pause after typing completes
+
+    function typeNavLogo() {
+      const currentText = navLogoElement.textContent;
+
+      if (!isDeleting && navLogoCharIndex < navLogoText.length) {
+        // Typing forward
+        navLogoElement.textContent = navLogoText.slice(0, navLogoCharIndex + 1);
+        navLogoCharIndex++;
+        typingSpeed = 120;
+        setTimeout(typeNavLogo, typingSpeed);
+      } else if (!isDeleting && navLogoCharIndex === navLogoText.length) {
+        // Finished typing, pause then start deleting
+        isDeleting = true;
+        typingSpeed = 50; // Faster deletion
+        setTimeout(typeNavLogo, pauseTime);
+      } else if (isDeleting && navLogoCharIndex > 0) {
+        // Deleting backward
+        navLogoCharIndex--;
+        navLogoElement.textContent = navLogoText.slice(0, navLogoCharIndex);
+        typingSpeed = 50;
+        setTimeout(typeNavLogo, typingSpeed);
+      } else if (isDeleting && navLogoCharIndex === 0) {
+        // Finished deleting, pause then start typing again
+        isDeleting = false;
+        navLogoElement.textContent = '';
+        typingSpeed = 120;
+        setTimeout(typeNavLogo, 500); // Short pause before restarting
+      }
+    }
+
+    // Typing effect for hero name
+    const heroNameElement = document.getElementById('hero-name');
+    const heroNameText = "ICEMAN404";
+    let heroCharIndex = 0;
+
+    function typeHeroName() {
+      if (heroCharIndex < heroNameText.length) {
+        heroNameElement.textContent = heroNameText.slice(0, heroCharIndex + 1);
+        heroCharIndex++;
+        setTimeout(typeHeroName, 150);
+      } else {
+        heroNameElement.textContent = heroNameText;
+      }
+    }
+
+    // Typing effect for project descriptions
+    const descriptions = document.querySelectorAll('.project-description');
+    const textArrays = [
+      "8052 & SIM800L Project",
+      "ESP-32 & LoRa Project",
+      "Java & OpenCV Project",
+      "Raspberry-PI Project",
+      "Edge-ML with ESP32 Server Project",
+      "Computer Vision Project",
+      "Coming Soon...",
+      "Coming Soon..."
+    ];
+
+    function typeDescriptions() {
+      descriptions.forEach((description, index) => {
+        let charIndex = 0;
+        const textToType = textArrays[index]?.trim() || '';
+
+        function type() {
+          if (charIndex < textToType.length) {
+            description.textContent = textToType.slice(0, charIndex + 1);
+            charIndex++;
+            setTimeout(type, 100);
           } else {
-            panel.style.display = "block";
+            description.textContent = textToType;
           }
-        });
-      }
-      // Code to handle project selection
-      function handleProjectSelection(projectUrl) {
-        if (projectUrl !== "") {
-          window.location.href = projectUrl;
         }
-      }
+        setTimeout(() => type(), index * 300);
+      });
+    }
 
-      function changeTheme() {
-        const body = document.getElementsByTagName('body')[0];
-        const particlesContainer = document.getElementById('particles-js');
-        body.classList.toggle('dark-theme');
-        if (body.classList.contains('dark-theme')) {
-          particlesContainer.style.backgroundColor = '#000000'; // Set the desired background color for dark theme
-        } else {
-          particlesContainer.style.backgroundColor = ''; // Remove the inline background color for light theme (fall back to CSS)
-        }
-      }
-      const descriptions = document.querySelectorAll('.project-details p');
-      const textArrays = ["8052 & SIM800L Project", "ESP-32 & Lora Project", "Java & OpenCV Project", "Raspberry-PI Project", "Edge-ML with ESP32 Server Project", "Computer Vision Project", "Coming Soon...", "Coming Soon..."
-        // Add more descriptions as needed
-      ];
-
-      function typeDescriptions() {
-        descriptions.forEach((description, index) => {
-          let charIndex = 0;
-          const textToType = textArrays[index].trim(); // Remove any extra spaces
-
-          function type() {
-            if (charIndex < textToType.length) {
-              description.textContent = textToType.slice(0, charIndex + 1);
-              charIndex++;
-              setTimeout(type, 190); // Typing speed
-            } else {
-              // Ensure no trailing spaces when typing finishes
-              description.textContent = textToType;
-            }
-          }
-          type(); // Start typing for each description
-        });
-      }
-      // Call the function to start typing on page load
-      document.addEventListener("DOMContentLoaded", typeDescriptions);
-      // Listen for visibility change to trigger typing again
-      document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'visible') {
-          typeDescriptions(); // Re-trigger typing when returning to the page
+    // Accordion functionality
+    const accordions = document.querySelectorAll('.accordion');
+    accordions.forEach(accordion => {
+      const header = accordion.querySelector('h3');
+      header.addEventListener('click', () => {
+        const isActive = accordion.classList.contains('active');
+        accordions.forEach(acc => acc.classList.remove('active'));
+        if (!isActive) {
+          accordion.classList.add('active');
         }
       });
-      // Typing effect for the name "Your_name"
-      const nameElement = document.getElementById('name');
-      const cursorElement = document.getElementById('cursor');
-      const nameText = "Hi... I'm iceman404";
-      let charIndex = 0;
-      let showBox = false;
+    });
 
-      function type() {
-        if (charIndex < nameText.length) {
-          nameElement.textContent = nameText.slice(0, charIndex + 1);
-          charIndex++;
-          setTimeout(type, 100);
-        } else {
-          // Ensure exact text when typing finishes - no extra spaces
-          nameElement.textContent = nameText;
-          showBox = true;
-          toggleContainerBox();
-          charIndex = 0;
-          setTimeout(type, 2000);
+    // Lightbox functionality
+    function openLightbox(imageSrc) {
+      const lightbox = document.querySelector('.lightbox');
+      const lightboxImg = document.querySelector('.lightbox-img');
+      lightbox.classList.add('active');
+      lightboxImg.src = imageSrc;
+    }
+
+    function closeLightbox() {
+      const lightbox = document.querySelector('.lightbox');
+      lightbox.classList.remove('active');
+    }
+
+    // Scroll to top functionality
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    const scrollTopBtn = document.querySelector('.scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    });
+
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
         }
-      }
+      });
+    }, observerOptions);
 
-      function openLightbox(imageSrc) {
-        const lightbox = document.querySelector('.lightbox');
-        const lightboxImg = document.querySelector('.lightbox-img');
-        lightbox.style.display = 'flex';
-        lightboxImg.src = imageSrc;
-      }
+    // Observe all fade-in elements
+    document.addEventListener('DOMContentLoaded', () => {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(el);
+      });
 
-      function closeLightbox() {
-        const lightbox = document.querySelector('.lightbox');
-        const lightboxImg = document.querySelector('.lightbox-img');
-        lightbox.style.display = 'none';
-        lightboxImg.src = '';
-      }
+      // Start typing effects
+      typeNavLogo();
+      setTimeout(typeHeroName, 1500);
+      setTimeout(typeDescriptions, 3000);
+    });
 
-      function toggleContainerBox() {
-        const containerBox = document.querySelector('.transparent-box');
-        if (showBox) {
-          containerBox.classList.add('show-box');
-        } else {
-          containerBox.classList.remove('show-box');
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
         }
-      }
+      });
+    });
+  </script>
 
-      function toggleCursor() {
-        cursorElement.classList.toggle('cursor');
-      }
-      window.onload = function() {
-        type();
-        setInterval(toggleCursor, 500);
-      };
-    </script>
-    <!-- scripts -->
-    <script src="particle.js/app.js"></script>
-  </body>
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .catch(() => {
+            // Service Worker registration failed silently
+          });
+      });
+    }
+  </script>
+</body>
 </html>
