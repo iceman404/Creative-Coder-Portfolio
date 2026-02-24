@@ -11,6 +11,16 @@ coverage/
 dist/
 build/
 
+# Vite dev server (local testing only - ignored when uploading to GitHub)
+.vite/
+vite.config.js
+start-dev.sh
+DEV_SERVER.md
+
+# SSL certificates (local development only)
+localhost.pem
+localhost-key.pem
+
 # Misc
 .DS_Store
 .env

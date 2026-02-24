@@ -12,25 +12,76 @@
 <meta name="author" content="iceman404" />
 <meta name="last-modified" content="2026-02-24" />
 <link rel="canonical" href="https://www.iceman404.com/bio" />
+<link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
 <!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GLTFLoader - Load after Three.js and ensure it's available -->
+<script>
+  // Wait for Three.js to load, then load GLTFLoader
+  (function() {
+    function loadGLTFLoader() {
+      if (typeof THREE === 'undefined') {
+        // Three.js not loaded yet, wait a bit
+        setTimeout(loadGLTFLoader, 100);
+        return;
+      }
+      
+      if (THREE.GLTFLoader) {
+        window.dispatchEvent(new Event('gltfloader-loaded'));
+        return;
+      }
+      
+      // Try compatible version first (r128 = 0.128.0)
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+      script.onload = function() {
+        window.dispatchEvent(new Event('gltfloader-loaded'));
+      };
+      script.onerror = function() {
+        console.warn('[Bio] Failed to load GLTFLoader from compatible version, trying latest...');
+        // Try latest version as fallback
+        const altScript = document.createElement('script');
+        altScript.src = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js';
+        altScript.onload = function() {
+          window.dispatchEvent(new Event('gltfloader-loaded'));
+        };
+        altScript.onerror = function() {
+          console.error('[Bio] Failed to load GLTFLoader from all sources');
+        };
+        document.head.appendChild(altScript);
+      };
+      document.head.appendChild(script);
+    }
+    
+    // Start loading when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadGLTFLoader);
+    } else {
+      loadGLTFLoader();
+    }
+  })();
+</script>
+
+<!-- Path Helper -->
+<script src="js/path-helper.js"></script>
+<!-- Settings Manager -->
+<script src="js/settings-manager.js"></script>
+<!-- Protection -->
+<script src="js/protection.js"></script>
+
+<!-- CV Showcase - Load before MediaPipe -->
+<script src="js/cv-showcase.js"></script>
 
 <!-- MediaPipe Vision - Loaded from CDN (works on GitHub Pages) -->
 <script type="module">
   // All dependencies loaded from CDN - compatible with static hosting
   import vision from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0';
   window.MediaPipeVision = vision;
-  console.log('[CV] MediaPipe loaded from CDN');
   window.dispatchEvent(new Event('mediapipe-loaded'));
 </script>
-
-<!-- Path Helper -->
-<script src="js/path-helper.js"></script>
-<!-- Protection -->
-<script src="js/protection.js"></script>
 
 <script type="application/ld+json">
 {
@@ -219,7 +270,7 @@
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
-    background: #000;
+    background: transparent;
     box-shadow: 0 0 50px rgba(74, 155, 168, 0.3);
     aspect-ratio: 16 / 9;
   }
@@ -230,6 +281,19 @@
     display: block;
     object-fit: contain;
     /* No transform needed - we flip coordinates in code */
+    background: transparent !important;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  
+  #cv-canvas.show-video {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
   }
 
   /* Hide favicon 404 error (harmless) */
@@ -238,13 +302,26 @@
   }
 
   #cv-3d-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0.6;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    z-index: 15 !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+  
+  #cv-3d-container canvas {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
   }
 
   .cv-controls {
@@ -317,6 +394,10 @@
     overflow-wrap: break-word;
     hyphens: auto;
     max-width: 100%;
+    min-height: 20px;
+    display: block;
+    visibility: visible;
+    opacity: 1;
   }
 
   .tech-stack {
@@ -383,6 +464,47 @@
     padding: 40px;
     color: #4a9ba8;
     font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    background: rgba(10, 15, 17, 0.9);
+    border-radius: 10px;
+  }
+  
+  .loading.hidden {
+    display: none;
+  }
+
+  .cv-instructions {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: rgba(26, 77, 84, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid #4a9ba8;
+    backdrop-filter: blur(5px);
+  }
+
+  .cv-instructions p {
+    margin: 8px 0;
+    color: #b0d4d9;
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cv-instructions p i {
+    color: #4a9ba8;
+    font-size: 16px;
+    min-width: 20px;
+  }
+
+  .cv-instructions p strong {
+    color: #4a9ba8;
+    font-weight: 700;
   }
 
   .stats {
@@ -465,6 +587,18 @@
       max-width: 100%;
     }
 
+    .cv-instructions {
+      padding: 12px 15px;
+      margin-top: 15px;
+    }
+
+    .cv-instructions p {
+      font-size: 13px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
     .stats {
       grid-template-columns: repeat(2, 1fr);
       gap: 15px;
@@ -520,6 +654,15 @@
       padding: 5px 10px;
     }
 
+    .cv-instructions {
+      padding: 10px 12px;
+      margin-top: 12px;
+    }
+
+    .cv-instructions p {
+      font-size: 12px;
+    }
+
     .bio-section {
       padding: 15px 10px;
       margin: 20px 0;
@@ -563,8 +706,6 @@
   }
 </style>
 
-<script src="js/cv-showcase.js"></script>
-
 <script>
   const bioContent = {
     whoAmI: `Hi! I'm John, a lifelong learner and tech enthusiast whose main goal is to get deep into AI and technology! My passion for AI is so strong that I've tried to teach my quadcopter how to fly by sending more voltages as a form of punishment reward. I'm basically a lifelong learner, mostly because I keep forgetting what I learned last week.`,
@@ -598,50 +739,111 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Start typing effects sequentially - each section starts after previous finishes
-    for (let i = 0; i < texts.length; i++) {
-      await typeText(texts[i]);
-      // Small pause between sections (500ms)
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    // Initialize CV Showcase
-    if (window.CVShowcase) {
-      const showcase = new CVShowcase();
-      await showcase.init();
-      window.cvShowcase = showcase;
-
-      // Setup camera control buttons
-      const startBtn = document.getElementById('start-camera-btn');
-      const stopBtn = document.getElementById('stop-camera-btn');
-
-      if (startBtn) {
-        startBtn.addEventListener('click', async () => {
-          try {
-            startBtn.disabled = true;
-            startBtn.textContent = 'Starting...';
-            await showcase.startCamera();
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'inline-block';
-            startBtn.disabled = false;
-          } catch (error) {
-            console.error('[CV] Failed to start camera:', error);
-            startBtn.disabled = false;
-            startBtn.textContent = 'Start Camera';
-            alert('Failed to start camera. Please check permissions.');
+    // PRIORITY 1: Initialize CV Showcase FIRST (top priority)
+    let retries = 0;
+    const maxRetries = 50; // 5 seconds max wait
+    
+    const initCVShowcase = async () => {
+      // Check if CVShowcase class is available
+      if (typeof window.CVShowcase === 'undefined') {
+        retries++;
+        if (retries < maxRetries) {
+          setTimeout(initCVShowcase, 100);
+        } else {
+          console.error('[CV] CVShowcase not available after ' + maxRetries + ' retries');
+          const loadingEl = document.getElementById('cv-loading');
+          if (loadingEl) {
+            loadingEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CV engine failed to load. Please refresh the page.';
+            loadingEl.style.color = '#ff6b6b';
           }
-        });
+        }
+        return;
       }
+      
+      // CVShowcase is available, initialize it IMMEDIATELY
+      try {
+        const showcase = new window.CVShowcase();
+        await showcase.init();
+        window.cvShowcase = showcase;
+        window.cvShowcaseInstance = showcase;
 
-      if (stopBtn) {
-        stopBtn.addEventListener('click', () => {
-          showcase.stop();
-          stopBtn.style.display = 'none';
-          startBtn.style.display = 'inline-block';
-          startBtn.textContent = 'Start Camera';
-        });
+        // Setup camera control buttons
+        const startBtn = document.getElementById('start-camera-btn');
+        const stopBtn = document.getElementById('stop-camera-btn');
+
+        if (startBtn) {
+          startBtn.addEventListener('click', async () => {
+            try {
+              startBtn.disabled = true;
+              startBtn.textContent = 'Starting...';
+              
+              if (!window.cvShowcase) {
+                throw new Error('CVShowcase not initialized');
+              }
+              
+              await window.cvShowcase.startCamera();
+              startBtn.style.display = 'none';
+              if (stopBtn) stopBtn.style.display = 'inline-block';
+              startBtn.disabled = false;
+            } catch (error) {
+              console.error('[CV] Failed to start camera:', error);
+              startBtn.disabled = false;
+              startBtn.textContent = 'Start Camera';
+              alert('Failed to start camera: ' + error.message + '\n\nPlease check:\n1. Camera permissions\n2. Browser console for details');
+            }
+          });
+        } else {
+          console.error('[CV] Start camera button not found!');
+        }
+
+        if (stopBtn) {
+          stopBtn.addEventListener('click', () => {
+            if (window.cvShowcase) {
+              window.cvShowcase.stop();
+              stopBtn.style.display = 'none';
+              if (startBtn) {
+                startBtn.style.display = 'inline-block';
+                startBtn.textContent = 'Start Camera';
+              }
+            }
+          });
+        }
+      } catch (error) {
+        console.error('[CV] Failed to initialize CVShowcase:', error);
+        const loadingEl = document.getElementById('cv-loading');
+        if (loadingEl) {
+          loadingEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to initialize CV engine. Check console for details.';
+          loadingEl.style.color = '#ff6b6b';
+        }
       }
-    }
+    };
+    
+    // Start CV Showcase initialization IMMEDIATELY (top priority)
+    initCVShowcase();
+
+    // PRIORITY 2: Start typing effects AFTER a short delay (non-blocking)
+    setTimeout(() => {
+      // Ensure all typing elements exist
+      const typingElements = texts.map(t => document.getElementById(t.id));
+      const missingElements = typingElements.filter(el => !el);
+      if (missingElements.length > 0) {
+        console.error('[Bio] Missing typing elements:', texts.filter((t, i) => !typingElements[i]).map(t => t.id));
+      }
+      
+      // Start typing effects sequentially - each section starts after previous finishes
+      (async () => {
+        for (let i = 0; i < texts.length; i++) {
+          const element = document.getElementById(texts[i].id);
+          if (element) {
+            await typeText(texts[i]);
+            // Small pause between sections (500ms)
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } else {
+            console.warn(`[Bio] Element ${texts[i].id} not found, skipping`);
+          }
+        }
+      })();
+    }, 100); // Small delay to let CV Showcase start first
 
     // Setup control buttons
     const controlButtons = document.querySelectorAll('.control-btn');
@@ -689,6 +891,12 @@
       <div class="loading" id="cv-loading">
         <i class="fas fa-spinner fa-spin"></i> Initializing Computer Vision Engine...
       </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="cv-instructions">
+      <p><i class="fas fa-hand-pointer"></i> <strong>Try to hold the cube with your hand and move it</strong> - minimum 2 fingers required.</p>
+      <p><i class="fas fa-hand-rock"></i> <strong>To change the cube size use both hands.</strong></p>
     </div>
 
   </div>

@@ -35,6 +35,8 @@
     <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
     <!-- Path Helper -->
     <script src="js/path-helper.js"></script>
+    <!-- Settings Manager -->
+    <script src="js/settings-manager.js"></script>
     <!-- Protection -->
     <script src="js/protection.js"></script>
     
@@ -297,6 +299,115 @@
         transform: translateY(-2px);
       }
 
+      .social-cards-personal {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .social-card-personal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 30px;
+        border-radius: 15px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(74, 155, 168, 0.3);
+        width: 120px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .social-card-personal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s ease;
+      }
+
+      .social-card-personal:hover::before {
+        left: 100%;
+      }
+
+      .social-card-personal i {
+        font-size: 32px;
+        transition: transform 0.3s ease;
+      }
+
+      .social-card-personal span {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .social-card-personal.facebook {
+        background: linear-gradient(135deg, rgba(24, 119, 242, 0.2), rgba(24, 119, 242, 0.1));
+        color: #1877f2;
+        border-color: rgba(24, 119, 242, 0.4);
+      }
+
+      .social-card-personal.facebook:hover {
+        background: linear-gradient(135deg, rgba(24, 119, 242, 0.4), rgba(24, 119, 242, 0.2));
+        border-color: #1877f2;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(24, 119, 242, 0.4);
+      }
+
+      .social-card-personal.instagram {
+        background: linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(225, 48, 108, 0.1));
+        color: #e1306c;
+        border-color: rgba(225, 48, 108, 0.4);
+      }
+
+      .social-card-personal.instagram:hover {
+        background: linear-gradient(135deg, rgba(225, 48, 108, 0.4), rgba(225, 48, 108, 0.2));
+        border-color: #e1306c;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(225, 48, 108, 0.4);
+      }
+
+      .social-card-personal.twitter {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2));
+        color: #000000;
+        border-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .social-card-personal.twitter:hover {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
+        border-color: #000000;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .social-card-personal.tiktok {
+        background: linear-gradient(135deg, rgba(0, 242, 234, 0.2), rgba(255, 0, 80, 0.1));
+        color: #00f2ea;
+        border-color: rgba(0, 242, 234, 0.4);
+      }
+
+      .social-card-personal.tiktok:hover {
+        background: linear-gradient(135deg, rgba(0, 242, 234, 0.4), rgba(255, 0, 80, 0.2));
+        border-color: #00f2ea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 242, 234, 0.4);
+      }
+
+      .social-card-personal:hover i {
+        transform: scale(1.2) rotate(5deg);
+      }
+
       /* Mobile Optimization */
       @media (max-width: 768px) {
         .container {
@@ -364,7 +475,7 @@
     
     <div class="container">
       <header>
-        <img src="./images/profile/puppy1.avif" alt="Profile Picture of John Subba (iceman404)" class="profilePic" />
+        <img src="./images/profile/mine3.avif" alt="Profile Picture of John Subba (iceman404)" class="profilePic" />
         <h1>GET IN TOUCH</h1>
         <p class="subtitle">GPU-Accelerated Computer Vision Engineer</p>
       </header>
@@ -372,14 +483,33 @@
       <div class="contact-section">
         <h2 class="section-title">Connect With Me</h2>
         <div class="socialLinks">
-          <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" aria-label="LinkedIn Profile">
+          <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" aria-label="LinkedIn Profile" rel="noopener noreferrer">
             <i class="fab fa-linkedin socialIcon" aria-hidden="true"></i>
           </a>
-          <a href="https://x.com/ic3man404" target="_blank" aria-label="X (formerly Twitter) Profile">
-            <i class="fab fa-x-twitter socialIcon" aria-hidden="true"></i>
-          </a>
-          <a href="https://github.com/iceman404" target="_blank" aria-label="GitHub Profile">
+          <a href="https://github.com/iceman404" target="_blank" aria-label="GitHub Profile" rel="noopener noreferrer">
             <i class="fab fa-github socialIcon" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-section">
+        <h2 class="section-title">Personal Socials</h2>
+        <div class="social-cards-personal">
+          <a href="https://www.facebook.com/johnsubba.404" target="_blank" class="social-card-personal facebook" rel="noopener noreferrer">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+          <a href="https://www.instagram.com/johnsubba.404" target="_blank" class="social-card-personal instagram" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+          </a>
+          <a href="https://x.com/ic3man404" target="_blank" class="social-card-personal twitter" rel="noopener noreferrer">
+            <i class="fab fa-x-twitter"></i>
+            <span>Twitter/X</span>
+          </a>
+          <a href="https://www.tiktok.com/@ic3man404" target="_blank" class="social-card-personal tiktok" rel="noopener noreferrer">
+            <i class="fab fa-tiktok"></i>
+            <span>TikTok</span>
           </a>
         </div>
       </div>

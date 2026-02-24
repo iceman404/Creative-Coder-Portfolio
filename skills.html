@@ -20,6 +20,9 @@
   <meta name="author" content="iceman404" />
   <meta name="last-modified" content="2026-02-24" />
   <link rel="canonical" href="https://www.iceman404.com/skills" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <title>Skills | AR/VR & CV Engineer | John Subba | iceman404</title>
@@ -33,6 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Path Helper -->
   <script src="js/path-helper.js"></script>
+  <!-- Settings Manager -->
+  <script src="js/settings-manager.js"></script>
+  <!-- Holographic Skills Visualization -->
+  <script src="js/skills-holographic.js"></script>
   <!-- Protection -->
   <script src="js/protection.js"></script>
   <style>
@@ -302,8 +309,8 @@
     }
 
     .overlay-content img {
-      width: 80px;
-      height: 80px;
+      width: 144px;
+      height: 144px;
       border-radius: 50%;
       margin-bottom: 15px;
       border: 3px solid rgba(74, 155, 168, 0.5);
@@ -350,6 +357,8 @@
       flex-wrap: wrap;
       justify-content: space-between;
       margin-top: 20px;
+      width: 100%;
+      gap: 0;
     }
 
     .skills-column {
@@ -361,6 +370,8 @@
       background: rgba(26, 77, 84, 0.2);
       border: 1px solid rgba(74, 155, 168, 0.3);
       backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
     }
 
     .skills-column h3 {
@@ -414,16 +425,119 @@
     .programming-language {
       width: 100%;
       height: auto;
-      padding: 15px;
+      padding: 0;
       z-index: 3;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-      margin-bottom: 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
       position: relative;
-      background: rgba(26, 77, 84, 0.3);
-      border: 1px solid rgba(74, 155, 168, 0.3);
-      backdrop-filter: blur(5px);
+      background: transparent;
+      border: none;
+      backdrop-filter: none;
       transition: all 0.3s ease;
+      overflow: visible;
+    }
+    
+    .holographic-card-wrapper {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    
+    .holographic-container {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+    }
+    
+    .holographic-main {
+      position: relative;
+      background: rgba(26, 77, 84, 0.4);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 20px;
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      padding: 25px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: translateZ(0);
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow: hidden;
+    }
+    
+    .holographic-card-wrapper:hover .holographic-main {
+      transform: translateZ(20px) scale(1.02);
+      border-color: rgba(74, 155, 168, 0.6);
+      box-shadow: 
+        0 20px 60px rgba(0, 185, 204, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .holographic-glow {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(135deg, 
+        rgba(0, 185, 204, 0.1) 0%,
+        rgba(6, 232, 255, 0.05) 50%,
+        rgba(0, 185, 204, 0.1) 100%);
+      border-radius: 20px;
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+    
+    .holographic-card-wrapper:hover .holographic-glow {
+      opacity: 1;
+    }
+    
+    .holographic-reflection {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 100%);
+      border-radius: 20px 20px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+    
+    .holographic-card-wrapper:hover .holographic-reflection {
+      opacity: 1;
+    }
+    
+    .holographic-gradient {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent,
+        rgba(74, 155, 168, 0.2),
+        transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .progress-container {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .code-block {
+      position: relative;
+      z-index: 2;
     }
 
     .page {
@@ -465,76 +579,119 @@
       font-weight: 700;
     }
 
-    /* Desktop hover effects - AR theme */
-    .programming-language:hover {
-      transform: translateY(-5px);
-      box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(74, 155, 168, 0.4);
-      z-index: 4;
-      background: rgba(26, 77, 84, 0.5);
-      border-color: #4a9ba8;
+    /* Enhanced progress bar */
+    .progress-bar {
+      position: relative;
+      overflow: hidden;
     }
-
-    /* Glow effect on hover */
-    .programming-language:hover::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 15px;
-      background: linear-gradient(
-        135deg,
-        rgba(74, 155, 168, 0.1) 0%,
-        transparent 50%,
-        rgba(74, 155, 168, 0.1) 100%
-      );
-      z-index: -1;
+    
+    .progress-bar span {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     }
-
-    /* Code block enhancement on hover */
-    .programming-language:hover .code-block {
+    
+    .holographic-card-wrapper:hover .progress-bar span {
+      box-shadow: 0 0 20px rgba(74, 155, 168, 0.8);
+      filter: brightness(1.2);
+    }
+    
+    /* Code block enhancement */
+    .holographic-card-wrapper:hover .code-block {
       background-color: rgba(10, 15, 17, 0.8);
       border-color: rgba(74, 155, 168, 0.4);
+      transform: translateZ(5px);
     }
-
-    /* Progress bar enhancement on hover */
-    .programming-language:hover .progress-bar span {
-      box-shadow: 0 0 15px rgba(74, 155, 168, 0.8);
+    
+    /* Image enhancement */
+    .holographic-card-wrapper:hover .progress-container img {
+      transform: scale(1.1) rotate(5deg);
+      filter: drop-shadow(0 0 10px rgba(74, 155, 168, 0.6));
+    }
+    
+    .progress-container img {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
     /* Add the media query for mobile responsiveness */
     @media (max-width: 879px) {
-      .skills-column {
+      .skills-section {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        gap: 0;
+      }
+      
+      .skills-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        padding: 10px;
+        box-sizing: border-box;
       }
 
       .programming-language {
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         height: auto;
-        padding: 12px;
+        padding: 0;
         z-index: 3;
         border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         margin-bottom: 16px;
         position: relative;
-        background: rgba(26, 77, 84, 0.3);
-        border: 1px solid rgba(74, 155, 168, 0.3);
+        background: transparent;
+        border: none;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: pointer;
         transform: translateY(0);
+        overflow: visible;
+        box-sizing: border-box;
+      }
+      
+      .holographic-card-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      .holographic-main {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      /* Disable 3D transforms on mobile */
+      .holographic-card-wrapper {
+        perspective: none;
+      }
+      
+      .holographic-container {
+        transform: none !important;
+      }
+      
+      .holographic-card-wrapper:hover .holographic-container {
+        transform: none !important;
+      }
+      
+      .holographic-main {
+        transform: translateZ(0) scale(1) !important;
+      }
+      
+      .holographic-card-wrapper:hover .holographic-main {
+        transform: translateZ(0) scale(1.02) !important;
       }
 
-      /* Mobile touch support - AR theme */
-      .programming-language:active {
+      /* Mobile touch support */
+      .programming-language:active,
+      .holographic-card-wrapper:active {
         transform: translateY(-3px);
+      }
+      
+      .holographic-card-wrapper:active .holographic-main {
+        transform: translateZ(0) scale(1.02) !important;
         box-shadow: 
-          0 8px 20px rgba(0, 0, 0, 0.4),
-          0 0 20px rgba(74, 155, 168, 0.4);
-        transition: transform 0.1s ease;
-        border-color: #4a9ba8;
+          0 12px 40px rgba(0, 185, 204, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
       }
 
       .page {
@@ -550,6 +707,29 @@
       }
     }
 
+    @media (max-width: 768px) {
+      .skills-section {
+        gap: 0;
+      }
+      
+      .skills-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 8px;
+        margin-bottom: 15px;
+      }
+      
+      .programming-language {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 12px;
+      }
+      
+      .holographic-main {
+        padding: 15px !important;
+      }
+    }
+
     @media (max-width: 480px) {
       .overlay-content {
         padding: 10px;
@@ -557,6 +737,18 @@
       
       .skills-column {
         padding: 5px;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      
+      .programming-language {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 10px;
+      }
+      
+      .holographic-main {
+        padding: 12px !important;
       }
     }
 
@@ -621,7 +813,7 @@
   <!-- Transparent overlay -->
   <div class="overlay" id="overlay">
     <div class="overlay-content">
-      <img src="images/profile/puppy1.avif" alt="John Subba | iceman404 | Photo">
+      <img src="images/profile/mine4.avif" alt="John Subba | iceman404 | Photo">
       <h2> 🤓 Geek by nature | Programmer by choice</h2>
       <p>Proficient in a range of programming languages and technologies, spanning from beginner to expert levels. Equipped with hands-on experience and a strong foundation in software development.</p>
       <div class="skills-section">
@@ -928,7 +1120,7 @@ K8s Knowledge:
         </div>
       </div>
       <span style="font-family: monospace; font-weight: bold;">
-        <a href="./resume/John-Resume.pdf" download="John-Resume">Download Resume</a>
+        <a id="resume-download-link" href="https://hackerresume-prod.s3.us-east-1.amazonaws.com/resumes/iceman404/8af7631f-dbb4-4c5d-952d-9439ac75342d.pdf" download="John-Subba-Resume.pdf" target="_blank" rel="noopener noreferrer">Download Resume</a>
       </span>
     </div>
   </div>
@@ -1128,12 +1320,67 @@ K8s Knowledge:
       animate();
     }
 
+    // Resume download with fallback
+    function setupResumeDownload() {
+      const resumeLink = document.getElementById('resume-download-link');
+      if (!resumeLink) return;
+      
+      const hackerRankUrl = 'https://hackerresume-prod.s3.us-east-1.amazonaws.com/resumes/iceman404/8af7631f-dbb4-4c5d-952d-9439ac75342d.pdf';
+      const fallbackUrl = './resume/John-Resume.pdf';
+      
+      // Set HackerRank URL as primary
+      resumeLink.href = hackerRankUrl;
+      resumeLink.download = 'John-Subba-Resume.pdf';
+      
+      // Handle click event for fallback
+      resumeLink.addEventListener('click', function(e) {
+        // Try to fetch HackerRank URL first
+        fetch(hackerRankUrl, { method: 'HEAD', mode: 'no-cors' })
+          .then(() => {
+            // HackerRank URL works, let the link proceed normally
+            // The href is already set to hackerRankUrl
+          })
+          .catch(() => {
+            // If HackerRank fails, use fallback
+            e.preventDefault();
+            const fallbackLink = document.createElement('a');
+            fallbackLink.href = fallbackUrl;
+            fallbackLink.download = 'John-Resume.pdf';
+            fallbackLink.target = '_blank';
+            fallbackLink.rel = 'noopener noreferrer';
+            document.body.appendChild(fallbackLink);
+            fallbackLink.click();
+            document.body.removeChild(fallbackLink);
+          });
+      });
+      
+      // Also check on page load and update href if needed
+      fetch(hackerRankUrl, { method: 'HEAD', mode: 'no-cors' })
+        .then(() => {
+          // HackerRank URL is accessible, keep it
+          resumeLink.href = hackerRankUrl;
+        })
+        .catch(() => {
+          // HackerRank URL not accessible, use fallback
+          resumeLink.href = fallbackUrl;
+          resumeLink.download = 'John-Resume.pdf';
+        });
+    }
+
     // Initialize the page
     window.addEventListener('load', function() {
       createFloatingTech();
       startRain();
       init3DBackground();
       type();
+      setupResumeDownload();
+      
+      // Initialize holographic skills after a short delay to ensure DOM is ready
+      setTimeout(() => {
+        if (window.HolographicSkills) {
+          window.HolographicSkills.init();
+        }
+      }, 500);
     });
   </script>
 </body>

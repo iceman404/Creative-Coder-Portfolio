@@ -31,6 +31,7 @@
   
   <!-- SEO & Performance Scripts -->
   <script src="js/path-helper.js"></script>
+  <script src="js/settings-manager.js"></script>
   <script src="js/seo-helper.js"></script>
   <script src="js/site-navigation.js"></script>
   <script src="js/performance-monitor.js"></script>
@@ -303,6 +304,89 @@
 
     .hero-btn.primary:hover {
       background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+    }
+
+    .social-cards {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .social-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 30px;
+      border-radius: 15px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(74, 155, 168, 0.3);
+      min-width: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .social-card:hover::before {
+      left: 100%;
+    }
+
+    .social-card i {
+      font-size: 32px;
+      transition: transform 0.3s ease;
+    }
+
+    .social-card span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .social-card.linkedin {
+      background: linear-gradient(135deg, rgba(0, 119, 181, 0.2), rgba(0, 119, 181, 0.1));
+      color: #0077b5;
+      border-color: rgba(0, 119, 181, 0.4);
+    }
+
+    .social-card.linkedin:hover {
+      background: linear-gradient(135deg, rgba(0, 119, 181, 0.4), rgba(0, 119, 181, 0.2));
+      border-color: #0077b5;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 119, 181, 0.4);
+    }
+
+    .social-card.github {
+      background: linear-gradient(135deg, rgba(36, 41, 46, 0.3), rgba(36, 41, 46, 0.2));
+      color: #24292e;
+      border-color: rgba(36, 41, 46, 0.4);
+    }
+
+    .social-card.github:hover {
+      background: linear-gradient(135deg, rgba(36, 41, 46, 0.5), rgba(36, 41, 46, 0.3));
+      border-color: #24292e;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(36, 41, 46, 0.4);
+    }
+
+    .social-card:hover i {
+      transform: scale(1.2) rotate(5deg);
     }
 
     /* Profile Section */
@@ -837,13 +921,25 @@
         <a href="/bio" class="hero-btn primary">Explore Bio</a>
         <a href="#projects" class="hero-btn">View Projects</a>
       </div>
+      
+      <!-- Professional Social Cards -->
+      <div class="social-cards">
+        <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" class="social-card linkedin" rel="noopener noreferrer">
+          <i class="fab fa-linkedin"></i>
+          <span>LinkedIn</span>
+        </a>
+        <a href="https://github.com/iceman404" target="_blank" class="social-card github" rel="noopener noreferrer">
+          <i class="fab fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- Profile Section -->
   <section class="profile-section">
     <div class="profile-container fade-in">
-      <img src="images/profile/puppy1.avif" alt="John Subba | iceman404" class="profile-img">
+      <img src="images/profile/mine3.avif" alt="John Subba | iceman404" class="profile-img">
       <div class="profile-info">
         <h2>John Subba</h2>
         <p class="real-name">Real Name: John Subba</p>
@@ -868,7 +964,7 @@
           <div class="panel">
             <div class="panel-content">
               <p><b>Spoken Languages:</b> English, Nepali, Hindi</p>
-              <p><b>Education:</b> Bachelor's in Information Technology</p>
+              <p><b>Education:</b> Bachelor's in Information Technology (Intelligent Systems and Business Analytics)</p>
               <p><b>Hobbies:</b> Open-source UAVs</p>
             </div>
           </div>
@@ -999,20 +1095,6 @@
   <!-- Footer -->
   <footer>
     <div class="footer-content">
-      <div class="social-icons">
-        <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook">
-          <i class="fab fa-facebook"></i>
-        </a>
-        <a href="https://www.x.com/" target="_blank" aria-label="Twitter">
-          <i class="fab fa-x-twitter"></i>
-        </a>
-        <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/" target="_blank" aria-label="LinkedIn">
-          <i class="fab fa-linkedin"></i>
-        </a>
-      </div>
       <p class="copyright">&copy; 2024 iceman404 | Designed by John Subba</p>
     </div>
   </footer>
@@ -1206,9 +1288,24 @@
     if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .catch(() => {
-            // Service Worker registration failed silently
+          .then((registration) => {
+            console.log('Service Worker registered:', registration.scope);
+            // Check for updates
+            registration.update();
+          })
+          .catch((error) => {
+            console.warn('Service Worker registration failed:', error);
           });
+        
+        // Unregister old service workers if needed
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => {
+            if (registration.active && registration.active.scriptURL.includes('sw.js')) {
+              // Check if it's an old version
+              registration.update();
+            }
+          });
+        });
       });
     }
   </script>

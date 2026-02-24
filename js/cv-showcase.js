@@ -28,6 +28,12 @@ class CVShowcase {
     this.scene3D = null;
     this.camera3D = null;
     this.renderer3D = null;
+    this.gltfLoader = null;
+    this.currentModel = null;
+    this.modelRotationSpeed = 0.01;
+    this.modelScale = 1.0;
+    this.selectedModel = 'tesseract';
+    this.pendingModelLoad = null;
     this.shaderTime = 0;
     this.cubeParticles = [];
     this.drawingMode = false;
@@ -53,11 +59,10 @@ class CVShowcase {
     this.isTouchingCube = false;
     this.hand3DPosition = { x: 0, y: 0, z: 0 }; // Hand position in 3D space
     this.lastHand3DPosition = null;
-    this.baseHandSize = null; // Reference hand size for depth estimation
-    this.debugFrameCount = 0; // Debug counter
-    this.debugGestureCount = 0; // Debug counter for gesture detection
-    this.initialHandDistance = null; // For two-hand scaling
+    this.baseHandSize = null;
+    this.initialHandDistance = null;
     this.initialScale = 1.0; // For two-hand scaling
+    this.initialHandDepth = null; // For single-hand depth-based scaling
     
     // Three.js Raycaster for proper screen-to-world conversion
     this.raycaster = null; // Will be initialized after Three.js loads
@@ -65,49 +70,47 @@ class CVShowcase {
   }
 
   async init() {
-    // Suppress MediaPipe console warnings/info
-    this.suppressMediaPipeLogs();
-    
-    // Hide loading indicator
-    const loadingEl = document.getElementById('cv-loading');
-    if (loadingEl) {
-      loadingEl.style.display = 'none';
+    try {
+      this.suppressMediaPipeLogs();
+      
+      const loadingEl = document.getElementById('cv-loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'none';
+        loadingEl.classList.add('hidden');
+      }
+      
+      this.canvas = document.getElementById('cv-canvas');
+      if (!this.canvas) {
+        console.error('[CV] Canvas element not found!');
+        return;
+      }
+      
+      this.ctx = this.canvas.getContext('2d');
+      const container = this.canvas.parentElement;
+      const containerWidth = container ? container.clientWidth : 1280;
+      const containerHeight = container ? Math.floor(containerWidth * 9 / 16) : 720;
+      
+      this.canvas.width = Math.max(640, Math.min(containerWidth, 1280));
+      this.canvas.height = Math.max(360, Math.min(containerHeight, 720));
+      
+      this.init3DScene();
+      await this.initMediaPipe();
+    } catch (error) {
+      console.error('[CV] Error during initialization:', error);
+      this.showError('Initialization failed: ' + error.message);
     }
-    
-    // Setup canvas
-    this.canvas = document.getElementById('cv-canvas');
-    if (!this.canvas) {
-      return;
-    }
-    
-    this.ctx = this.canvas.getContext('2d');
-    // Set canvas size based on container, with fallback
-    const container = this.canvas.parentElement;
-    const containerWidth = container ? container.clientWidth : 1280;
-    const containerHeight = container ? Math.floor(containerWidth * 9 / 16) : 720;
-    
-    this.canvas.width = Math.max(640, Math.min(containerWidth, 1280));
-    this.canvas.height = Math.max(360, Math.min(containerHeight, 720));
-    
-    // Initialize MediaPipe
-    await this.initMediaPipe();
-    
-    // Initialize 3D scene
-    this.init3DScene();
-    
-    // Don't auto-start - user will click start button
   }
 
   async startCamera() {
-    if (this.isRunning) {
-      return;
+    if (this.isRunning) return;
+    
+    try {
+      await this.setupVideo();
+      this.start();
+    } catch (error) {
+      console.error('[CV] Error starting camera:', error);
+      throw error;
     }
-    
-    // Setup video (requests camera access)
-    await this.setupVideo();
-    
-    // Start rendering
-    this.start();
   }
 
   suppressMediaPipeLogs() {
@@ -131,22 +134,35 @@ class CVShowcase {
     
     console.warn = (...args) => {
       const message = args.join(' ');
-      // Only suppress MediaPipe warnings
+      // Suppress MediaPipe warnings including I0000 logs, gl_context messages, and TensorFlow Lite
       if (!message.includes('vision_wasm_internal') && 
           !message.includes('W0000') &&
+          !message.includes('I0000') &&
+          !message.includes('gl_context') &&
+          !message.includes('gl_context_webgl') &&
+          !message.includes('gl_context.cc') &&
           !message.includes('Face blendshape') &&
-          !message.includes('OpenGL error checking')) {
+          !message.includes('OpenGL error checking') &&
+          !message.includes('Successfully created a WebGL context') &&
+          !message.includes('GL version:') &&
+          !message.includes('Strategy') &&
+          !message.includes('failed:') &&
+          !message.includes('TensorFlow Lite') &&
+          !message.includes('XNNPACK delegate') &&
+          !message.includes('INFO:')) {
         originalConsoleWarn.apply(console, args);
       }
     };
     
     console.info = (...args) => {
       const message = args.join(' ');
-      // Only suppress MediaPipe info
+      // Suppress MediaPipe info and TensorFlow Lite messages
       if (!message.includes('vision_wasm_internal') && 
           !message.includes('I0000') &&
           !message.includes('gl_context') &&
-          !message.includes('WebGL context')) {
+          !message.includes('WebGL context') &&
+          !message.includes('TensorFlow Lite') &&
+          !message.includes('XNNPACK delegate')) {
         originalConsoleInfo.apply(console, args);
       }
     };
@@ -256,7 +272,10 @@ class CVShowcase {
   }
 
   init3DScene() {
-    if (typeof THREE === 'undefined') return;
+    if (typeof THREE === 'undefined') {
+      console.warn('[CV] Three.js not loaded, 3D scene will not be available');
+      return;
+    }
     
     // Create 3D scene for volumetric effects
     this.scene3D = new THREE.Scene();
@@ -267,36 +286,373 @@ class CVShowcase {
       return;
     }
     
-    // Get container dimensions
-    const width = container.clientWidth || 1280;
-    const height = container.clientHeight || 720;
+    // Ensure container has dimensions
+    const containerRect = container.getBoundingClientRect();
+    const width = containerRect.width || container.clientWidth || 1280;
+    const height = containerRect.height || container.clientHeight || 720;
+    
     
     this.camera3D = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.renderer3D = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer3D.setSize(width, height);
     this.renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer3D.setClearColor(0x000000, 0); // Transparent background
+    this.renderer3D.setClearColor(0x000011, 0.05); // Very slight tint to verify renderer works (almost transparent)
+    
+    // Ensure renderer canvas is visible and interactive (ABOVE the video canvas)
+    this.renderer3D.domElement.style.cssText = `
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      z-index: 20 !important;
+      pointer-events: auto !important;
+      cursor: grab !important;
+      background: transparent !important;
+    `;
+    
     
     container.appendChild(this.renderer3D.domElement);
-    this.renderer3D.domElement.style.position = 'absolute';
-    this.renderer3D.domElement.style.top = '0';
-    this.renderer3D.domElement.style.left = '0';
-    this.renderer3D.domElement.style.width = '100%';
-    this.renderer3D.domElement.style.height = '100%';
     
-    this.camera3D.position.z = 5;
-    this.camera3D.lookAt(0, 0, 0);
+    // Position camera closer and ensure it can see the cube
+    this.camera3D.position.set(0, 0, 5);
+    this.camera3D.lookAt(0, 0, -2); // Look at cube position
+    this.camera3D.updateProjectionMatrix();
+    
+    // Ensure camera can see the cube
     
     // Initialize Raycaster for screen-to-world conversion
     this.raycaster = new THREE.Raycaster();
     this.mouseVector = new THREE.Vector2();
     
+    // Mouse interaction state
+    this.isMouseDown = false;
+    this.mouseX = 0;
+    this.mouseY = 0;
+    this.rotationX = 0;
+    this.rotationY = 0;
+    this.zoomDistance = 5;
+    
+    // Touch interaction state
+    this.isPinching = false;
+    this.lastTouchDistance = null;
+    
     // Removed volumetric particles for cleaner look
     
-    // Create interactive 3D model
+    // Initialize GLTFLoader if available
+    this.initGLTFLoader();
+    
+    // Load settings from localStorage BEFORE creating model
+    this.loadCubeColorsFromSettings();
+    this.loadModelSettingsFromStorage();
+    
+    // Create interactive 3D model (will create tesseract by default, or load selected model if different)
     this.createInteractive3DModel();
     
-    // 3D scene initialized
+    // Setup mouse controls
+    this.setupMouseControls();
+    
+    // Render immediately to ensure cube is visible
+    if (this.renderer3D && this.scene3D && this.camera3D && this.model3DGroup) {
+      // Force render multiple times to ensure visibility
+      for (let i = 0; i < 5; i++) {
+        this.renderer3D.render(this.scene3D, this.camera3D);
+      }
+      
+      // Verify renderer actually drew something by reading pixel data
+    } else {
+      console.warn('[CV] Cannot render - missing components:', {
+        renderer: !!this.renderer3D,
+        scene: !!this.scene3D,
+        camera: !!this.camera3D,
+        model: !!this.model3DGroup
+      });
+    }
+    
+    // Start continuous 3D animation loop
+    this.animate3D();
+    
+    if (this.pendingModelLoad) {
+      setTimeout(() => {
+        this.loadModelFromSettings(this.pendingModelLoad);
+      }, 500);
+    }
+  }
+
+  async loadModelFromSettings(modelName) {
+    // Load model based on settings
+    const modelUrls = {
+      'gltf-damaged-helmet': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf',
+      'gltf-flamingo': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Flamingo/glTF/Flamingo.gltf',
+      'gltf-cube': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF/Cube.gltf',
+      'gltf-duck': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf'
+    };
+
+    if (modelName === 'tesseract') {
+      // Already have tesseract, just ensure it's visible
+      return;
+    }
+
+    // Wait for GLTFLoader to be available
+    if (!this.gltfLoader) {
+      await new Promise((resolve, reject) => {
+        const checkLoader = setInterval(() => {
+          if (typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+            this.gltfLoader = new THREE.GLTFLoader();
+            clearInterval(checkLoader);
+            resolve();
+          }
+        }, 100);
+        
+        // Timeout after 10 seconds
+        setTimeout(() => {
+          clearInterval(checkLoader);
+          if (!this.gltfLoader) {
+            console.error('[CV] GLTFLoader timeout - model loading failed');
+            reject(new Error('GLTFLoader not available'));
+          }
+        }, 10000);
+      });
+    }
+
+    // Check for custom URL in settings
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      if (modelName === 'custom' && settings.model3D && settings.model3D.customModelUrl) {
+        await this.loadModel(settings.model3D.customModelUrl);
+        return;
+      }
+    } catch (e) {
+      console.warn('[CV] Could not load custom model URL:', e);
+    }
+
+    const url = modelUrls[modelName];
+    if (url) {
+      await this.loadModel(url);
+    }
+  }
+  
+  setupMouseControls() {
+    const canvas = this.renderer3D.domElement;
+    if (!canvas) return;
+    
+    // Helper function to get coordinates from event (mouse or touch)
+    const getEventCoords = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    };
+    
+    // Mouse down - start dragging (only when camera is NOT running)
+    canvas.addEventListener('mousedown', (e) => {
+      if (this.isRunning) return; // Disable mouse controls when camera is active
+      this.isMouseDown = true;
+      this.mouseX = e.clientX;
+      this.mouseY = e.clientY;
+      canvas.style.cursor = 'grabbing';
+    });
+    
+    // Touch start - start dragging (only when camera is NOT running)
+    canvas.addEventListener('touchstart', (e) => {
+      if (this.isRunning) return; // Disable touch controls when camera is active
+      if (e.touches.length === 1) {
+        // Single touch - rotate
+        e.preventDefault(); // Prevent scrolling
+        this.isMouseDown = true;
+        const coords = getEventCoords(e);
+        this.mouseX = coords.x;
+        this.mouseY = coords.y;
+      } else if (e.touches.length === 2) {
+        // Two touches - zoom (pinch)
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+          Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+        this.lastTouchDistance = distance;
+        this.isPinching = true;
+      }
+    }, { passive: false });
+    
+    // Mouse move - rotate cube (only when camera is NOT running)
+    canvas.addEventListener('mousemove', (e) => {
+      if (this.isRunning) {
+        canvas.style.cursor = 'default';
+        return; // Disable mouse controls when camera is active
+      }
+      if (this.isMouseDown) {
+        const deltaX = e.clientX - this.mouseX;
+        const deltaY = e.clientY - this.mouseY;
+        
+        this.rotationY += deltaX * 0.01;
+        this.rotationX += deltaY * 0.01;
+        
+        // Limit rotation X to prevent flipping
+        this.rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.rotationX));
+        
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+      }
+    });
+    
+    // Touch move - rotate or zoom cube (only when camera is NOT running)
+    canvas.addEventListener('touchmove', (e) => {
+      if (this.isRunning) return; // Disable touch controls when camera is active
+      
+      if (e.touches.length === 1 && this.isMouseDown) {
+        // Single touch - rotate
+        e.preventDefault(); // Prevent scrolling
+        const coords = getEventCoords(e);
+        const deltaX = coords.x - this.mouseX;
+        const deltaY = coords.y - this.mouseY;
+        
+        this.rotationY += deltaX * 0.01;
+        this.rotationX += deltaY * 0.01;
+        
+        // Limit rotation X to prevent flipping
+        this.rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.rotationX));
+        
+        this.mouseX = coords.x;
+        this.mouseY = coords.y;
+      } else if (e.touches.length === 2 && this.isPinching) {
+        // Two touches - zoom (pinch)
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+          Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+        
+        if (this.lastTouchDistance) {
+          const delta = this.lastTouchDistance - distance;
+          this.zoomDistance += delta * 0.02;
+          this.zoomDistance = Math.max(2, Math.min(10, this.zoomDistance));
+        }
+        
+        this.lastTouchDistance = distance;
+      }
+    }, { passive: false });
+    
+    // Mouse up - stop dragging
+    canvas.addEventListener('mouseup', () => {
+      if (this.isRunning) return;
+      this.isMouseDown = false;
+      canvas.style.cursor = 'grab';
+    });
+    
+    // Touch end - stop dragging
+    canvas.addEventListener('touchend', (e) => {
+      if (this.isRunning) return;
+      
+      if (e.touches.length === 0) {
+        // All touches ended
+        this.isMouseDown = false;
+        this.isPinching = false;
+        this.lastTouchDistance = null;
+      } else if (e.touches.length === 1) {
+        // One touch ended, but one remains - switch to single touch mode
+        this.isPinching = false;
+        this.lastTouchDistance = null;
+        const coords = getEventCoords(e);
+        this.mouseX = coords.x;
+        this.mouseY = coords.y;
+      }
+    });
+    
+    // Touch cancel - stop dragging
+    canvas.addEventListener('touchcancel', () => {
+      if (this.isRunning) return;
+      this.isMouseDown = false;
+      this.isPinching = false;
+      this.lastTouchDistance = null;
+    });
+    
+    // Mouse leave - stop dragging
+    canvas.addEventListener('mouseleave', () => {
+      if (this.isRunning) return;
+      this.isMouseDown = false;
+      canvas.style.cursor = 'grab';
+    });
+    
+    // Mouse wheel - zoom (only when camera is NOT running)
+    canvas.addEventListener('wheel', (e) => {
+      if (this.isRunning) return; // Disable mouse controls when camera is active
+      e.preventDefault();
+      this.zoomDistance += e.deltaY * 0.01;
+      this.zoomDistance = Math.max(2, Math.min(10, this.zoomDistance));
+    });
+  }
+  
+  animate3D() {
+    if (!this.renderer3D || !this.scene3D || !this.camera3D) {
+      // Retry if not initialized yet
+      setTimeout(() => this.animate3D(), 100);
+      return;
+    }
+    
+    // Update rotation based on mode
+    if (this.model3DGroup) {
+      if (!this.isRunning) {
+        // Mouse control mode - apply mouse rotation
+        this.model3DGroup.rotation.x = this.rotationX;
+        this.model3DGroup.rotation.y = this.rotationY;
+        
+        // Auto-rotate when not being dragged or pinching
+        if (!this.isMouseDown && !this.isPinching) {
+          this.rotationY += 0.01;
+        }
+      } else {
+        // Camera mode - hand tracking controls rotation (handled in detectGestures)
+        // But we still allow some auto-rotation if not being held
+        if (!this.isHoldingModel) {
+          this.model3DGroup.rotation.y += 0.01;
+        }
+      }
+    }
+    
+    // Update camera zoom (but ensure it can see the cube)
+    this.camera3D.position.z = this.zoomDistance;
+    this.camera3D.lookAt(0, 0, -2); // Look at cube position
+    
+    // Update cube particles
+    if (this.model3DGroup) {
+      this.updateCubeParticles();
+    }
+    
+    // Rotate tesseract/model for better visibility (always rotates)
+    if (this.model3D) {
+      this.model3D.rotation.x += 0.005;
+      this.model3D.rotation.y += this.modelRotationSpeed;
+    }
+    
+    // Update camera aspect ratio if container size changed
+    const container = document.getElementById('cv-3d-container');
+    if (container) {
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      if (width > 0 && height > 0 && this.camera3D.aspect !== width / height) {
+        this.camera3D.aspect = width / height;
+        this.camera3D.updateProjectionMatrix();
+        this.renderer3D.setSize(width, height);
+      }
+    }
+    
+    // Render 3D scene
+    if (this.scene3D.children.length > 0) {
+      this.renderer3D.render(this.scene3D, this.camera3D);
+    } else {
+      console.warn('[CV] Scene has no children to render!');
+    }
+    
+    // Continue animation loop
+    requestAnimationFrame(() => this.animate3D());
   }
 
   createInteractive3DModel() {
@@ -310,33 +666,34 @@ class CVShowcase {
     
     // Create particle system inside the tesseract
     this.createCubeParticles();
-    // Set initial position
-    this.model3DGroup.position.set(
-      this.cubePosition.x,
-      this.cubePosition.y,
-      this.cubePosition.z
-    );
+    // Set initial position (centered at origin)
+    this.model3DGroup.position.set(0, 0, -2);
+    this.cubePosition = { x: 0, y: 0, z: -2 };
     // Initialize smooth position to match initial position
-    this.smoothPosition.x = this.cubePosition.x;
-    this.smoothPosition.y = this.cubePosition.y;
-    this.smoothPosition.z = this.cubePosition.z;
+    this.smoothPosition.x = 0;
+    this.smoothPosition.y = 0;
+    this.smoothPosition.z = -2;
     this.scene3D.add(this.model3DGroup);
     
     // Add enhanced lighting for better visibility
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); // Increased intensity
     this.scene3D.add(ambientLight);
     
-    const pointLight1 = new THREE.PointLight(0x6366f1, 1.5, 100);
+    const pointLight1 = new THREE.PointLight(0x6366f1, 2.0, 100); // Increased intensity
     pointLight1.position.set(5, 5, 5);
     this.scene3D.add(pointLight1);
     
-    const pointLight2 = new THREE.PointLight(0x8b5cf6, 1.2, 100);
+    const pointLight2 = new THREE.PointLight(0x8b5cf6, 1.8, 100); // Increased intensity
     pointLight2.position.set(-5, 5, -5);
     this.scene3D.add(pointLight2);
     
-    const directionalLight = new THREE.DirectionalLight(0xa78bfa, 0.8);
+    const directionalLight = new THREE.DirectionalLight(0xa78bfa, 1.0); // Increased intensity
     directionalLight.position.set(0, 5, 0);
     this.scene3D.add(directionalLight);
+    
+    // Set current model to tesseract
+    this.currentModel = 'tesseract';
+    
     
     // Interactive 3D tesseract created
   }
@@ -344,19 +701,26 @@ class CVShowcase {
   createTesseract() {
     // Create a tesseract (4D hypercube) - outer and inner cubes connected by edges
     const group = new THREE.Group();
-    const size = 0.6; // Half size for inner cube
-    const outerSize = 1.5; // Larger outer cube for better visibility
+    const size = 1.0; // Inner cube size (increased for visibility)
+    const outerSize = 2.5; // Larger outer cube for better visibility (increased from 2.0)
     
     const primaryColor = 0x6366f1;
     const secondaryColor = 0x8b5cf6;
     const accentColor = 0xa78bfa;
     
-    // Create outer cube (more visible and opaque)
+    // Use colors from settings if available
+    const outerColorHex = parseInt((this.cubeColors?.outer || '#6366f1').replace('#', ''), 16);
+    const innerColorHex = parseInt((this.cubeColors?.inner || '#8b5cf6').replace('#', ''), 16);
+    const edgeColorHex = parseInt((this.cubeColors?.edge || '#a78bfa').replace('#', ''), 16);
+    const emissiveColorHex = parseInt((this.cubeColors?.emissive || '#ffffff').replace('#', ''), 16);
+    const emissiveIntensity = this.cubeColors?.emissiveIntensity || 1.0;
+    
+    // Create outer cube (more visible and opaque) - BRIGHT COLORS for visibility
     const outerGeometry = new THREE.BoxGeometry(outerSize, outerSize, outerSize);
     const outerMaterial = new THREE.MeshPhongMaterial({
-      color: primaryColor,
-      emissive: secondaryColor,
-      emissiveIntensity: 0.6,
+      color: outerColorHex,
+      emissive: emissiveColorHex,
+      emissiveIntensity: emissiveIntensity,
       specular: accentColor,
       shininess: 100,
       transparent: false,
@@ -365,12 +729,13 @@ class CVShowcase {
     const outerCube = new THREE.Mesh(outerGeometry, outerMaterial);
     group.add(outerCube);
     
-    // Create inner cube (more visible and opaque)
+    
+    // Create inner cube (more visible and opaque) - BRIGHT COLORS for visibility
     const innerGeometry = new THREE.BoxGeometry(size, size, size);
     const innerMaterial = new THREE.MeshPhongMaterial({
-      color: secondaryColor,
-      emissive: accentColor,
-      emissiveIntensity: 0.5,
+      color: innerColorHex,
+      emissive: emissiveColorHex,
+      emissiveIntensity: emissiveIntensity,
       specular: primaryColor,
       shininess: 100,
       transparent: false,
@@ -379,9 +744,10 @@ class CVShowcase {
     const innerCube = new THREE.Mesh(innerGeometry, innerMaterial);
     group.add(innerCube);
     
+    
     // Create connecting edges (8 edges connecting outer to inner cube vertices)
     const edgeMaterial = new THREE.LineBasicMaterial({
-      color: accentColor,
+      color: edgeColorHex,
       linewidth: 4,
       transparent: true,
       opacity: 1.0
@@ -415,7 +781,7 @@ class CVShowcase {
     // Add wireframe to outer cube for definition
     const outerWireframe = new THREE.WireframeGeometry(outerGeometry);
     const wireframeMaterial = new THREE.LineBasicMaterial({
-      color: accentColor,
+      color: edgeColorHex,
       linewidth: 3,
       transparent: true,
       opacity: 1.0
@@ -428,18 +794,232 @@ class CVShowcase {
     const innerWireframeMesh = new THREE.LineSegments(innerWireframe, wireframeMaterial);
     group.add(innerWireframeMesh);
     
-    // Add enhanced glow effect
+    // Add enhanced glow effect - BRIGHTER for visibility
     const glowGeometry = new THREE.BoxGeometry(outerSize * 1.15, outerSize * 1.15, outerSize * 1.15);
     const glowMaterial = new THREE.MeshBasicMaterial({
-      color: secondaryColor,
+      color: emissiveColorHex,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.5 * emissiveIntensity, // Scale opacity with intensity
       side: THREE.BackSide
     });
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     group.add(glow);
     
+    
     return group;
+  }
+
+  loadCubeColorsFromSettings() {
+    // Load cube colors from localStorage
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      if (settings.cubeColors) {
+        this.cubeColors = settings.cubeColors;
+      } else {
+        this.cubeColors = {
+          outer: '#6366f1',
+          inner: '#8b5cf6',
+          edge: '#a78bfa',
+          emissive: '#ffffff',
+          emissiveIntensity: 1.0
+        };
+      }
+    } catch (e) {
+      console.warn('[CV] Failed to load cube colors:', e);
+      this.cubeColors = {
+        outer: '#6366f1',
+        inner: '#8b5cf6',
+        edge: '#a78bfa',
+        emissive: '#ffffff',
+        emissiveIntensity: 1.0
+      };
+    }
+  }
+
+  loadModelSettingsFromStorage() {
+    // Load 3D model settings from localStorage
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      if (settings.model3D) {
+        this.modelScale = settings.model3D.scale || 1.0;
+        this.modelRotationSpeed = settings.model3D.rotationSpeed || 0.01;
+        this.selectedModel = settings.model3D.selectedModel || 'tesseract';
+        if (this.selectedModel && this.selectedModel !== 'tesseract') {
+          this.pendingModelLoad = this.selectedModel;
+        } else {
+          this.pendingModelLoad = null;
+        }
+      } else {
+        this.modelScale = 1.0;
+        this.modelRotationSpeed = 0.01;
+        this.selectedModel = 'tesseract';
+      }
+    } catch (e) {
+      console.warn('[CV] Failed to load model settings:', e);
+      this.modelScale = 1.0;
+      this.modelRotationSpeed = 0.01;
+      this.selectedModel = 'tesseract';
+    }
+  }
+
+  updateCubeColors(colors) {
+    this.cubeColors = { ...this.cubeColors, ...colors };
+    
+    // Update existing tesseract materials if model exists and is tesseract
+    if (this.model3D && this.model3DGroup && (!this.currentModel || this.currentModel === 'tesseract')) {
+      this.model3DGroup.traverse((child) => {
+        if (child.isMesh) {
+          if (child.material) {
+            if (child.material.color) {
+              // Check if it's outer cube (larger) or inner cube (smaller)
+              const isOuter = child.geometry && child.geometry.parameters && child.geometry.parameters.width >= 2.0;
+              if (isOuter) {
+                child.material.color.setHex(parseInt(this.cubeColors.outer.replace('#', ''), 16));
+                if (child.material.emissive) {
+                  child.material.emissive.setHex(parseInt(this.cubeColors.emissive.replace('#', ''), 16));
+                  child.material.emissiveIntensity = this.cubeColors.emissiveIntensity;
+                }
+              } else {
+                child.material.color.setHex(parseInt(this.cubeColors.inner.replace('#', ''), 16));
+                if (child.material.emissive) {
+                  child.material.emissive.setHex(parseInt(this.cubeColors.emissive.replace('#', ''), 16));
+                  child.material.emissiveIntensity = this.cubeColors.emissiveIntensity;
+                }
+              }
+            }
+          }
+        } else if (child.isLine) {
+          // Update edge colors
+          if (child.material) {
+            child.material.color.setHex(parseInt(this.cubeColors.edge.replace('#', ''), 16));
+          }
+        }
+      });
+    }
+    
+    // Save to settings
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      settings.cubeColors = this.cubeColors;
+      localStorage.setItem('iceman404_settings', JSON.stringify(settings));
+    } catch (e) {
+      console.warn('[CV] Could not save cube colors:', e);
+    }
+  }
+
+  async loadModel(modelUrl = null) {
+    if (!modelUrl) {
+      // Load default tesseract
+      if (this.currentModel && this.currentModel !== 'tesseract') {
+        // Remove existing GLTF model
+        if (this.model3DGroup) {
+          this.model3DGroup.remove(this.model3D);
+          this.scene3D.remove(this.model3DGroup);
+        }
+        this.createInteractive3DModel();
+        this.currentModel = 'tesseract';
+        this.selectedModel = 'tesseract';
+        
+        // Save to settings
+        try {
+          const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+          if (!settings.model3D) settings.model3D = {};
+          settings.model3D.selectedModel = 'tesseract';
+          localStorage.setItem('iceman404_settings', JSON.stringify(settings));
+        } catch (e) {
+          console.warn('[CV] Could not save model selection:', e);
+        }
+      }
+      return;
+    }
+
+    if (!this.gltfLoader) {
+      console.error('[CV] GLTFLoader not available');
+      return;
+    }
+
+    try {
+      
+      // Remove existing model (tesseract or previous GLTF)
+      if (this.model3DGroup) {
+        if (this.currentModel === 'tesseract') {
+          // Remove tesseract and its particles
+          this.model3DGroup.remove(this.model3D);
+          if (this.cubeParticleSystem) {
+            this.model3DGroup.remove(this.cubeParticleSystem);
+          }
+        } else {
+          // Remove previous GLTF model
+          this.scene3D.remove(this.model3DGroup);
+        }
+      }
+
+      // Load GLTF model
+      const gltf = await new Promise((resolve, reject) => {
+        this.gltfLoader.load(
+          modelUrl,
+          (gltf) => resolve(gltf),
+          (progress) => {},
+          (error) => reject(error)
+        );
+      });
+
+      // Create new model group
+      this.model3DGroup = new THREE.Group();
+      this.model3D = gltf.scene;
+      
+      // Scale model (use stored scale from settings)
+      const scale = this.modelScale || 1.0;
+      this.model3D.scale.set(scale, scale, scale);
+      
+      // Center model
+      const box = new THREE.Box3().setFromObject(this.model3D);
+      const center = box.getCenter(new THREE.Vector3());
+      this.model3D.position.sub(center);
+      this.model3D.position.z = -2;
+      
+      this.model3DGroup.add(this.model3D);
+      this.model3DGroup.position.set(0, 0, -2);
+      this.scene3D.add(this.model3DGroup);
+      
+      this.currentModel = modelUrl;
+    } catch (error) {
+      console.error('[CV] Error loading GLTF model:', error);
+      // Fallback to tesseract
+      this.createInteractive3DModel();
+      this.currentModel = 'tesseract';
+    }
+  }
+
+  updateModelScale(scale) {
+    this.modelScale = scale;
+    if (this.model3D) {
+      this.model3D.scale.set(scale, scale, scale);
+    }
+    
+    // Save to settings
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      if (!settings.model3D) settings.model3D = {};
+      settings.model3D.scale = scale;
+      localStorage.setItem('iceman404_settings', JSON.stringify(settings));
+    } catch (e) {
+      console.warn('[CV] Could not save model scale:', e);
+    }
+  }
+
+  updateModelRotationSpeed(speed) {
+    this.modelRotationSpeed = speed;
+    
+    // Save to settings
+    try {
+      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      if (!settings.model3D) settings.model3D = {};
+      settings.model3D.rotationSpeed = speed;
+      localStorage.setItem('iceman404_settings', JSON.stringify(settings));
+    } catch (e) {
+      console.warn('[CV] Could not save rotation speed:', e);
+    }
   }
 
   createCubeParticles() {
@@ -783,48 +1363,411 @@ class CVShowcase {
     this.scene3D.add(this.particleSystem);
   }
 
-  async setupVideo() {
-    try {
-      this.video = document.createElement('video');
-      this.video.style.display = 'none';
-      document.body.appendChild(this.video);
-      
-      // Get optimal video resolution based on canvas size
-      const idealWidth = Math.max(640, Math.min(this.canvas.width, 1280));
-      const idealHeight = Math.max(360, Math.min(this.canvas.height, 720));
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: idealWidth },
-          height: { ideal: idealHeight },
-          facingMode: 'user'
-        } 
-      });
-      
-      this.video.srcObject = stream;
-      this.video.play();
-      
-      // Video stream initialized
-    } catch (error) {
-      console.error('[CV] Video access denied:', error);
-      this.showFallback();
+  detectDevice() {
+    // Detect device type and capabilities
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase());
+    const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(ua.toLowerCase());
+    const isIOS = /iphone|ipad|ipod/i.test(ua.toLowerCase());
+    const isAndroid = /android/i.test(ua.toLowerCase());
+    const isChrome = /chrome/i.test(ua) && !/edge/i.test(ua);
+    const isSafari = /safari/i.test(ua) && !/chrome/i.test(ua);
+    const isFirefox = /firefox/i.test(ua);
+    const isEdge = /edge/i.test(ua);
+    
+    // Check for specific devices
+    const isChromebook = /CrOS/i.test(ua);
+    const isIPad = /ipad/i.test(ua) || (isIOS && navigator.maxTouchPoints > 1);
+    
+    return {
+      isMobile,
+      isTablet,
+      isIOS,
+      isAndroid,
+      isChrome,
+      isSafari,
+      isFirefox,
+      isEdge,
+      isChromebook,
+      isIPad,
+      hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    };
+  }
+
+  getOptimalVideoConstraints(device) {
+    // Base constraints that work on all devices
+    const baseConstraints = {
+      facingMode: { ideal: 'user' }, // Prefer front camera
+      aspectRatio: { ideal: 16 / 9 }
+    };
+
+    // Device-specific optimizations
+    if (device.isMobile || device.isTablet) {
+      // Mobile/Tablet: Lower resolution for better performance
+      return {
+        ...baseConstraints,
+        width: { ideal: 640, max: 1280 },
+        height: { ideal: 480, max: 720 },
+        frameRate: { ideal: 30, max: 30 }
+      };
+    } else if (device.isChromebook) {
+      // Chromebook: Medium resolution
+      return {
+        ...baseConstraints,
+        width: { ideal: 1280, max: 1920 },
+        height: { ideal: 720, max: 1080 },
+        frameRate: { ideal: 30, max: 60 }
+      };
+    } else {
+      // Desktop: Higher resolution
+      const idealWidth = Math.max(640, Math.min(this.canvas.width, 1920));
+      const idealHeight = Math.max(360, Math.min(this.canvas.height, 1080));
+      return {
+        ...baseConstraints,
+        width: { ideal: idealWidth, max: 1920 },
+        height: { ideal: idealHeight, max: 1080 },
+        frameRate: { ideal: 30, max: 60 }
+      };
     }
   }
 
-  showFallback() {
+  checkHTTPS() {
+    // Check if running on HTTPS or localhost (which is allowed)
+    const isSecure = window.location.protocol === 'https:';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname === '[::1]';
+    const isLocalIP = /^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[01])\./.test(window.location.hostname);
+    
+    if (!isSecure && !isLocalhost && !isLocalIP) {
+      return {
+        required: true,
+        message: 'Camera API requires HTTPS. Please use https:// instead of http://'
+      };
+    }
+    
+    return { required: false };
+  }
+
+  async setupVideo() {
+    // Check HTTPS requirement first
+    const httpsCheck = this.checkHTTPS();
+    if (httpsCheck.required) {
+      const error = new Error(httpsCheck.message);
+      error.name = 'HTTPSRequiredError';
+      throw error;
+    }
+    
+    try {
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        // Fallback for older browsers
+        const getUserMedia = navigator.getUserMedia || 
+                            navigator.webkitGetUserMedia || 
+                            navigator.mozGetUserMedia || 
+                            navigator.msGetUserMedia;
+        
+        if (!getUserMedia) {
+          throw new Error('Camera API not supported in this browser');
+        }
+        
+        // Use legacy API with promise wrapper
+        return new Promise((resolve, reject) => {
+          getUserMedia.call(navigator, 
+            { video: { facingMode: 'user' } },
+            (stream) => {
+              this.video = document.createElement('video');
+              this.video.style.display = 'none';
+              this.video.setAttribute('playsinline', 'true'); // iOS fix
+              this.video.setAttribute('webkit-playsinline', 'true'); // iOS fix
+              document.body.appendChild(this.video);
+              this.video.srcObject = stream;
+              this.video.play();
+              resolve();
+            },
+            reject
+          );
+        });
+      }
+
+      // Modern API
+      this.video = document.createElement('video');
+      this.video.style.display = 'none';
+      
+      // Critical iOS fixes
+      this.video.setAttribute('playsinline', 'true');
+      this.video.setAttribute('webkit-playsinline', 'true');
+      this.video.setAttribute('autoplay', 'true');
+      this.video.setAttribute('muted', 'true'); // Required for autoplay on some devices
+      
+      document.body.appendChild(this.video);
+      
+      const deviceInfo = this.detectDevice();
+      const constraints = this.getOptimalVideoConstraints(deviceInfo);
+      
+      // Try multiple constraint strategies with fallbacks
+      const strategies = [
+        // Strategy 1: Optimal constraints for device
+        constraints,
+        
+        // Strategy 2: Simpler constraints (fallback)
+        {
+          video: {
+            facingMode: { ideal: 'user' },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
+        },
+        
+        // Strategy 3: Minimal constraints (last resort)
+        {
+          video: {
+            facingMode: 'user'
+          }
+        },
+        
+        // Strategy 4: Any camera (if front camera fails)
+        {
+          video: true
+        }
+      ];
+      
+      let lastError = null;
+      
+      for (let i = 0; i < strategies.length; i++) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(strategies[i]);
+          
+          // Verify stream is valid
+          if (stream && stream.getVideoTracks().length > 0) {
+            const track = stream.getVideoTracks()[0];
+            const settings = track.getSettings();
+            
+            this.video.srcObject = stream;
+            
+            // Additional mobile optimizations
+            if (deviceInfo.isMobile || deviceInfo.isTablet) {
+              this.video.setAttribute('playsinline', 'true');
+              this.video.setAttribute('webkit-playsinline', 'true');
+              this.video.setAttribute('x5-playsinline', 'true'); // Android WebView
+              this.video.setAttribute('x5-video-player-type', 'h5'); // Android WebView
+              this.video.setAttribute('x5-video-player-fullscreen', 'false'); // Android WebView
+              this.video.setAttribute('x5-video-orientation', 'portraint'); // Android WebView
+            }
+            
+            // Wait for video metadata to load
+            await new Promise((resolve, reject) => {
+              const timeout = setTimeout(() => {
+                reject(new Error('Video metadata timeout'));
+              }, 10000); // Increased timeout for slower devices
+              
+              const cleanup = () => {
+                clearTimeout(timeout);
+                this.video.removeEventListener('loadedmetadata', onLoaded);
+                this.video.removeEventListener('error', onError);
+              };
+              
+              const onLoaded = () => {
+                cleanup();
+                resolve();
+              };
+              
+              const onError = (e) => {
+                cleanup();
+                reject(e);
+              };
+              
+              this.video.addEventListener('loadedmetadata', onLoaded, { once: true });
+              this.video.addEventListener('error', onError, { once: true });
+              
+              // Also check if already loaded
+              if (this.video.readyState >= 1) {
+                cleanup();
+                resolve();
+              }
+            });
+            
+            // Play video with retry logic for mobile
+            let playAttempts = 0;
+            const maxPlayAttempts = 3;
+            
+            while (playAttempts < maxPlayAttempts) {
+              try {
+                await this.video.play();
+                break;
+              } catch (playError) {
+                playAttempts++;
+                console.warn(`[CV] Play attempt ${playAttempts} failed:`, playError);
+                
+                if (playAttempts >= maxPlayAttempts) {
+                  console.warn('[CV] Autoplay blocked, user interaction required');
+                  // This is OK - video will play when user interacts with the page
+                  // Set up a click handler to start playback
+                  const startPlayback = () => {
+                    this.video.play().catch(e => console.warn('[CV] Manual play failed:', e));
+                    document.removeEventListener('click', startPlayback);
+                    document.removeEventListener('touchstart', startPlayback);
+                  };
+                  document.addEventListener('click', startPlayback, { once: true });
+                  document.addEventListener('touchstart', startPlayback, { once: true });
+                } else {
+                  // Wait a bit before retrying
+                  await new Promise(resolve => setTimeout(resolve, 500));
+                }
+              }
+            }
+            
+            // Set up video event handlers
+            this.video.addEventListener('loadeddata', () => {});
+            
+            this.video.addEventListener('error', (e) => {
+              console.error('[CV] Video error:', e);
+            });
+            
+            return; // Success!
+          } else {
+            throw new Error('No video tracks in stream');
+          }
+        } catch (error) {
+          lastError = error;
+          
+          // If it's a permission error, don't try other strategies
+          if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+            throw error;
+          }
+          
+          // Continue to next strategy
+          continue;
+        }
+      }
+      
+      // All strategies failed
+      throw lastError || new Error('All camera strategies failed');
+      
+    } catch (error) {
+      console.error('[CV] Camera setup failed:', error);
+      
+      // Provide helpful error messages based on error type
+      let errorMessage = 'Camera access failed';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = 'Camera permission denied. Please allow camera access in your browser settings.';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage = 'No camera found. Please connect a camera and try again.';
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMessage = 'Camera is already in use by another application.';
+      } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+        errorMessage = 'Camera does not support the required settings.';
+      } else if (error.name === 'HTTPSRequiredError') {
+        errorMessage = 'Camera API requires HTTPS. Please use https:// instead of http://';
+      } else if (error.message && error.message.includes('not supported')) {
+        errorMessage = 'Camera API not supported in this browser. Please use a modern browser.';
+      } else if (error.message && error.message.includes('HTTPS')) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = `Camera error: ${error.message || error.name}`;
+      }
+      
+      this.showFallback(errorMessage);
+      throw error;
+    }
+  }
+
+  showFallback(errorMessage = null) {
     const canvas = document.getElementById('cv-canvas');
     if (canvas && this.ctx) {
+      const device = this.detectDevice();
+      
       this.ctx.fillStyle = '#0a0f11';
       this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Title
       this.ctx.fillStyle = '#4a9ba8';
       this.ctx.font = 'bold 28px Roboto';
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('Camera Access Required', canvas.width / 2, canvas.height / 2 - 20);
-      this.ctx.font = '18px Roboto';
+      this.ctx.fillText('Camera Access Required', canvas.width / 2, canvas.height / 2 - 60);
+      
+      // Error message
+      if (errorMessage) {
+        this.ctx.font = '16px Roboto';
+        this.ctx.fillStyle = '#ff6b6b';
+        const lines = this.wrapText(errorMessage, canvas.width - 40, this.ctx);
+        lines.forEach((line, i) => {
+          this.ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 20 + (i * 25));
+        });
+      }
+      
+      // Device-specific instructions
+      this.ctx.font = '14px Roboto';
       this.ctx.fillStyle = '#b0d4d9';
-      this.ctx.fillText('Please allow camera access to see the CV showcase', canvas.width / 2, canvas.height / 2 + 20);
-      this.ctx.fillText('This demo uses real-time face mesh, hand tracking, and pose estimation', canvas.width / 2, canvas.height / 2 + 50);
+      let instructions = [];
+      
+      if (device.isIOS) {
+        instructions = [
+          'iOS Instructions:',
+          '1. Tap "Allow" when prompted',
+          '2. If blocked, go to Settings > Safari > Camera',
+          '3. Enable camera access for this site',
+          '4. Refresh the page'
+        ];
+      } else if (device.isAndroid) {
+        instructions = [
+          'Android Instructions:',
+          '1. Tap "Allow" when prompted',
+          '2. If blocked, go to Chrome Settings > Site Settings',
+          '3. Find this site and enable Camera',
+          '4. Refresh the page'
+        ];
+      } else if (device.isChromebook) {
+        instructions = [
+          'Chromebook Instructions:',
+          '1. Click "Allow" when prompted',
+          '2. Check Chrome settings if camera is blocked',
+          '3. Ensure no other app is using the camera',
+          '4. Refresh the page'
+        ];
+      } else {
+        instructions = [
+          'Desktop Instructions:',
+          '1. Click "Allow" when prompted',
+          '2. Check browser settings if camera is blocked',
+          '3. Ensure camera is connected and not in use',
+          '4. Refresh the page'
+        ];
+      }
+      
+      instructions.forEach((line, i) => {
+        this.ctx.fillText(line, canvas.width / 2, canvas.height / 2 + 40 + (i * 20));
+      });
+      
+      // Browser compatibility info
+      this.ctx.font = '12px Roboto';
+      this.ctx.fillStyle = '#8a9ba0';
+      this.ctx.fillText(
+        `Browser: ${device.isChrome ? 'Chrome' : device.isSafari ? 'Safari' : device.isFirefox ? 'Firefox' : device.isEdge ? 'Edge' : 'Unknown'}`,
+        canvas.width / 2,
+        canvas.height / 2 + 140
+      );
     }
+  }
+
+  wrapText(text, maxWidth, ctx) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + ' ' + word).width;
+      if (width < maxWidth) {
+        currentLine += ' ' + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+    return lines;
   }
 
   async detect() {
@@ -1555,8 +2498,6 @@ class CVShowcase {
       const normalizedDepth = Math.max(-3, Math.min(1, (wristToMiddleDistance - 100) / 50));
       this.handDepth = normalizedDepth;
       
-      // Debug logs removed for production
-      
       // Check unlock condition first
       if (this.isHoldingModel && touchResult.shouldUnlock) {
         // Unlock if: 3+ fingers moved away from cube
@@ -1565,6 +2506,7 @@ class CVShowcase {
         this.lastHandPosition = null;
         this.lastHand3DPosition = null;
         this.baseHandSize = null;
+        this.initialHandDepth = null; // Reset depth scaling
         this.isTouchingCube = false;
         // Cube unlocked
       }
@@ -1584,16 +2526,15 @@ class CVShowcase {
           y: currentCubePos.y - handCentroid3D.y,
           z: currentCubePos.z - handCentroid3D.z
         };
+        // Store initial hand depth and scale for single-hand scaling
+        this.initialHandDepth = handCentroid3D.z;
+        this.initialScale = this.modelScale;
         this.lastHand3DPosition = { ...handCentroid3D };
         // Grab initialized
       }
       
-      // CONTINUOUS UPDATE: When holding, always update position based on hand movement
-      // DEBUG: Log state every frame when holding
-      if (this.isHoldingModel) {
-        if (!this.grabOffset) {
-          console.error('[CV] ERROR: isHoldingModel=true but grabOffset is null!');
-        }
+      if (this.isHoldingModel && !this.grabOffset) {
+        console.error('[CV] ERROR: isHoldingModel=true but grabOffset is null!');
       }
       
       if (this.isHoldingModel && this.grabOffset) {
@@ -1607,16 +2548,6 @@ class CVShowcase {
         const targetCubeY = handCentroid3D.y + this.grabOffset.y;
         const targetCubeZ = handCentroid3D.z + this.grabOffset.z;
         
-        // Debug logging (every 10th frame to avoid spam)
-        if (this.debugFrameCount % 10 === 0) {
-          console.log(`[CV] HOLDING UPDATE - Frame ${this.debugFrameCount}:`);
-          console.log(`  isHoldingModel: ${this.isHoldingModel}, grabOffset exists: ${!!this.grabOffset}`);
-          console.log(`  Hand 3D: (${handCentroid3D.x.toFixed(2)}, ${handCentroid3D.y.toFixed(2)}, ${handCentroid3D.z.toFixed(2)})`);
-          console.log(`  Target Cube: (${targetCubeX.toFixed(2)}, ${targetCubeY.toFixed(2)}, ${targetCubeZ.toFixed(2)})`);
-          console.log(`  Current Smooth: (${this.smoothPosition.x.toFixed(2)}, ${this.smoothPosition.y.toFixed(2)}, ${this.smoothPosition.z.toFixed(2)})`);
-          console.log(`  Model Position BEFORE: (${this.model3DGroup.position.x.toFixed(2)}, ${this.model3DGroup.position.y.toFixed(2)}, ${this.model3DGroup.position.z.toFixed(2)})`);
-        }
-        this.debugFrameCount++;
         
         // When locked, use high smoothing factor for smooth following
         // But make it responsive enough to feel locked
@@ -1671,11 +2602,26 @@ class CVShowcase {
           this.smoothRotation.z   // Roll (rotation around Z-axis)
         );
         
-        // Debug: Log position after setting (every 10th frame)
-        if ((this.debugFrameCount - 1) % 10 === 0) {
-          console.log(`  Model Position AFTER: (${this.model3DGroup.position.x.toFixed(2)}, ${this.model3DGroup.position.y.toFixed(2)}, ${this.model3DGroup.position.z.toFixed(2)})`);
-          console.log(`  Position Changed: ${Math.abs(this.model3DGroup.position.x - this.smoothPosition.x) > 0.01 || Math.abs(this.model3DGroup.position.y - this.smoothPosition.y) > 0.01 || Math.abs(this.model3DGroup.position.z - this.smoothPosition.z) > 0.01}`);
+        // === SINGLE-HAND DEPTH-BASED SCALING ===
+        // Scale cube based on hand depth: closer = bigger, farther = smaller
+        // In 3D space: more negative Z = closer to camera, less negative Z = farther from camera
+        if (this.initialHandDepth !== null) {
+          const currentHandDepth = handCentroid3D.z;
+          // depthDelta: positive when moved closer (current Z more negative than initial)
+          // Example: initial = -2.0, current = -2.5 → delta = 0.5 (closer = bigger)
+          const depthDelta = this.initialHandDepth - currentHandDepth;
+          
+          // Calculate scale factor: closer hand (positive delta) = larger scale
+          // Invert: when hand moves closer (more negative Z), we want larger scale
+          // Sensitivity: 0.5 means 1 unit closer = 50% scale increase
+          const depthScaleFactor = 1.0 + (depthDelta * 0.5);
+          const targetScale = Math.max(0.3, Math.min(3.0, this.initialScale * depthScaleFactor));
+          
+          // Smooth interpolation for scale
+          this.modelScale += (targetScale - this.modelScale) * 0.15;
+          this.model3DGroup.scale.set(this.modelScale, this.modelScale, this.modelScale);
         }
+        
         
         // Update cube position for next frame
         this.cubePosition = {
@@ -1704,7 +2650,7 @@ class CVShowcase {
           this.lastHandPosition = null;
           this.lastHand3DPosition = null;
           this.baseHandSize = null;
-          this.debugFrameCount = 0; // Reset debug counter
+          this.initialHandDepth = null;
         }
       }
       
@@ -1766,23 +2712,18 @@ class CVShowcase {
       setTimeout(() => {
         if (this.drawingPath.length > 0) {
           this.drawingPath = [];
-          console.log('[CV] Drawing cleared');
         }
       }, 1000);
     }
   }
 
   detectTwoHandScaling() {
-    // Two-hand scaling: use distance between two hands to control cube scale
+    // Two-hand scaling: both hands must touch model surface, then scale based on hand distance
     if (!this.handData || this.handData.length < 2 || !this.model3DGroup) {
-      // Not enough hands - reset scaling state and gradually return to normal size
+      // Not enough hands - reset scaling state
       if (this.initialHandDistance !== null) {
         this.initialHandDistance = null;
         this.initialScale = 1.0;
-      }
-      if (this.modelScale < 1.0) {
-        this.modelScale = Math.min(1.0, this.modelScale + 0.01);
-        this.model3DGroup.scale.set(this.modelScale, this.modelScale, this.modelScale);
       }
       return;
     }
@@ -1793,44 +2734,90 @@ class CVShowcase {
     
     if (!hand1 || !hand2 || hand1.length < 21 || hand2.length < 21) return;
     
-    // Calculate centroids of both hands (using finger tips)
-    const hand1Centroid = {
-      x: ((1 - hand1[4].x) + (1 - hand1[8].x) + (1 - hand1[12].x) + (1 - hand1[16].x) + (1 - hand1[20].x)) / 5,
-      y: (hand1[4].y + hand1[8].y + hand1[12].y + hand1[16].y + hand1[20].y) / 5
-    };
+    // Check if both hands are touching the model surface
+    const hand1Touch = this.checkFingerTouchingCube(hand1);
+    const hand2Touch = this.checkFingerTouchingCube(hand2);
     
-    const hand2Centroid = {
-      x: ((1 - hand2[4].x) + (1 - hand2[8].x) + (1 - hand2[12].x) + (1 - hand2[16].x) + (1 - hand2[20].x)) / 5,
-      y: (hand2[4].y + hand2[8].y + hand2[12].y + hand2[16].y + hand2[20].y) / 5
-    };
+    // Both hands must have at least 2 fingers touching the model
+    const bothHandsTouching = hand1Touch.touching && hand1Touch.fingersTouchingCount >= 2 &&
+                              hand2Touch.touching && hand2Touch.fingersTouchingCount >= 2;
     
-    // Calculate distance between hands in screen space (pixels)
+    if (!bothHandsTouching) {
+      // Reset scaling if hands are not both touching
+      if (this.initialHandDistance !== null) {
+        this.initialHandDistance = null;
+        this.initialScale = this.modelScale;
+      }
+      return;
+    }
+    
+    // Calculate centroids of both hands (using finger tips) in 3D space
+    const hand1Centroid3D = this.calculateHandCentroid3D(hand1);
+    const hand2Centroid3D = this.calculateHandCentroid3D(hand2);
+    
+    // Calculate distance between hands in 3D space
     const handDistance = Math.sqrt(
-      Math.pow((hand1Centroid.x - hand2Centroid.x) * this.canvas.width, 2) +
-      Math.pow((hand1Centroid.y - hand2Centroid.y) * this.canvas.height, 2)
+      Math.pow(hand2Centroid3D.x - hand1Centroid3D.x, 2) +
+      Math.pow(hand2Centroid3D.y - hand1Centroid3D.y, 2) +
+      Math.pow(hand2Centroid3D.z - hand1Centroid3D.z, 2)
     );
     
-    // Store initial distance on first detection
+    // Store initial distance on first detection (when both hands start touching)
     if (this.initialHandDistance === null) {
       this.initialHandDistance = handDistance;
       this.initialScale = this.modelScale;
-      console.log(`[CV] Two-hand scaling initialized: distance=${handDistance.toFixed(1)}px, scale=${this.modelScale.toFixed(2)}`);
     }
     
     // Calculate scale based on hand distance
-    // Closer hands = smaller scale, farther hands = larger scale
-    // Max scale: half of screen height in 3D units
+    // Hands stretching apart (larger distance) = bigger model
+    // Hands coming together (smaller distance) = smaller model
     const distance = Math.abs(this.cubePosition.z - this.camera3D.position.z);
     const fov = this.camera3D.fov * Math.PI / 180;
     const screenHeight3D = 2 * Math.tan(fov / 2) * distance;
-    const maxScale = screenHeight3D * 0.5; // Half screen height
+    const maxScale = screenHeight3D * 0.5;
     
+    // Scale factor: larger handDistance = larger scale
     const scaleFactor = handDistance / this.initialHandDistance;
     const targetScale = Math.max(0.3, Math.min(maxScale, this.initialScale * scaleFactor));
     
     // Smooth interpolation
-    this.modelScale += (targetScale - this.modelScale) * 0.1;
+    this.modelScale += (targetScale - this.modelScale) * 0.15;
     this.model3DGroup.scale.set(this.modelScale, this.modelScale, this.modelScale);
+  }
+
+  initGLTFLoader() {
+    // Initialize GLTFLoader if available
+    if (typeof THREE !== 'undefined') {
+      if (THREE.GLTFLoader) {
+        this.gltfLoader = new THREE.GLTFLoader();
+      } else {
+        const onGLTFLoaded = () => {
+          if (typeof THREE !== 'undefined' && THREE.GLTFLoader && !this.gltfLoader) {
+            this.gltfLoader = new THREE.GLTFLoader();
+            window.removeEventListener('gltfloader-loaded', onGLTFLoaded);
+          }
+        };
+        window.addEventListener('gltfloader-loaded', onGLTFLoaded);
+        
+        const checkGLTFLoader = setInterval(() => {
+          if (typeof THREE !== 'undefined' && THREE.GLTFLoader && !this.gltfLoader) {
+            this.gltfLoader = new THREE.GLTFLoader();
+            clearInterval(checkGLTFLoader);
+            window.removeEventListener('gltfloader-loaded', onGLTFLoaded);
+          }
+        }, 100);
+        
+        setTimeout(() => {
+          clearInterval(checkGLTFLoader);
+          window.removeEventListener('gltfloader-loaded', onGLTFLoaded);
+          if (!this.gltfLoader) {
+            console.warn('[CV] GLTFLoader not available after timeout - GLTF models will not work');
+          }
+        }, 10000);
+      }
+    } else {
+      console.warn('[CV] THREE.js not available - GLTFLoader cannot be initialized');
+    }
   }
 
   onGesture(gesture) {
@@ -1859,9 +2846,8 @@ class CVShowcase {
   render() {
     if (!this.isRunning) return;
     
-    // Clear canvas
-    this.ctx.fillStyle = '#0a0f11';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Clear canvas with transparent background (video will show through)
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
     // Draw video frame (mirrored correctly)
     if (this.video && this.video.readyState >= 2) {
@@ -1883,31 +2869,8 @@ class CVShowcase {
     // Update reaction particles
     this.updateReactionParticles();
     
-    // Render 3D scene (cube position is updated in detectGestures)
-    if (this.renderer3D && this.scene3D && this.camera3D) {
-      // Update cube particles
-      this.updateCubeParticles();
-      
-      // Rotate tesseract for better visibility
-      if (this.model3D) {
-        this.model3D.rotation.x += 0.005;
-        this.model3D.rotation.y += 0.01;
-      }
-      
-      // Update camera aspect ratio if container size changed
-      const container = document.getElementById('cv-3d-container');
-      if (container) {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        if (width > 0 && height > 0 && this.camera3D.aspect !== width / height) {
-          this.camera3D.aspect = width / height;
-          this.camera3D.updateProjectionMatrix();
-          this.renderer3D.setSize(width, height);
-        }
-      }
-      
-      this.renderer3D.render(this.scene3D, this.camera3D);
-    }
+    // Note: 3D scene is rendered in animate3D() loop, not here
+    // This keeps 3D rendering independent of camera state
     
     requestAnimationFrame(() => this.render());
   }
@@ -1992,8 +2955,15 @@ class CVShowcase {
 
   start() {
     this.isRunning = true;
+    // Show canvas when camera starts
+    if (this.canvas) {
+      this.canvas.classList.add('show-video');
+    }
+    // Disable mouse controls cursor when camera is active
+    if (this.renderer3D && this.renderer3D.domElement) {
+      this.renderer3D.domElement.style.cursor = 'default';
+    }
     this.render();
-    console.log('[CV] Showcase started');
   }
 
 
@@ -2007,10 +2977,19 @@ class CVShowcase {
       this.video.pause();
     }
     
+    // Hide canvas when camera stops (so 3D renderer is visible)
+    if (this.canvas) {
+      this.canvas.classList.remove('show-video');
+    }
+    
+    // Re-enable mouse controls cursor when camera stops
+    if (this.renderer3D && this.renderer3D.domElement) {
+      this.renderer3D.domElement.style.cursor = 'grab';
+    }
+    
     // Clear canvas
     if (this.ctx && this.canvas) {
-      this.ctx.fillStyle = '#0a0f11';
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     // Showcase stopped

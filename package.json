@@ -4,7 +4,8 @@
   "description": "World-class portfolio website built with modern web technologies",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config vite.config.js",
+    "serve": "vite --config vite.config.js",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

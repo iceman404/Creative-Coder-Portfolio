@@ -13,6 +13,16 @@
       this.createGlitchEffect();
       this.createCursorTrail();
       this.createTypingSignature();
+      this.setupRippleEffect();
+    },
+
+    setupRippleEffect() {
+      const settings = this.getMouseEffectSettings();
+      if (settings.rippleEnabled) {
+        document.addEventListener('click', (e) => {
+          this.createRipple(e.clientX, e.clientY);
+        });
+      }
     },
 
     createFloatingCode() {
@@ -166,25 +176,104 @@
       });
     },
 
+    getMouseEffectSettings() {
+      const saved = localStorage.getItem('mouseEffects');
+      return saved ? JSON.parse(saved) : {
+        trailLength: 20,
+        particlesEnabled: true,
+        magneticEnabled: true,
+        rippleEnabled: true
+      };
+    },
+
     createCursorTrail() {
-      // Create signature cursor trail (optimized)
+      // Enhanced cursor trail with particles and magnetic effects
+      const settings = this.getMouseEffectSettings();
       const trail = [];
-      const trailLength = 12; // Reduced from 20
+      const particles = [];
+      const trailLength = settings.trailLength || 20;
       let lastMouseUpdate = 0;
       const mouseThrottle = 16; // ~60fps max
+      let mouseX = 0, mouseY = 0;
+      let lastX = 0, lastY = 0;
+
+      // Magnetic elements
+      const magneticElements = document.querySelectorAll('a, button, .magnetic');
+      magneticElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          el.style.transition = 'transform 0.3s ease-out';
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transition = '';
+          el.style.transform = '';
+        });
+      });
 
       document.addEventListener('mousemove', (e) => {
         const now = performance.now();
         if (now - lastMouseUpdate < mouseThrottle) return;
         lastMouseUpdate = now;
         
-        trail.push({ x: e.clientX, y: e.clientY, time: Date.now() });
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Calculate velocity for dynamic effects
+        const velocity = Math.sqrt(
+          Math.pow(mouseX - lastX, 2) + Math.pow(mouseY - lastY, 2)
+        );
+        
+        trail.push({ 
+          x: mouseX, 
+          y: mouseY, 
+          time: Date.now(),
+          velocity: velocity
+        });
         if (trail.length > trailLength) trail.shift();
+
+        // Create particles on fast movement
+        if (velocity > 10 && settings.particlesEnabled) {
+          for (let i = 0; i < Math.min(3, Math.floor(velocity / 20)); i++) {
+            particles.push({
+              x: mouseX + (Math.random() - 0.5) * 20,
+              y: mouseY + (Math.random() - 0.5) * 20,
+              vx: (Math.random() - 0.5) * 4,
+              vy: (Math.random() - 0.5) * 4,
+              life: 1.0,
+              decay: 0.02 + Math.random() * 0.03,
+              size: 2 + Math.random() * 4
+            });
+          }
+        }
+
+        // Magnetic effect on interactive elements
+        if (settings.magneticEnabled) {
+          magneticElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const distance = Math.sqrt(
+              Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+            );
+            
+            if (distance < 100) {
+              const force = (100 - distance) / 100;
+              const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
+              const moveX = Math.cos(angle) * force * 15;
+              const moveY = Math.sin(angle) * force * 15;
+              el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            }
+          });
+        }
+
+        // Ripple effect will be handled separately on click
+
+        lastX = mouseX;
+        lastY = mouseY;
       });
 
       let rafId = null;
       let lastDraw = 0;
-      const drawThrottle = 33; // ~30fps for trail
+      const drawThrottle = 16; // ~60fps
 
       function drawTrail() {
         const now = performance.now();
@@ -214,25 +303,111 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Clear with fade for smooth trails
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // Draw trail with gradient
         trail.forEach((point, i) => {
           const age = Date.now() - point.time;
-          const alpha = 1 - (age / 500);
-          const size = (trailLength - i) * 1.5; // Slightly smaller
+          const alpha = Math.max(0, 1 - (age / 800));
+          const progress = i / trail.length;
+          const size = (trailLength - i) * 2 + (point.velocity || 0) * 0.1;
 
           if (alpha > 0) {
+            const gradient = ctx.createRadialGradient(
+              point.x, point.y, 0,
+              point.x, point.y, size
+            );
+            gradient.addColorStop(0, `rgba(0, 185, 204, ${alpha * 0.8})`);
+            gradient.addColorStop(0.5, `rgba(6, 232, 255, ${alpha * 0.4})`);
+            gradient.addColorStop(1, `rgba(0, 185, 204, 0)`);
+
             ctx.beginPath();
             ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0, 185, 204, ${alpha * 0.4})`; // Slightly more transparent
+            ctx.fillStyle = gradient;
             ctx.fill();
+
+            // Connect trail points with lines
+            if (i > 0) {
+              const prevPoint = trail[i - 1];
+              ctx.beginPath();
+              ctx.moveTo(prevPoint.x, prevPoint.y);
+              ctx.lineTo(point.x, point.y);
+              ctx.strokeStyle = `rgba(0, 185, 204, ${alpha * 0.3})`;
+              ctx.lineWidth = 2;
+              ctx.stroke();
+            }
           }
         });
+
+        // Draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= p.decay;
+          p.vy += 0.1; // Gravity
+
+          if (p.life > 0) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 185, 204, ${p.life * 0.6})`;
+            ctx.fill();
+          } else {
+            particles.splice(i, 1);
+          }
+        }
 
         rafId = requestAnimationFrame(drawTrail);
       }
 
       drawTrail();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        const canvas = document.getElementById('cursor-trail');
+        if (canvas) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+      });
+    },
+
+    createRipple(x, y) {
+      const ripple = document.createElement('div');
+      ripple.style.cssText = `
+        position: fixed;
+        left: ${x}px;
+        top: ${y}px;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 185, 204, 0.6);
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        animation: rippleExpand 0.6s ease-out forwards;
+      `;
+      document.body.appendChild(ripple);
+
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes rippleExpand {
+          to {
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+            border-width: 1px;
+          }
+        }
+      `;
+      if (!document.getElementById('ripple-style')) {
+        style.id = 'ripple-style';
+        document.head.appendChild(style);
+      }
+
+      setTimeout(() => ripple.remove(), 600);
     },
 
     createTypingSignature() {

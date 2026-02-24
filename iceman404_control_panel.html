@@ -1,0 +1,1313 @@
+<!--
+  Author: iceman404 (John Subba)
+  Last Modified: 2026-02-24
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICEMAN404 Control Panel | Site Configuration</title>
+  <meta name="description" content="Central control panel for ICEMAN404 portfolio customization">
+  <meta name="author" content="iceman404" />
+  <meta name="last-modified" content="2026-02-24" />
+  
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Scripts -->
+  <script src="js/path-helper.js"></script>
+  <script src="js/settings-manager.js"></script>
+  <!-- Protection -->
+  <script src="js/protection.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --cp-primary: #00b9cc;
+      --cp-secondary: #06e8ff;
+      --cp-bg: #0a0f11;
+      --cp-surface: #151a1d;
+      --cp-text: #e0f4f7;
+      --cp-text-secondary: #8a9ba0;
+      --cp-border: #1e2a2f;
+      --cp-accent: #005c66;
+      --cp-success: #10b981;
+      --cp-warning: #f59e0b;
+      --cp-error: #ef4444;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .background-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 185, 204, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 185, 204, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+      border-bottom: 2px solid var(--cp-border);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      background: linear-gradient(135deg, var(--cp-primary), var(--cp-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 30px rgba(0, 185, 204, 0.5);
+    }
+
+    .subtitle {
+      color: var(--cp-text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .control-section {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .control-section:hover {
+      border-color: var(--cp-primary);
+      box-shadow: 0 0 20px rgba(0, 185, 204, 0.2);
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--cp-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(180deg, var(--cp-primary), var(--cp-secondary));
+      border-radius: 2px;
+    }
+
+    .control-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .control-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--cp-text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    select, input[type="text"], input[type="number"], input[type="range"] {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--cp-bg);
+      border: 1px solid var(--cp-border);
+      border-radius: 6px;
+      color: var(--cp-text);
+      font-family: 'Roboto', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--cp-primary);
+      box-shadow: 0 0 10px rgba(0, 185, 204, 0.3);
+    }
+
+    input[type="range"] {
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--cp-border);
+      border-radius: 4px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--cp-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 185, 204, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--cp-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 10px rgba(0, 185, 204, 0.5);
+    }
+
+    .theme-presets {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .theme-preset {
+      padding: 1rem;
+      border: 2px solid var(--cp-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-preset:hover {
+      border-color: var(--cp-primary);
+      transform: translateY(-2px);
+    }
+
+    .theme-preset.active {
+      border-color: var(--cp-primary);
+      box-shadow: 0 0 20px rgba(0, 185, 204, 0.4);
+    }
+
+    .theme-preset::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--preset-color-1, #00b9cc), var(--preset-color-2, #06e8ff));
+    }
+
+    .preset-name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .preset-desc {
+      font-size: 0.8rem;
+      color: var(--cp-text-secondary);
+    }
+
+    .color-picker-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .color-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    input[type="color"] {
+      width: 60px;
+      height: 40px;
+      border: 1px solid var(--cp-border);
+      border-radius: 6px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 4px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--cp-border);
+      transition: 0.3s;
+      border-radius: 30px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--cp-primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cp-primary), var(--cp-secondary));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 185, 204, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      border: 1px solid var(--cp-border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cp-primary);
+      color: var(--cp-primary);
+    }
+
+    .btn-danger {
+      background: var(--cp-error);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    .preview-box {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-primary, 'Orbitron');
+      color: var(--color-text, var(--cp-text));
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      background: var(--cp-success);
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+      display: none;
+    }
+
+    .notification.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .range-value {
+      display: inline-block;
+      margin-left: 0.5rem;
+      color: var(--cp-primary);
+      font-weight: 600;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      color: var(--cp-primary);
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--cp-secondary);
+      text-shadow: 0 0 10px rgba(0, 185, 204, 0.5);
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .info-text {
+      font-size: 0.85rem;
+      color: var(--cp-text-secondary);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-grid"></div>
+  
+  <div class="container">
+    <a href="/" class="back-link">← Back to Home</a>
+    
+    <header>
+      <h1>ICEMAN404 CONTROL PANEL</h1>
+      <p class="subtitle">Central Configuration Hub | Customize Your Experience</p>
+    </header>
+
+    <div class="notification" id="notification">
+      Settings saved successfully!
+    </div>
+
+    <form id="controlForm">
+      <div class="control-grid">
+        <!-- Theme Presets -->
+        <div class="control-section full-width">
+          <h2 class="section-title">Theme Presets</h2>
+          <div class="theme-presets" id="themePresets">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Fonts -->
+        <div class="control-section">
+          <h2 class="section-title">Typography</h2>
+          
+          <div class="control-group">
+            <label class="control-label">Primary Font</label>
+            <select id="fontPrimary">
+              <option value="Orbitron">Orbitron</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Inter">Inter</option>
+              <option value="JetBrains Mono">JetBrains Mono</option>
+              <option value="Space Mono">Space Mono</option>
+              <option value="Fira Code">Fira Code</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Secondary Font</label>
+            <select id="fontSecondary">
+              <option value="Roboto">Roboto</option>
+              <option value="Orbitron">Orbitron</option>
+              <option value="Inter">Inter</option>
+              <option value="JetBrains Mono">JetBrains Mono</option>
+              <option value="Space Mono">Space Mono</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Base Font Size</label>
+            <select id="fontSize">
+              <option value="small">Small</option>
+              <option value="normal" selected>Normal</option>
+              <option value="large">Large</option>
+              <option value="xlarge">Extra Large</option>
+            </select>
+          </div>
+
+          <div class="preview-box" id="fontPreview">
+            Preview: The quick brown fox jumps over the lazy dog
+          </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="control-section">
+          <h2 class="section-title">Color Customization</h2>
+          
+          <div class="color-picker-group">
+            <div class="control-group">
+              <label class="control-label">Primary Color</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorPrimary" value="#00b9cc">
+                <input type="text" id="colorPrimaryText" value="#00b9cc" placeholder="#00b9cc">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Secondary Color</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorSecondary" value="#06e8ff">
+                <input type="text" id="colorSecondaryText" value="#06e8ff" placeholder="#06e8ff">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Background</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorBackground" value="#0a0f11">
+                <input type="text" id="colorBackgroundText" value="#0a0f11" placeholder="#0a0f11">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Text Color</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorText" value="#e0f4f7">
+                <input type="text" id="colorTextText" value="#e0f4f7" placeholder="#e0f4f7">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Accent Color</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorAccent" value="#005c66">
+                <input type="text" id="colorAccentText" value="#005c66" placeholder="#005c66">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mouse Effects -->
+        <div class="control-section">
+          <h2 class="section-title">Mouse Effects</h2>
+          
+          <div class="toggle-wrapper">
+            <label class="control-label">Enable Particles</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="particlesEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-wrapper">
+            <label class="control-label">Enable Magnetic Effect</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="magneticEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-wrapper">
+            <label class="control-label">Enable Ripple Effect</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="rippleEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Trail Length
+              <span class="range-value" id="trailLengthValue">20</span>
+            </label>
+            <input type="range" id="trailLength" min="5" max="50" value="20">
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Trail Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="trailColor" value="#00b9cc">
+              <input type="text" id="trailColorText" value="#00b9cc">
+            </div>
+          </div>
+        </div>
+
+        <!-- Animations -->
+        <div class="control-section">
+          <h2 class="section-title">Animations</h2>
+          
+          <div class="toggle-wrapper">
+            <label class="control-label">Enable Animations</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="animationsEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Animation Speed</label>
+            <select id="animationSpeed">
+              <option value="slow">Slow</option>
+              <option value="normal" selected>Normal</option>
+              <option value="fast">Fast</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Particle Count
+              <span class="range-value" id="particleCountValue">800</span>
+            </label>
+            <input type="range" id="particleCount" min="100" max="2000" value="800" step="100">
+            <p class="info-text">Lower values improve performance</p>
+          </div>
+        </div>
+
+        <!-- Particles -->
+        <div class="control-section">
+          <h2 class="section-title">Particle System</h2>
+          
+          <div class="toggle-wrapper">
+            <label class="control-label">Enable Particles</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="particlesSystemEnabled" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Particle Count
+              <span class="range-value" id="particlesCountValue">50</span>
+            </label>
+            <input type="range" id="particlesCount" min="10" max="100" value="50">
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Particle Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="particleColor" value="#00b9cc">
+              <input type="text" id="particleColorText" value="#00b9cc">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Cube Settings -->
+        <div class="control-section">
+          <h2 class="section-title">3D Cube Colors</h2>
+          
+          <div class="control-group">
+            <label class="control-label">Outer Cube Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="cubeOuterColor" value="#6366f1">
+              <input type="text" id="cubeOuterColorText" value="#6366f1">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Inner Cube Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="cubeInnerColor" value="#8b5cf6">
+              <input type="text" id="cubeInnerColorText" value="#8b5cf6">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Edge Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="cubeEdgeColor" value="#a78bfa">
+              <input type="text" id="cubeEdgeColorText" value="#a78bfa">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Emissive Color</label>
+            <div class="color-input-wrapper">
+              <input type="color" id="cubeEmissiveColor" value="#ffffff">
+              <input type="text" id="cubeEmissiveColorText" value="#ffffff">
+            </div>
+            <p class="info-text">Glow color for the cube</p>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Emissive Intensity
+              <span class="range-value" id="cubeEmissiveIntensityValue">1.0</span>
+            </label>
+            <input type="range" id="cubeEmissiveIntensity" min="0" max="2" step="0.1" value="1.0">
+          </div>
+        </div>
+
+        <!-- 3D Model Loader -->
+        <div class="control-section full-width">
+          <h2 class="section-title">3D Model Loader</h2>
+          
+          <div class="control-group">
+            <label class="control-label">Select 3D Model</label>
+            <select id="modelSelector">
+              <option value="tesseract">Default Tesseract</option>
+              <option value="gltf-damaged-helmet">Damaged Helmet (GLTF)</option>
+              <option value="gltf-flamingo">Flamingo (GLTF)</option>
+              <option value="gltf-cube">Cube (GLTF)</option>
+              <option value="gltf-duck">Duck (GLTF)</option>
+            </select>
+            <p class="info-text">Choose a 3D model to display in the CV showcase</p>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Custom GLTF Model URL</label>
+            <input type="text" id="customModelUrl" placeholder="https://example.com/model.gltf">
+            <button type="button" class="btn btn-secondary" id="loadCustomModel" style="margin-top: 0.5rem;">Load Custom Model</button>
+            <p class="info-text">Load a GLTF model from a URL (must be CORS-enabled)</p>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Model Scale
+              <span class="range-value" id="modelScaleValue">1.0</span>
+            </label>
+            <input type="range" id="modelScale" min="0.1" max="3" step="0.1" value="1.0">
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Model Rotation Speed
+              <span class="range-value" id="modelRotationSpeedValue">0.01</span>
+            </label>
+            <input type="range" id="modelRotationSpeed" min="0" max="0.1" step="0.001" value="0.01">
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-primary" id="saveBtn">Save Settings</button>
+        <button type="button" class="btn btn-secondary" id="resetBtn">Reset to Default</button>
+        <button type="button" class="btn btn-secondary" id="exportBtn">Export Settings</button>
+        <button type="button" class="btn btn-secondary" id="importBtn">Import Settings</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Control Panel Logic
+    const ControlPanel = {
+      settings: null,
+
+      init() {
+        this.loadSettings();
+        this.setupEventListeners();
+        this.renderThemePresets();
+        this.updatePreview();
+      },
+
+      loadSettings() {
+        if (window.SettingsManager) {
+          this.settings = window.SettingsManager.getSettings();
+          this.populateForm();
+        }
+      },
+
+      populateForm() {
+        const s = this.settings;
+        
+        // Fonts
+        document.getElementById('fontPrimary').value = s.fontPrimary || 'Orbitron';
+        document.getElementById('fontSecondary').value = s.fontSecondary || 'Roboto';
+        document.getElementById('fontSize').value = s.fontSize || 'normal';
+
+        // Colors
+        if (s.colors) {
+          document.getElementById('colorPrimary').value = s.colors.primary || '#00b9cc';
+          document.getElementById('colorPrimaryText').value = s.colors.primary || '#00b9cc';
+          document.getElementById('colorSecondary').value = s.colors.secondary || '#06e8ff';
+          document.getElementById('colorSecondaryText').value = s.colors.secondary || '#06e8ff';
+          document.getElementById('colorBackground').value = s.colors.background || '#0a0f11';
+          document.getElementById('colorBackgroundText').value = s.colors.background || '#0a0f11';
+          document.getElementById('colorText').value = s.colors.text || '#e0f4f7';
+          document.getElementById('colorTextText').value = s.colors.text || '#e0f4f7';
+          document.getElementById('colorAccent').value = s.colors.accent || '#005c66';
+          document.getElementById('colorAccentText').value = s.colors.accent || '#005c66';
+        }
+
+        // Mouse Effects
+        if (s.mouseEffects) {
+          document.getElementById('particlesEnabled').checked = s.mouseEffects.particlesEnabled !== false;
+          document.getElementById('magneticEnabled').checked = s.mouseEffects.magneticEnabled !== false;
+          document.getElementById('rippleEnabled').checked = s.mouseEffects.rippleEnabled !== false;
+          document.getElementById('trailLength').value = s.mouseEffects.trailLength || 20;
+          document.getElementById('trailLengthValue').textContent = s.mouseEffects.trailLength || 20;
+          document.getElementById('trailColor').value = s.mouseEffects.trailColor || '#00b9cc';
+          document.getElementById('trailColorText').value = s.mouseEffects.trailColor || '#00b9cc';
+        }
+
+        // Animations
+        if (s.animations) {
+          document.getElementById('animationsEnabled').checked = s.animations.enabled !== false;
+          document.getElementById('animationSpeed').value = s.animations.speed || 'normal';
+          document.getElementById('particleCount').value = s.animations.particleCount || 800;
+          document.getElementById('particleCountValue').textContent = s.animations.particleCount || 800;
+        }
+
+        // Particles
+        if (s.particles) {
+          document.getElementById('particlesSystemEnabled').checked = s.particles.enabled !== false;
+          document.getElementById('particlesCount').value = s.particles.count || 50;
+          document.getElementById('particlesCountValue').textContent = s.particles.count || 50;
+          document.getElementById('particleColor').value = s.particles.color || '#00b9cc';
+          document.getElementById('particleColorText').value = s.particles.color || '#00b9cc';
+        }
+
+        // Cube colors
+        if (s.cubeColors) {
+          document.getElementById('cubeOuterColor').value = s.cubeColors.outer || '#6366f1';
+          document.getElementById('cubeOuterColorText').value = s.cubeColors.outer || '#6366f1';
+          document.getElementById('cubeInnerColor').value = s.cubeColors.inner || '#8b5cf6';
+          document.getElementById('cubeInnerColorText').value = s.cubeColors.inner || '#8b5cf6';
+          document.getElementById('cubeEdgeColor').value = s.cubeColors.edge || '#a78bfa';
+          document.getElementById('cubeEdgeColorText').value = s.cubeColors.edge || '#a78bfa';
+          document.getElementById('cubeEmissiveColor').value = s.cubeColors.emissive || '#ffffff';
+          document.getElementById('cubeEmissiveColorText').value = s.cubeColors.emissive || '#ffffff';
+          document.getElementById('cubeEmissiveIntensity').value = s.cubeColors.emissiveIntensity || 1.0;
+          document.getElementById('cubeEmissiveIntensityValue').textContent = s.cubeColors.emissiveIntensity || 1.0;
+        }
+
+        // 3D Model
+        if (s.model3D) {
+          const modelSelector = document.getElementById('modelSelector');
+          if (modelSelector && s.model3D.selectedModel) {
+            modelSelector.value = s.model3D.selectedModel || 'tesseract';
+          }
+          if (s.model3D.scale !== undefined) {
+            document.getElementById('modelScale').value = s.model3D.scale || 1.0;
+            document.getElementById('modelScaleValue').textContent = s.model3D.scale || 1.0;
+          }
+          if (s.model3D.rotationSpeed !== undefined) {
+            document.getElementById('modelRotationSpeed').value = s.model3D.rotationSpeed || 0.01;
+            document.getElementById('modelRotationSpeedValue').textContent = s.model3D.rotationSpeed || 0.01;
+          }
+        }
+      },
+
+      setupEventListeners() {
+        // Save button
+        document.getElementById('saveBtn').addEventListener('click', () => this.saveSettings());
+
+        // Reset button
+        document.getElementById('resetBtn').addEventListener('click', () => {
+          if (confirm('Reset all settings to default?')) {
+            this.resetSettings();
+          }
+        });
+
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', () => this.exportSettings());
+
+        // Import button
+        document.getElementById('importBtn').addEventListener('click', () => {
+          document.getElementById('importFile').click();
+        });
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+          this.importSettings(e.target.files[0]);
+        });
+
+        // Range inputs
+        document.getElementById('trailLength').addEventListener('input', (e) => {
+          document.getElementById('trailLengthValue').textContent = e.target.value;
+        });
+
+        document.getElementById('particleCount').addEventListener('input', (e) => {
+          document.getElementById('particleCountValue').textContent = e.target.value;
+        });
+
+        document.getElementById('particlesCount').addEventListener('input', (e) => {
+          document.getElementById('particlesCountValue').textContent = e.target.value;
+        });
+
+        // Color inputs sync
+        ['Primary', 'Secondary', 'Background', 'Text', 'Accent', 'trail', 'particle', 'cubeOuter', 'cubeInner', 'cubeEdge', 'cubeEmissive'].forEach(color => {
+          const colorId = color === 'trail' ? 'trailColor' : 
+                         color === 'particle' ? 'particleColor' : 
+                         color === 'cubeOuter' ? 'cubeOuterColor' :
+                         color === 'cubeInner' ? 'cubeInnerColor' :
+                         color === 'cubeEdge' ? 'cubeEdgeColor' :
+                         color === 'cubeEmissive' ? 'cubeEmissiveColor' :
+                         `color${color}`;
+          const textId = `${colorId}Text`;
+          
+          const colorEl = document.getElementById(colorId);
+          const textEl = document.getElementById(textId);
+          
+          if (colorEl && textEl) {
+            colorEl.addEventListener('input', (e) => {
+              textEl.value = e.target.value;
+              if (color.startsWith('cube')) {
+                this.applyCubeColors();
+              } else {
+                this.updatePreview();
+              }
+            });
+
+            textEl.addEventListener('input', (e) => {
+              if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                colorEl.value = e.target.value;
+                if (color.startsWith('cube')) {
+                  this.applyCubeColors();
+                } else {
+                  this.updatePreview();
+                }
+              }
+            });
+          }
+        });
+
+        // Cube emissive intensity
+        const cubeEmissiveIntensity = document.getElementById('cubeEmissiveIntensity');
+        const cubeEmissiveIntensityValue = document.getElementById('cubeEmissiveIntensityValue');
+        if (cubeEmissiveIntensity && cubeEmissiveIntensityValue) {
+          cubeEmissiveIntensity.addEventListener('input', (e) => {
+            cubeEmissiveIntensityValue.textContent = parseFloat(e.target.value).toFixed(1);
+            this.applyCubeColors();
+          });
+        }
+
+        // Model selector
+        const modelSelector = document.getElementById('modelSelector');
+        if (modelSelector) {
+          modelSelector.addEventListener('change', (e) => {
+            this.loadModel(e.target.value);
+          });
+        }
+
+        // Custom model loader
+        const loadCustomModelBtn = document.getElementById('loadCustomModel');
+        if (loadCustomModelBtn) {
+          loadCustomModelBtn.addEventListener('click', () => {
+            const url = document.getElementById('customModelUrl').value;
+            if (url) {
+              this.loadModel('custom', url);
+            }
+          });
+        }
+
+        // Model scale
+        const modelScale = document.getElementById('modelScale');
+        const modelScaleValue = document.getElementById('modelScaleValue');
+        if (modelScale && modelScaleValue) {
+          modelScale.addEventListener('input', (e) => {
+            modelScaleValue.textContent = parseFloat(e.target.value).toFixed(1);
+            this.updateModelScale(parseFloat(e.target.value));
+          });
+        }
+
+        // Model rotation speed
+        const modelRotationSpeed = document.getElementById('modelRotationSpeed');
+        const modelRotationSpeedValue = document.getElementById('modelRotationSpeedValue');
+        if (modelRotationSpeed && modelRotationSpeedValue) {
+          modelRotationSpeed.addEventListener('input', (e) => {
+            modelRotationSpeedValue.textContent = parseFloat(e.target.value).toFixed(3);
+            this.updateModelRotationSpeed(parseFloat(e.target.value));
+          });
+        }
+
+        // Font changes
+        ['fontPrimary', 'fontSecondary', 'fontSize'].forEach(id => {
+          document.getElementById(id).addEventListener('change', () => this.updatePreview());
+        });
+      },
+
+      renderThemePresets() {
+        const presets = [
+          { name: 'AR/VR Dark', desc: 'Default theme', theme: 'ar-vr-dark' },
+          { name: 'Grubvox Light', desc: 'Clean light theme', theme: 'grubvox-light' },
+          { name: 'Professional White', desc: 'Corporate style', theme: 'professional-white' },
+          { name: 'Dark Green', desc: 'Nature inspired', theme: 'dark-green' },
+          { name: 'Cyberpunk', desc: 'Neon futuristic', theme: 'cyberpunk' },
+          { name: 'Minimal Dark', desc: 'Ultra minimal', theme: 'minimal-dark' },
+          { name: 'Ocean Blue', desc: 'Calm blue tones', theme: 'ocean-blue' },
+          { name: 'Sunset Orange', desc: 'Warm orange', theme: 'sunset-orange' },
+          { name: 'Neon Purple', desc: 'Vibrant purple', theme: 'neon-purple' },
+          { name: 'Matrix Green', desc: 'Matrix style', theme: 'matrix-green' },
+          { name: 'Midnight Blue', desc: 'Deep blue', theme: 'midnight-blue' },
+          { name: 'Rose Gold', desc: 'Elegant rose', theme: 'rose-gold' },
+          { name: 'Aurora Northern', desc: 'Northern lights', theme: 'aurora-northern' },
+          { name: 'Emerald Forest', desc: 'Forest green', theme: 'emerald-forest' },
+          { name: 'Royal Purple', desc: 'Regal purple', theme: 'royal-purple' },
+          { name: 'Fire Red', desc: 'Bold red', theme: 'fire-red' },
+          { name: 'Ice Blue', desc: 'Cool blue', theme: 'ice-blue' },
+          { name: 'Golden Hour', desc: 'Golden sunset', theme: 'golden-hour' },
+          { name: 'Deep Space', desc: 'Space purple', theme: 'deep-space' },
+          { name: 'Sakura Pink', desc: 'Cherry blossom', theme: 'sakura-pink' },
+          { name: 'Volcanic Orange', desc: 'Lava orange', theme: 'volcanic-orange' },
+          { name: 'Arctic Cyan', desc: 'Ice cyan', theme: 'arctic-cyan' },
+          { name: 'Lavender Dream', desc: 'Soft lavender', theme: 'lavender-dream' },
+          { name: 'Neon Cyan', desc: 'Bright cyan', theme: 'neon-cyan' },
+          { name: 'Crimson Dark', desc: 'Dark red', theme: 'crimson-dark' },
+          { name: 'Mint Fresh', desc: 'Fresh mint', theme: 'mint-fresh' },
+          { name: 'Cosmic Purple', desc: 'Cosmic vibes', theme: 'cosmic-purple' },
+          { name: 'KDE Breeze Dark', desc: 'Official KDE theme', theme: 'kde-breeze-dark' },
+          { name: 'KDE Gruvbox Dark', desc: 'Retro groove', theme: 'kde-gruvbox-dark' },
+          { name: 'KDE Nord', desc: 'Arctic blue', theme: 'kde-nord' },
+          { name: 'KDE Dracula', desc: 'Vampire theme', theme: 'kde-dracula' },
+          { name: 'KDE Sweet Dark', desc: 'Sweet colors', theme: 'kde-sweet-dark' },
+          { name: 'KDE Arc Dark', desc: 'Modern arc', theme: 'kde-arc-dark' },
+          { name: 'KDE Materia Dark', desc: 'Material design', theme: 'kde-materia-dark' },
+          { name: 'KDE Ant Dark', desc: 'Ant design', theme: 'kde-ant-dark' },
+          { name: 'KDE Layan Dark', desc: 'Layan style', theme: 'kde-layan-dark' },
+          { name: 'KDE WhiteSur Dark', desc: 'macOS inspired', theme: 'kde-whitesur-dark' },
+          { name: 'KDE Catppuccin', desc: 'Soothing pastel', theme: 'kde-catppuccin-mocha' },
+          { name: 'KDE Tokyo Night', desc: 'Tokyo vibes', theme: 'kde-tokyo-night' },
+          { name: 'KDE Kanagawa', desc: 'Japanese art', theme: 'kde-kanagawa' },
+          { name: 'KDE OneDark', desc: 'Atom editor', theme: 'kde-onedark' },
+          { name: 'KDE Monokai', desc: 'Sublime text', theme: 'kde-monokai' }
+        ];
+
+        const container = document.getElementById('themePresets');
+        container.innerHTML = presets.map(preset => `
+          <div class="theme-preset" data-theme="${preset.theme}">
+            <div class="preset-name">${preset.name}</div>
+            <div class="preset-desc">${preset.desc}</div>
+          </div>
+        `).join('');
+
+        // Set active theme
+        const currentTheme = this.settings?.theme || 'ar-vr-dark';
+        container.querySelector(`[data-theme="${currentTheme}"]`)?.classList.add('active');
+
+        // Add click handlers
+        container.querySelectorAll('.theme-preset').forEach(preset => {
+          preset.addEventListener('click', () => {
+            container.querySelectorAll('.theme-preset').forEach(p => p.classList.remove('active'));
+            preset.classList.add('active');
+            this.applyThemePreset(preset.dataset.theme);
+          });
+        });
+      },
+
+      applyThemePreset(themeName) {
+        if (window.SettingsManager) {
+          window.SettingsManager.applyThemePreset(themeName);
+          this.loadSettings();
+          this.populateForm();
+          this.updatePreview();
+          this.showNotification('Theme preset applied!');
+        }
+      },
+
+      saveSettings() {
+        const settings = {
+          theme: this.settings?.theme || 'ar-vr-dark',
+          fontPrimary: document.getElementById('fontPrimary').value,
+          fontSecondary: document.getElementById('fontSecondary').value,
+          fontSize: document.getElementById('fontSize').value,
+          colors: {
+            primary: document.getElementById('colorPrimary').value,
+            secondary: document.getElementById('colorSecondary').value,
+            background: document.getElementById('colorBackground').value,
+            text: document.getElementById('colorText').value,
+            accent: document.getElementById('colorAccent').value
+          },
+          mouseEffects: {
+            particlesEnabled: document.getElementById('particlesEnabled').checked,
+            magneticEnabled: document.getElementById('magneticEnabled').checked,
+            rippleEnabled: document.getElementById('rippleEnabled').checked,
+            trailLength: parseInt(document.getElementById('trailLength').value),
+            trailColor: document.getElementById('trailColor').value
+          },
+          animations: {
+            enabled: document.getElementById('animationsEnabled').checked,
+            speed: document.getElementById('animationSpeed').value,
+            particleCount: parseInt(document.getElementById('particleCount').value)
+          },
+          particles: {
+            enabled: document.getElementById('particlesSystemEnabled').checked,
+            count: parseInt(document.getElementById('particlesCount').value),
+            color: document.getElementById('particleColor').value
+          },
+          cubeColors: {
+            outer: document.getElementById('cubeOuterColor').value,
+            inner: document.getElementById('cubeInnerColor').value,
+            edge: document.getElementById('cubeEdgeColor').value,
+            emissive: document.getElementById('cubeEmissiveColor').value,
+            emissiveIntensity: parseFloat(document.getElementById('cubeEmissiveIntensity').value)
+          },
+          model3D: {
+            selectedModel: document.getElementById('modelSelector').value,
+            scale: parseFloat(document.getElementById('modelScale').value),
+            rotationSpeed: parseFloat(document.getElementById('modelRotationSpeed').value)
+          }
+        };
+
+        if (window.SettingsManager) {
+          window.SettingsManager.updateSettings(settings);
+          this.showNotification('Settings saved successfully!');
+          
+          // Reload page after a delay to apply changes
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      },
+
+      resetSettings() {
+        if (window.SettingsManager) {
+          window.SettingsManager.resetSettings();
+          this.loadSettings();
+          this.populateForm();
+          this.updatePreview();
+          this.showNotification('Settings reset to default!');
+        }
+      },
+
+      exportSettings() {
+        const settings = window.SettingsManager?.getSettings() || {};
+        const dataStr = JSON.stringify(settings, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'iceman404-settings.json';
+        link.click();
+        URL.revokeObjectURL(url);
+        this.showNotification('Settings exported!');
+      },
+
+      importSettings(file) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const settings = JSON.parse(e.target.result);
+            if (window.SettingsManager) {
+              window.SettingsManager.updateSettings(settings);
+              this.loadSettings();
+              this.populateForm();
+              this.updatePreview();
+              this.showNotification('Settings imported successfully!');
+              setTimeout(() => window.location.reload(), 1000);
+            }
+          } catch (err) {
+            alert('Invalid settings file!');
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      updatePreview() {
+        const preview = document.getElementById('fontPreview');
+        const fontPrimary = document.getElementById('fontPrimary').value;
+        preview.style.fontFamily = `'${fontPrimary}', sans-serif`;
+        preview.style.color = document.getElementById('colorText').value;
+        preview.style.background = document.getElementById('colorBackground').value;
+      },
+
+      showNotification(message) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.add('show');
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+      },
+
+      applyCubeColors() {
+        // Save cube colors to settings (persistent, like themes)
+        try {
+          const outerColorEl = document.getElementById('cubeOuterColor');
+          const innerColorEl = document.getElementById('cubeInnerColor');
+          const edgeColorEl = document.getElementById('cubeEdgeColor');
+          const emissiveColorEl = document.getElementById('cubeEmissiveColor');
+          const emissiveIntensityEl = document.getElementById('cubeEmissiveIntensity');
+          
+          if (!outerColorEl || !innerColorEl || !edgeColorEl || !emissiveColorEl || !emissiveIntensityEl) {
+            return;
+          }
+          
+          const colors = {
+            outer: outerColorEl.value,
+            inner: innerColorEl.value,
+            edge: edgeColorEl.value,
+            emissive: emissiveColorEl.value,
+            emissiveIntensity: parseFloat(emissiveIntensityEl.value)
+          };
+          
+          // Save to settings (persistent storage)
+          if (window.SettingsManager) {
+            const settings = window.SettingsManager.getSettings() || {};
+            settings.cubeColors = colors;
+            window.SettingsManager.updateSettings(settings);
+          }
+          
+          // Optionally apply immediately if bio.html is open (but not required)
+          if (window.CVShowcase && window.cvShowcaseInstance) {
+            window.cvShowcaseInstance.updateCubeColors(colors);
+          }
+        } catch (error) {
+          // Error applying cube colors
+        }
+      },
+
+      loadModel(modelName, customUrl = null) {
+        try {
+          const modelUrls = {
+            'gltf-damaged-helmet': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf',
+            'gltf-flamingo': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Flamingo/glTF/Flamingo.gltf',
+            'gltf-cube': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF/Cube.gltf',
+            'gltf-duck': 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf'
+          };
+
+          const url = customUrl || (modelName === 'custom' ? null : modelUrls[modelName]);
+          
+          // Save to settings (persistent storage)
+          if (window.SettingsManager) {
+            const settings = window.SettingsManager.getSettings() || {};
+            if (!settings.model3D) settings.model3D = {};
+            settings.model3D.selectedModel = modelName;
+            if (customUrl && modelName === 'custom') {
+              // Store custom URL if provided
+              settings.model3D.customModelUrl = customUrl;
+            } else if (modelName !== 'custom') {
+              // Clear custom URL if switching to a preset model
+              delete settings.model3D.customModelUrl;
+            }
+            window.SettingsManager.updateSettings(settings);
+            this.showNotification(`Model selection saved: ${modelName === 'tesseract' ? 'Tesseract' : modelName}`);
+          }
+          
+          // Optionally apply immediately if bio.html is open (but not required)
+          if (window.CVShowcase && window.cvShowcaseInstance) {
+            if (url || modelName === 'tesseract') {
+              window.cvShowcaseInstance.loadModel(modelName === 'tesseract' ? null : url);
+              this.showNotification(`Loading ${modelName === 'tesseract' ? 'Tesseract' : 'GLTF model'}...`);
+            }
+          }
+        } catch (error) {
+          this.showNotification('Error saving model selection.');
+        }
+      },
+
+      updateModelScale(scale) {
+        // Save to settings (persistent storage)
+        if (window.SettingsManager) {
+          const settings = window.SettingsManager.getSettings() || {};
+          if (!settings.model3D) settings.model3D = {};
+          settings.model3D.scale = scale;
+          window.SettingsManager.updateSettings(settings);
+        }
+        
+        // Optionally apply immediately if bio.html is open
+        if (window.CVShowcase && window.cvShowcaseInstance) {
+          window.cvShowcaseInstance.updateModelScale(scale);
+        }
+      },
+
+      updateModelRotationSpeed(speed) {
+        // Save to settings (persistent storage)
+        if (window.SettingsManager) {
+          const settings = window.SettingsManager.getSettings() || {};
+          if (!settings.model3D) settings.model3D = {};
+          settings.model3D.rotationSpeed = speed;
+          window.SettingsManager.updateSettings(settings);
+        }
+        
+        // Optionally apply immediately if bio.html is open
+        if (window.CVShowcase && window.cvShowcaseInstance) {
+          window.cvShowcaseInstance.updateModelRotationSpeed(speed);
+        }
+      }
+    };
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => ControlPanel.init());
+    } else {
+      ControlPanel.init();
+    }
+  </script>
+</body>
+</html>

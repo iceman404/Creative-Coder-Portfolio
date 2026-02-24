@@ -21,6 +21,7 @@
       '/project-html-files/fine_tuning_resnet50',
       '/project-html-files/advanced_redis_clone',
       '/project-html-files/open_hardware_drone',
+      '/iceman404_control_panel',
       '/404'
     ],
 

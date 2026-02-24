@@ -17,5 +17,8 @@
 /project-html-files/advanced_redis_clone.html /project-html-files/advanced_redis_clone 301
 /project-html-files/open_hardware_drone.html /project-html-files/open_hardware_drone 301
 
+# Control Panel
+/iceman404_control_panel.html /iceman404_control_panel 301
+
 # Catch all 404
 /* /404.html 404
