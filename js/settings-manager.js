@@ -35,6 +35,18 @@
         enabled: true,
         count: 50,
         color: '#00b9cc'
+      },
+      cubeColors: {
+        outer: '#6366f1',
+        inner: '#8b5cf6',
+        edge: '#a78bfa',
+        emissive: '#ffffff',
+        emissiveIntensity: 1.0
+      },
+      model3D: {
+        selectedModel: 'tesseract',
+        scale: 1.0,
+        rotationSpeed: 0.01
       }
     },
 

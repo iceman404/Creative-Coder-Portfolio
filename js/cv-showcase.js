@@ -810,12 +810,25 @@ class CVShowcase {
   }
 
   loadCubeColorsFromSettings() {
-    // Load cube colors from localStorage
+    // Load cube colors from settings (uses defaultSettings as fallback)
     try {
-      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      let settings = {};
+      if (window.SettingsManager) {
+        settings = window.SettingsManager.getSettings();
+      } else {
+        const saved = localStorage.getItem('iceman404_settings');
+        if (saved) {
+          settings = JSON.parse(saved);
+        }
+      }
+      
+      // Use settings if available, otherwise fall back to defaultSettings
       if (settings.cubeColors) {
         this.cubeColors = settings.cubeColors;
+      } else if (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.cubeColors) {
+        this.cubeColors = { ...window.SettingsManager.defaultSettings.cubeColors };
       } else {
+        // Final fallback
         this.cubeColors = {
           outer: '#6366f1',
           inner: '#8b5cf6',
@@ -826,20 +839,35 @@ class CVShowcase {
       }
     } catch (e) {
       console.warn('[CV] Failed to load cube colors:', e);
-      this.cubeColors = {
-        outer: '#6366f1',
-        inner: '#8b5cf6',
-        edge: '#a78bfa',
-        emissive: '#ffffff',
-        emissiveIntensity: 1.0
-      };
+      // Fallback to defaultSettings or hardcoded defaults
+      if (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.cubeColors) {
+        this.cubeColors = { ...window.SettingsManager.defaultSettings.cubeColors };
+      } else {
+        this.cubeColors = {
+          outer: '#6366f1',
+          inner: '#8b5cf6',
+          edge: '#a78bfa',
+          emissive: '#ffffff',
+          emissiveIntensity: 1.0
+        };
+      }
     }
   }
 
   loadModelSettingsFromStorage() {
-    // Load 3D model settings from localStorage
+    // Load 3D model settings from settings (uses defaultSettings as fallback)
     try {
-      const settings = JSON.parse(localStorage.getItem('iceman404_settings') || '{}');
+      let settings = {};
+      if (window.SettingsManager) {
+        settings = window.SettingsManager.getSettings();
+      } else {
+        const saved = localStorage.getItem('iceman404_settings');
+        if (saved) {
+          settings = JSON.parse(saved);
+        }
+      }
+      
+      // Use settings if available, otherwise fall back to defaultSettings
       if (settings.model3D) {
         this.modelScale = settings.model3D.scale || 1.0;
         this.modelRotationSpeed = settings.model3D.rotationSpeed || 0.01;
@@ -849,16 +877,36 @@ class CVShowcase {
         } else {
           this.pendingModelLoad = null;
         }
+      } else if (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.model3D) {
+        // Use defaultSettings
+        const defaultModel3D = window.SettingsManager.defaultSettings.model3D;
+        this.modelScale = defaultModel3D.scale || 1.0;
+        this.modelRotationSpeed = defaultModel3D.rotationSpeed || 0.01;
+        this.selectedModel = defaultModel3D.selectedModel || 'tesseract';
+        if (this.selectedModel && this.selectedModel !== 'tesseract') {
+          this.pendingModelLoad = this.selectedModel;
+        } else {
+          this.pendingModelLoad = null;
+        }
       } else {
+        // Final fallback
         this.modelScale = 1.0;
         this.modelRotationSpeed = 0.01;
         this.selectedModel = 'tesseract';
       }
     } catch (e) {
       console.warn('[CV] Failed to load model settings:', e);
-      this.modelScale = 1.0;
-      this.modelRotationSpeed = 0.01;
-      this.selectedModel = 'tesseract';
+      // Fallback to defaultSettings or hardcoded defaults
+      if (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.model3D) {
+        const defaultModel3D = window.SettingsManager.defaultSettings.model3D;
+        this.modelScale = defaultModel3D.scale || 1.0;
+        this.modelRotationSpeed = defaultModel3D.rotationSpeed || 0.01;
+        this.selectedModel = defaultModel3D.selectedModel || 'tesseract';
+      } else {
+        this.modelScale = 1.0;
+        this.modelRotationSpeed = 0.01;
+        this.selectedModel = 'tesseract';
+      }
     }
   }
 

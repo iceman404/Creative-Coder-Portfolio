@@ -841,35 +841,39 @@
           document.getElementById('particleColorText').value = s.particles.color || '#00b9cc';
         }
 
-        // Cube colors
-        if (s.cubeColors) {
-          document.getElementById('cubeOuterColor').value = s.cubeColors.outer || '#6366f1';
-          document.getElementById('cubeOuterColorText').value = s.cubeColors.outer || '#6366f1';
-          document.getElementById('cubeInnerColor').value = s.cubeColors.inner || '#8b5cf6';
-          document.getElementById('cubeInnerColorText').value = s.cubeColors.inner || '#8b5cf6';
-          document.getElementById('cubeEdgeColor').value = s.cubeColors.edge || '#a78bfa';
-          document.getElementById('cubeEdgeColorText').value = s.cubeColors.edge || '#a78bfa';
-          document.getElementById('cubeEmissiveColor').value = s.cubeColors.emissive || '#ffffff';
-          document.getElementById('cubeEmissiveColorText').value = s.cubeColors.emissive || '#ffffff';
-          document.getElementById('cubeEmissiveIntensity').value = s.cubeColors.emissiveIntensity || 1.0;
-          document.getElementById('cubeEmissiveIntensityValue').textContent = s.cubeColors.emissiveIntensity || 1.0;
-        }
+        // Cube colors (use defaultSettings as fallback)
+        const cubeColors = s.cubeColors || (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.cubeColors) || {
+          outer: '#6366f1',
+          inner: '#8b5cf6',
+          edge: '#a78bfa',
+          emissive: '#ffffff',
+          emissiveIntensity: 1.0
+        };
+        document.getElementById('cubeOuterColor').value = cubeColors.outer || '#6366f1';
+        document.getElementById('cubeOuterColorText').value = cubeColors.outer || '#6366f1';
+        document.getElementById('cubeInnerColor').value = cubeColors.inner || '#8b5cf6';
+        document.getElementById('cubeInnerColorText').value = cubeColors.inner || '#8b5cf6';
+        document.getElementById('cubeEdgeColor').value = cubeColors.edge || '#a78bfa';
+        document.getElementById('cubeEdgeColorText').value = cubeColors.edge || '#a78bfa';
+        document.getElementById('cubeEmissiveColor').value = cubeColors.emissive || '#ffffff';
+        document.getElementById('cubeEmissiveColorText').value = cubeColors.emissive || '#ffffff';
+        document.getElementById('cubeEmissiveIntensity').value = cubeColors.emissiveIntensity || 1.0;
+        document.getElementById('cubeEmissiveIntensityValue').textContent = cubeColors.emissiveIntensity || 1.0;
 
-        // 3D Model
-        if (s.model3D) {
-          const modelSelector = document.getElementById('modelSelector');
-          if (modelSelector && s.model3D.selectedModel) {
-            modelSelector.value = s.model3D.selectedModel || 'tesseract';
-          }
-          if (s.model3D.scale !== undefined) {
-            document.getElementById('modelScale').value = s.model3D.scale || 1.0;
-            document.getElementById('modelScaleValue').textContent = s.model3D.scale || 1.0;
-          }
-          if (s.model3D.rotationSpeed !== undefined) {
-            document.getElementById('modelRotationSpeed').value = s.model3D.rotationSpeed || 0.01;
-            document.getElementById('modelRotationSpeedValue').textContent = s.model3D.rotationSpeed || 0.01;
-          }
+        // 3D Model (use defaultSettings as fallback)
+        const model3D = s.model3D || (window.SettingsManager && window.SettingsManager.defaultSettings && window.SettingsManager.defaultSettings.model3D) || {
+          selectedModel: 'tesseract',
+          scale: 1.0,
+          rotationSpeed: 0.01
+        };
+        const modelSelector = document.getElementById('modelSelector');
+        if (modelSelector) {
+          modelSelector.value = model3D.selectedModel || 'tesseract';
         }
+        document.getElementById('modelScale').value = model3D.scale !== undefined ? model3D.scale : 1.0;
+        document.getElementById('modelScaleValue').textContent = model3D.scale !== undefined ? model3D.scale : 1.0;
+        document.getElementById('modelRotationSpeed').value = model3D.rotationSpeed !== undefined ? model3D.rotationSpeed : 0.01;
+        document.getElementById('modelRotationSpeedValue').textContent = model3D.rotationSpeed !== undefined ? model3D.rotationSpeed : 0.01;
       },
 
       setupEventListeners() {
