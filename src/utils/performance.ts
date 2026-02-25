@@ -107,6 +107,7 @@ export class PerformanceMonitor {
   reportMetrics(): void {
     const metrics = this.getMetrics();
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
       console.table(metrics);
     }
     // In production, send to analytics service

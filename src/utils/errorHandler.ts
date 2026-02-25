@@ -74,12 +74,12 @@ export class ErrorHandler {
     this.showUserError(error);
   }
 
-  private reportToErrorTracking(errorEntry: typeof this.errorLog[0]): void {
+  private reportToErrorTracking(_errorEntry: typeof this.errorLog[0]): void {
     // TODO: Integrate with error tracking service (Sentry, LogRocket, etc.)
     // Example:
-    // Sentry.captureException(errorEntry.error, {
-    //   extra: errorEntry.context,
-    //   tags: { timestamp: errorEntry.timestamp.toISOString() },
+    // Sentry.captureException(_errorEntry.error, {
+    //   extra: _errorEntry.context,
+    //   tags: { timestamp: _errorEntry.timestamp.toISOString() },
     // });
   }
 
