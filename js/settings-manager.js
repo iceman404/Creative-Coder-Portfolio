@@ -37,10 +37,10 @@
         color: '#00b9cc'
       },
       cubeColors: {
-        outer: '#6366f1',
-        inner: '#8b5cf6',
-        edge: '#a78bfa',
-        emissive: '#ffffff',
+        outer: '#22a9ec',
+        inner: '#29948d',
+        edge: '#20ee95',
+        emissive: '#2bb679',
         emissiveIntensity: 1.0
       },
       model3D: {
