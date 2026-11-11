@@ -7,6 +7,7 @@
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
   <title>Skills | Systems &amp; Heterogeneous Compute | John Subba (iceman404)</title>
   <meta name="description" content="Technical expertise of John Subba (iceman404): CUDA/HIP/Metal GPU programming, modern C++ systems work, real-time computer vision, sensor fusion, and embedded platforms — each skill linked to the work that proves it.">
   <meta name="author" content="John Subba" />
@@ -44,12 +45,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
+:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff}
+
     :root {
-      --primary-color: #1a4d54;
-      --secondary-color: #2d7a87;
-      --accent-color: #4a9ba8;
-      --text: #e0f4f7;
-      --text-dim: #b0d4d9;
+      --primary-color: var(--accent-deep);
+      --secondary-color: var(--accent-strong);
+      --accent-color: var(--accent);
+      --text: var(--text);
+      --text-dim: var(--text-dim);
     }
 
     * {
@@ -60,7 +64,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #0a0f11;
+      background: var(--bg);
       color: var(--text);
       overflow-x: hidden;
       position: relative;
@@ -74,8 +78,8 @@
       width: 100%;
       height: 100%;
       background-image:
-        linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
+        linear-gradient(rgba(var(--grid-rgb), 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--grid-rgb), 0.1) 1px, transparent 1px);
       background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
@@ -88,10 +92,10 @@
       left: 0;
       width: 100%;
       z-index: 1000;
-      background: rgba(10, 15, 17, 0.95);
+      background: rgba(var(--bg-rgb), 0.95);
       backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(74, 155, 168, 0.3);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+      box-shadow: 0 4px 30px rgba(var(--shadow-rgb), 0.5);
     }
 
     .site-nav .nav-inner {
@@ -109,7 +113,7 @@
       font-weight: 700;
       font-size: 24px;
       letter-spacing: 1px;
-      color: #4a9ba8;text-decoration: none;
+      color: var(--accent);text-decoration: none;
     }
 
     .nav-links {
@@ -134,16 +138,16 @@
     .nav-links a.active { color: var(--accent-color); }
 
     .nav-links a.nav-resume {
-      border: 2px solid rgba(74, 155, 168, 0.5);
-      background: linear-gradient(135deg, #1a4d54, #2d7a87);
-      color: var(--text);
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent);
       padding: 6px 14px;
       border-radius: 8px;
     }
 
     .nav-links a.nav-resume:hover {
-      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
-      color: var(--text);
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+      color: var(--on-accent);
     }
 
     .page {
@@ -158,10 +162,10 @@
       text-align: center;
       margin-bottom: 50px;
       padding: 44px 24px;
-      background: linear-gradient(135deg, rgba(26, 77, 84, 0.3), rgba(45, 122, 135, 0.2));
+      background: linear-gradient(135deg, rgba(var(--wash-rgb), 0.3), rgba(var(--grid-rgb), 0.2));
       border-radius: 20px;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(74, 155, 168, 0.3);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
     }
 
     header img {
@@ -169,8 +173,8 @@
       height: 140px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid rgba(74, 155, 168, 0.5);
-      box-shadow: 0 0 20px rgba(74, 155, 168, 0.4);
+      border: 3px solid rgba(var(--accent-rgb), 0.5);
+      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
       margin-bottom: 18px;
     }
 
@@ -195,22 +199,22 @@
       display: inline-block;
       padding: 12px 28px;
       border-radius: 10px;
-      color: #4a9ba8;
+      color: var(--accent);
       color: var(--text);
       text-decoration: none;
       font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 1px;
-      border: 2px solid rgba(74, 155, 168, 0.5);
-      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
       transition: all 0.3s ease;
     }
 
     .resume-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(74, 155, 168, 0.5);
-      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      box-shadow: 0 6px 25px rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
     }
 
     .skills-section {
@@ -220,8 +224,8 @@
     }
 
     .skill-card {
-      background: rgba(10, 15, 17, 0.8);
-      border: 1px solid rgba(74, 155, 168, 0.3);
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
       border-radius: 16px;
       padding: 28px;
       backdrop-filter: blur(8px);
@@ -229,9 +233,9 @@
     }
 
     .skill-card:hover {
-      border-color: rgba(74, 155, 168, 0.65);
+      border-color: rgba(var(--accent-rgb), 0.65);
       transform: translateY(-4px);
-      box-shadow: 0 10px 35px rgba(74, 155, 168, 0.25);
+      box-shadow: 0 10px 35px rgba(var(--accent-rgb), 0.25);
     }
 
     .skill-card h2 {
@@ -246,7 +250,7 @@
     .skill-card .evidence {
       display: inline-block;
       font-size: 0.78rem;
-      color: #7fb5be;
+      color: var(--accent-muted);
       letter-spacing: 0.5px;
       margin-bottom: 18px;
       font-style: italic;
@@ -259,7 +263,7 @@
     .skill-card li {
       padding: 9px 0 9px 22px;
       position: relative;
-      border-bottom: 1px solid rgba(74, 155, 168, 0.12);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
       font-size: 0.95rem;
       line-height: 1.6;
       color: var(--text);
@@ -281,7 +285,7 @@
     .skill-card li a {
       color: var(--accent-color);
       text-decoration: none;
-      border-bottom: 1px dotted rgba(74, 155, 168, 0.5);
+      border-bottom: 1px dotted rgba(var(--accent-rgb), 0.5);
     }
 
     .skill-card li a:hover { border-bottom-style: solid; }
@@ -299,7 +303,7 @@
     footer {
       text-align: center;
       padding: 30px 20px 40px;
-      border-top: 1px solid rgba(74, 155, 168, 0.2);
+      border-top: 1px solid rgba(var(--accent-rgb), 0.2);
       position: relative;
       z-index: 1;
     }
@@ -327,6 +331,7 @@
       .skill-card { padding: 20px; }
     }
   </style>
+<style>.theme-toggle{background:transparent;border:2px solid rgba(var(--accent-rgb),.5);color:var(--accent);width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:15px;transition:all .3s ease;display:inline-flex;align-items:center;justify-content:center;margin-left:6px}.theme-toggle:hover{background:rgba(var(--accent-rgb),.15);border-color:var(--accent);transform:translateY(-2px)}.theme-toggle-item{display:flex}</style>
 </head>
 <body>
   <div class="background-grid"></div>
@@ -340,6 +345,7 @@
         <li><a href="/skills" class="active" aria-current="page">Skills</a></li>
         <li><a href="/contacts">Contact</a></li>
         <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
       </ul>
     </div>
   </nav>
@@ -358,19 +364,19 @@
     <div class="skills-section">
       <section class="skill-card" aria-labelledby="skills-gpu">
         <h2 id="skills-gpu">Heterogeneous Compute</h2>
-        <span class="evidence">Proven at: Himalogic (AR/VR) · GPU architecture research</span>
+        <span class="evidence">Where it shipped: production mobile AR/VR pipelines · <a href="/gpu-playground">the GPU Playground</a> (in development)</span>
         <ul>
-          <li><b>CUDA</b> — Gaussian pyramid, DoG &amp; scale-space kernels; descriptor testing; memory hierarchy &amp; warp-level tuning</li>
-          <li><b>HIP / AMD ROCm</b> — ported foundational CUDA vision kernels to AMD platforms</li>
-          <li><b>Metal (iOS)</b> — Objective-C++ backend with threadgroup sizing for mobile power budgets</li>
-          <li><b>OpenGL ES 3.1/3.2 &amp; WebAssembly</b> — cross-platform execution under strict latency limits</li>
+          <li><b>CUDA</b> — vision kernels (Gaussian pyramid, DoG, descriptors); coalescing &amp; shared-memory swizzling; tensor cores (mma.sync, ldmatrix); cp.async/TMA pipelines; CUDA Graphs</li>
+          <li><b>HIP / AMD ROCm</b> — CUDA-to-HIP porting of vision kernels; RDNA ISA reading (VOP/SOP/SMEM, S_WAITCNT, DPP); rocprof counters &amp; occupancy</li>
+          <li><b>Metal (Apple silicon)</b> — MSL, TBDR/imageblocks, SIMD-group programming, metal-cpp host side; Objective-C++ backend tuned for mobile power budgets</li>
+          <li><b>OpenGL ES 3.1/3.2, Vulkan &amp; WebAssembly</b> — explicit sync/barriers, subgroups, cooperative matrices; cross-platform execution under strict latency limits</li>
           <li><b>Benchmarking</b> — NVIDIA vs AMD: throughput, memory bandwidth, occupancy</li>
         </ul>
       </section>
 
       <section class="skill-card" aria-labelledby="skills-systems">
         <h2 id="skills-systems">Systems Programming</h2>
-        <span class="evidence">Proven at: GuardWare Australia (kernel &amp; security)</span>
+        <span class="evidence">Where it shipped: Windows security software, kernel-mode</span>
         <ul>
           <li><b>Modern C++17/20</b> — RAII, move semantics, templates &amp; concepts, lock-free structures, coroutines</li>
           <li><b>C &amp; the kernel</b> — Linux LKMs, syscalls, raw/BSD sockets, shared-memory IPC</li>
@@ -382,7 +388,7 @@
 
       <section class="skill-card" aria-labelledby="skills-cv">
         <h2 id="skills-cv">Computer Vision &amp; ML</h2>
-        <span class="evidence">Proven at: <a href="/bio">the live demo on my bio page</a> · SkyReCon · FaceMood</span>
+        <span class="evidence">Where it ships: <a href="/bio">the live demo on my bio page</a> · SkyReCon · FaceMood</span>
         <ul>
           <li><b>Real-time in-browser CV</b> — MediaPipe face/hand/pose landmarkers on GPU delegate + WebGL (running <a href="/bio">right here</a>)</li>
           <li><b>Feature pipelines</b> — SIFT ported to GPU; brute-force + voxel-grid matching that replaced a failing KD-tree FLANN</li>
@@ -394,7 +400,7 @@
 
       <section class="skill-card" aria-labelledby="skills-robotics">
         <h2 id="skills-robotics">Robotics &amp; Embedded</h2>
-        <span class="evidence">Proven at: sensor-fusion contracting · UAV builds</span>
+        <span class="evidence">Where it ships: sensor-fusion contracts · UAV builds</span>
         <ul>
           <li><b>Sensor fusion</b> — KF/EKF/UKF, Lie-group state estimation (SO(3)/SE(3)), SLAM prototyping; &lt;10ms loops on embedded targets</li>
           <li><b>ROS2</b> — custom low-latency pub/sub with real-time determinism; Carla simulation</li>
@@ -411,5 +417,22 @@
   <footer>
     <a href="/">Back to Home</a>
   </footer>
+<script>
+(function(){
+  function currentTheme(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
+  function paintToggle(){var b=document.getElementById('theme-toggle');if(!b)return;var c=currentTheme();
+    b.innerHTML='<i class="fas fa-'+(c==='light'?'moon':'sun')+'" aria-hidden="true"></i>';
+    b.setAttribute('aria-label',c==='light'?'Switch to dark theme':'Switch to light theme');}
+  document.addEventListener('DOMContentLoaded',function(){
+    var b=document.getElementById('theme-toggle');
+    if(b){b.addEventListener('click',function(){
+      var next=currentTheme()==='light'?'dark':'light';
+      document.documentElement.setAttribute('data-theme',next);
+      try{localStorage.setItem('iceman404-theme',next);}catch(e){}
+      document.dispatchEvent(new CustomEvent('themechange',{detail:{theme:next}}));
+      paintToggle();});}
+    paintToggle();});
+})();
+</script>
 </body>
 </html>

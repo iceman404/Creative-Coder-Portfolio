@@ -71,7 +71,47 @@
       window.addEventListener('resize', () => this.handleResize());
       
       this.isInitialized = true;
+
+      this.applyTheme();
+      window.addEventListener('themechange', () => this.applyTheme());
     },
+
+  getParticlePalette() {
+    const light = document.documentElement.getAttribute('data-theme') === 'light';
+    return light ? [0x0e7285, 0x128397, 0x0a5f6e] : [0x00b9cc, 0x06e8ff, 0x00ccdd];
+  },
+
+  applyTheme() {
+    if (!this.isInitialized) return;
+    const light = document.documentElement.getAttribute('data-theme') === 'light';
+    if (this.scene && this.scene.fog) this.scene.fog.color.set(light ? 0xf5f8f9 : 0x000000);
+    if (this.particles && this.particles.material) {
+      this.particles.material.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending;
+      this.particles.material.needsUpdate = true;
+      const attr = this.particles.geometry.getAttribute('color');
+      if (attr) {
+        const palette = this.getParticlePalette();
+        const c = [new THREE.Color(palette[0]), new THREE.Color(palette[1]), new THREE.Color(palette[2])];
+        for (let i = 0; i < attr.count; i++) {
+          const pick = c[i % 3];
+          attr.setXYZ(i, pick.r, pick.g, pick.b);
+        }
+        attr.needsUpdate = true;
+      }
+    }
+    if (this.signatureGeometry) {
+      this.signatureGeometry.traverse((o) => {
+        if (o.material && o.material.color) {
+          o.material.color.set(light ? 0x128397 : 0x00b9cc);
+          if (o.material.emissive) o.material.emissive.set(light ? 0xcfe6ea : 0x001122);
+        }
+      });
+    }
+    if (this.interactiveMesh && this.interactiveMesh.material) {
+      this.interactiveMesh.material.color.set(light ? 0x0e7285 : 0x06e8ff);
+      if (this.interactiveMesh.material.emissive) this.interactiveMesh.material.emissive.set(light ? 0xdceef2 : 0x001133);
+    }
+  },
 
     createSignatureParticles() {
       const particleCount = 800; // Reduced from 2000 for better performance
@@ -80,9 +120,10 @@
       const colors = new Float32Array(particleCount * 3);
       const sizes = new Float32Array(particleCount);
 
-      const color1 = new THREE.Color(0x00b9cc);
-      const color2 = new THREE.Color(0x06e8ff);
-      const color3 = new THREE.Color(0x00ccdd);
+      const palette = this.getParticlePalette();
+      const color1 = new THREE.Color(palette[0]);
+      const color2 = new THREE.Color(palette[1]);
+      const color3 = new THREE.Color(palette[2]);
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;

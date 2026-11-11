@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Author: John Subba (iceman404)
+  Last Modified: 2026-11-12
+-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPU Playground | Metal · CUDA · ROCm · Vulkan | John Subba (iceman404)</title>
+  <meta name="description" content="Metal Forge — a cross-vendor GPU engineering playground: 40 chapters across Metal, CUDA, ROCm/HIP and Vulkan, an in-browser Virtual GPU Lab that compiles and runs kernels, a Real GPU Bridge, and 3D hardware explorers. Live demos coming to this page.">
+  <meta name="author" content="John Subba" />
+  <meta name="last-modified" content="2026-11-12" />
+  <link rel="canonical" href="https://www.iceman404.com/gpu-playground" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+
+  <!-- Social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.iceman404.com/gpu-playground">
+  <meta property="og:title" content="GPU Playground | John Subba (iceman404)">
+  <meta property="og:description" content="A cross-vendor GPU engineering lab — Metal, CUDA, ROCm/HIP, Vulkan — with an in-browser kernel lab and 3D hardware explorers. Live demos in development.">
+  <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+  <meta property="og:site_name" content="John Subba | iceman404">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GPU Playground | John Subba (iceman404)">
+  <meta name="twitter:description" content="A cross-vendor GPU engineering lab — Metal, CUDA, ROCm/HIP, Vulkan — with an in-browser kernel lab and 3D hardware explorers.">
+  <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
+  <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.iceman404.com" },
+      { "@type": "ListItem", "position": 2, "name": "GPU Playground", "item": "https://www.iceman404.com/gpu-playground" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff}
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .background-grid {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(var(--grid-rgb), 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--grid-rgb), 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .site-nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(var(--bg-rgb), 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+      box-shadow: 0 4px 30px rgba(var(--shadow-rgb), 0.5);
+    }
+    .site-nav .nav-inner {
+      max-width: 1400px; margin: 0 auto; padding: 14px 40px;
+      display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; font-size: 24px;
+      letter-spacing: 1px; color: var(--accent); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 26px; list-style: none; align-items: center; flex-wrap: wrap; }
+    .nav-links a {
+      color: var(--text); text-decoration: none; font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600; transition: color 0.3s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-links a.nav-resume {
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent); padding: 6px 14px; border-radius: 8px;
+    }
+    .nav-links a.nav-resume:hover { background: linear-gradient(135deg, var(--accent-strong), var(--accent)); color: var(--on-accent); }
+    .theme-toggle {
+      background: transparent; border: 2px solid rgba(var(--accent-rgb), .5); color: var(--accent);
+      width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 15px;
+      transition: all .3s ease; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px;
+    }
+    .theme-toggle:hover { background: rgba(var(--accent-rgb), .15); border-color: var(--accent); transform: translateY(-2px); }
+    .theme-toggle-item { display: flex; }
+
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 120px 20px 60px;
+    }
+
+    header {
+      text-align: center; margin-bottom: 44px;
+      padding: 44px 24px;
+      background: linear-gradient(135deg, rgba(var(--wash-rgb), 0.3), rgba(var(--grid-rgb), 0.2));
+      border-radius: 20px; backdrop-filter: blur(10px);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+    }
+
+    .status-chip {
+      display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border-radius: 20px; padding: 6px 18px; margin-bottom: 20px; letter-spacing: 0.5px;
+    }
+
+    header h1 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: clamp(30px, 5vw, 48px); font-weight: 700;
+      color: var(--accent); margin-bottom: 14px; letter-spacing: 0.5px;
+    }
+
+    header .lead {
+      font-size: clamp(1rem, 1.7vw, 1.15rem); color: var(--text-dim);
+      max-width: 780px; margin: 0 auto 26px; line-height: 1.75;
+    }
+    header .lead b { color: var(--text); }
+
+    .track-row {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    }
+    .track-row span {
+      background: rgba(var(--wash-rgb), 0.25); border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 8px; padding: 7px 14px; color: var(--text);
+    }
+    .track-row span b { color: var(--accent); font-weight: 600; }
+
+    .modules {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 24px; margin: 30px 0 40px;
+    }
+
+    .module-card {
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 16px; padding: 26px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .module-card:hover {
+      border-color: rgba(var(--accent-rgb), 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 35px rgba(var(--accent-rgb), 0.22);
+    }
+    .module-card .mod-icon { font-size: 26px; color: var(--accent); margin-bottom: 14px; }
+    .module-card h2 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;
+    }
+    .module-card p { color: var(--text-dim); font-size: 0.94rem; line-height: 1.7; flex: 1; }
+    .module-card .mod-status {
+      margin-top: 16px; display: inline-block; align-self: flex-start;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.5px;
+      padding: 5px 12px; border-radius: 20px;
+      background: rgba(var(--wash-rgb), 0.25); border: 1px solid rgba(var(--accent-rgb), 0.35);
+      color: var(--accent);
+    }
+
+    .build-note {
+      margin-top: 10px; padding: 24px 28px;
+      background: rgba(var(--wash-rgb), 0.2);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      color: var(--text); line-height: 1.75; font-size: 0.97rem;
+    }
+    .build-note b { color: var(--accent); }
+
+    footer {
+      text-align: center; padding: 30px 20px 40px;
+      border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+      position: relative; z-index: 1;
+    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    @media (max-width: 768px) {
+      .site-nav .nav-inner { padding: 12px 16px; flex-direction: column; gap: 10px; }
+      .page { padding: 165px 15px 40px; }
+      .module-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-grid"></div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">ICEMAN404</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="/gpu-playground" class="active" aria-current="page">GPU Lab</a></li>
+        <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <header>
+      <span class="status-chip">status: in active development — live demos land here</span>
+      <h1>The GPU Playground</h1>
+      <p class="lead">
+        A cross-vendor GPU engineering course and laboratory — <b>Metal</b> for Apple silicon,
+        <b>CUDA</b> for NVIDIA, <b>ROCm/HIP</b> for AMD, and <b>Vulkan</b> for everything else.
+        Forty chapters, a Virtual GPU Lab that compiles and executes kernels in your browser,
+        and a bridge that runs the same kernel on real silicon. The working prototypes exist —
+        they're being packaged for the web, and this page will host the live demos.
+      </p>
+      <div class="track-row">
+        <span>🍎 <b>Metal</b> 17 ch</span>
+        <span>🟩 <b>CUDA</b> 17 ch</span>
+        <span>🔥 <b>ROCm</b> 15 ch</span>
+        <span>🌋 <b>Vulkan</b> 7 ch</span>
+        <span>📝 251 exam questions</span>
+      </div>
+    </header>
+
+    <div class="modules">
+      <section class="module-card" aria-labelledby="mod-vgpu">
+        <i class="fas fa-microchip mod-icon" aria-hidden="true" id="mod-vgpu"></i>
+        <h2>Virtual GPU Lab</h2>
+        <p>Write a kernel in the browser, compile it, and execute it against a simulated GPU —
+        with the memory layout, warps, and occupancy visualized as it runs. No drivers, no install:
+        the whole lab is plain HTML/CSS/JS.</p>
+        <span class="mod-status">prototype working</span>
+      </section>
+
+      <section class="module-card" aria-labelledby="mod-bridge">
+        <i class="fas fa-plug mod-icon" aria-hidden="true" id="mod-bridge"></i>
+        <h2>Real GPU Bridge</h2>
+        <p>The same kernel you wrote in the lab, compiled and executed on physical NVIDIA and AMD
+        hardware — results cross-verified identical across the Metal, CUDA, ROCm, and Vulkan
+        engines. Runs locally; your silicon never talks to a server.</p>
+        <span class="mod-status">prototype working (localhost)</span>
+      </section>
+
+      <section class="module-card" aria-labelledby="mod-studio">
+        <i class="fas fa-cubes mod-icon" aria-hidden="true" id="mod-studio"></i>
+        <h2>Hardware Studio</h2>
+        <p>Orbit, explode, and click through 3D models of an Apple UMA package and a discrete
+        CPU + GPU board — dies, clusters, memory stacks, VRM and PCIe edges — every part
+        labelled, with provenance tiers. Drag in your own .glb to inspect it.</p>
+        <span class="mod-status">prototype working</span>
+      </section>
+
+      <section class="module-card" aria-labelledby="mod-isa">
+        <i class="fas fa-microscope mod-icon" aria-hidden="true" id="mod-isa"></i>
+        <h2>ISA Lab</h2>
+        <p>Step through RDNA microcode formats (VOP, SOP, SMEM, DS, MIMG), decode S_WAITCNT's
+        SIMM16 encoding, and watch DPP divergence mechanics — then disassemble one of your own
+        kernels on the ROCm track.</p>
+        <span class="mod-status">in development</span>
+      </section>
+
+      <section class="module-card" aria-labelledby="mod-infer">
+        <i class="fas fa-brain mod-icon" aria-hidden="true" id="mod-infer"></i>
+        <h2>Inference Engine Atlas</h2>
+        <p>Twelve units on how LLM inference engines actually work — the decode budget and KV-cache
+        arithmetic, kernel inventories, sampling math, continuous batching, paged KV, speculative
+        decoding — each with interactive visualizations.</p>
+        <span class="mod-status">in development</span>
+      </section>
+
+      <section class="module-card" aria-labelledby="mod-curriculum">
+        <i class="fas fa-graduation-cap mod-icon" aria-hidden="true" id="mod-curriculum"></i>
+        <h2>Four Full Tracks</h2>
+        <p>Metal (MSL, TBDR, metal-cpp, Metal 4 tensors), CUDA (PTX/SASS, tensor cores by hand,
+        async pipelines, FlashAttention), ROCm/HIP (a porting ladder from saxpy to tiled GEMM),
+        and Vulkan (explicit sync and the barrier model) — each with quizzes and a final exam.</p>
+        <span class="mod-status">in development</span>
+      </section>
+    </div>
+
+    <div class="build-note">
+      <b>Why a playground?</b> Because knowledge you can run beats knowledge you skim. Every concept in the
+      curriculum is backed by compilable code, a simulator, or a 3D model — built from the primary references:
+      the Metal Shading Language specification, the Metal feature-set tables, the metal-cpp API headers, and
+      vendor curricula. The portfolio's <a href="/bio" style="color:var(--accent)">live CV demo</a> shows the same
+      philosophy applied to computer vision: if it matters, it runs in your browser.
+    </div>
+  </div>
+
+  <footer>
+    <a href="/">Back to Home</a>
+  </footer>
+
+  <script>
+  (function(){
+    function currentTheme(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
+    function paintToggle(){var b=document.getElementById('theme-toggle');if(!b)return;var c=currentTheme();
+      b.innerHTML='<i class="fas fa-'+(c==='light'?'moon':'sun')+'" aria-hidden="true"></i>';
+      b.setAttribute('aria-label',c==='light'?'Switch to dark theme':'Switch to light theme');}
+    document.addEventListener('DOMContentLoaded',function(){
+      var b=document.getElementById('theme-toggle');
+      if(b){b.addEventListener('click',function(){
+        var next=currentTheme()==='light'?'dark':'light';
+        document.documentElement.setAttribute('data-theme',next);
+        try{localStorage.setItem('iceman404-theme',next);}catch(e){}
+        document.dispatchEvent(new CustomEvent('themechange',{detail:{theme:next}}));
+        paintToggle();});}
+      paintToggle();});
+  })();
+  </script>
+</body>
+</html>
