@@ -18,6 +18,18 @@
   <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="canonical" href="https://www.iceman404.com/project-html-files/facemood_music_player" />
+  <meta name="last-modified" content="2026-11-12" />
+  <!-- Social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.iceman404.com/project-html-files/facemood_music_player">
+  <meta property="og:title" content="Face Mood Music Player | John Subba | iceman404">
+  <meta property="og:description" content="Mood-aware desktop music player — MediaPipe reads your expression, the queue follows.">
+  <meta property="og:image" content="https://www.iceman404.com/og/facemood_music_player.jpg">
+  <meta property="og:site_name" content="John Subba | iceman404">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Face Mood Music Player | John Subba | iceman404">
+  <meta name="twitter:description" content="Mood-aware desktop music player — MediaPipe reads your expression, the queue follows.">
+  <meta name="twitter:image" content="https://www.iceman404.com/og/facemood_music_player.jpg">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <meta name="description" content="Face Mood Music Player by John Subba (iceman404). Smart music player with facial expression detection using Raspberry Pi and computer vision.">
   <script type="application/ld+json">
@@ -46,12 +58,6 @@
     ]
   }
   </script>
-  <!-- Path Helper -->
-  <script src="../js/path-helper.js"></script>
-  <!-- Settings Manager -->
-  <script src="../js/settings-manager.js"></script>
-  <!-- Protection -->
-  <script src="../js/protection.js"></script>
   
   <style>
     * {
@@ -291,9 +297,38 @@
   </style>
 
 
+<style>
+  /* Shared site navigation (injected) */
+  .site-nav{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(10,15,17,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(74,155,168,.3);box-shadow:0 4px 30px rgba(0,0,0,.5)}
+  .site-nav .nav-inner{max-width:1400px;margin:0 auto;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .nav-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:2px;background:linear-gradient(135deg,#4a9ba8,#2d7a87);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+  .nav-links{display:flex;gap:26px;list-style:none;align-items:center;flex-wrap:wrap}
+  .nav-links a{color:#e0f4f7;text-decoration:none;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;transition:color .3s ease}
+  .nav-links a:hover,.nav-links a.active{color:#4a9ba8}
+  .nav-links a.nav-resume{border:2px solid rgba(74,155,168,.5);background:linear-gradient(135deg,#1a4d54,#2d7a87);color:#e0f4f7;padding:6px 14px;border-radius:8px}
+  .nav-links a.nav-resume:hover{background:linear-gradient(135deg,#2d7a87,#4a9ba8);color:#e0f4f7}
+  body{padding-top:64px}
+  @media(max-width:768px){.site-nav .nav-inner{padding:12px 16px;flex-direction:column;gap:10px}body{padding-top:110px}}
+  a:focus-visible,button:focus-visible{outline:2px solid #4a9ba8;outline-offset:3px;border-radius:6px}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
   <div class="background-grid"></div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">ICEMAN404</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>R&#233;sum&#233;</a></li>
+      </ul>
+    </div>
+  </nav>
+
 
 <header>
     <h1>Face Mood Music Player</h1>

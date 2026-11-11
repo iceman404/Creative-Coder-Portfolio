@@ -1,24 +1,26 @@
 <!--Contacts of iceman404-->
 <!--
-  Author: iceman404 (John Subba)
-  Last Modified: 2026-02-24
+  Author: John Subba (iceman404)
+  Last Modified: 2026-11-12
 -->
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!--
-      Author: iceman404 (John Subba)
-      Last Modified: 2026-02-24
-    -->
-    <meta name="author" content="iceman404" />
-    <meta name="last-modified" content="2026-02-24" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="John Subba" />
+    <meta name="last-modified" content="2026-11-12" />
+    <meta name="description" content="Contact John Subba (iceman404) — systems & heterogeneous compute engineer. Get in touch for GPU, computer vision, or embedded systems work." />
+
+    <title>Contact | Systems &amp; Heterogeneous Compute Engineer | John Subba</title>
+
     <!-- Preload for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+
     <!-- Favicon and Manifest -->
     <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png" />
@@ -26,20 +28,18 @@
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href="https://www.iceman404.com/contacts" />
 
-    <!-- Meta tags for SEO and responsive design -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Contact page for John Subba (iceman404) - AR/VR & Computer Vision Engineer. Get in touch for collaborations, opportunities, or just to say Hi." />
-    
-    <title>Contact | AR/VR & CV Engineer | John Subba | iceman404</title>
-    <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
-    <!-- Path Helper -->
-    <script src="js/path-helper.js"></script>
-    <!-- Settings Manager -->
-    <script src="js/settings-manager.js"></script>
-    <!-- Protection -->
-    <script src="js/protection.js"></script>
-    
+    <!-- Social sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.iceman404.com/contacts">
+    <meta property="og:title" content="Contact | John Subba (iceman404)">
+    <meta property="og:description" content="Get in touch for GPU, computer vision, or embedded systems work.">
+    <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+    <meta property="og:site_name" content="John Subba | iceman404">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact | John Subba (iceman404)">
+    <meta name="twitter:description" content="Get in touch for GPU, computer vision, or embedded systems work.">
+    <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -112,11 +112,104 @@
         z-index: 2;
         max-width: 900px;
         margin: 0 auto;
-        padding: 60px 20px;
+        padding: 130px 20px 60px;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
+      }
+
+      /* Shared site navigation */
+      .site-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        background: rgba(10, 15, 17, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(74, 155, 168, 0.3);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .site-nav .nav-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 14px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .nav-logo {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 24px;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 26px;
+        list-style: none;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .nav-links a {
+        color: #e0f4f7;
+        text-decoration: none;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: color 0.3s ease;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active { color: #4a9ba8; }
+
+      .nav-links a.nav-resume {
+        border: 2px solid rgba(74, 155, 168, 0.5);
+        background: linear-gradient(135deg, #1a4d54, #2d7a87);
+        color: #e0f4f7;
+        padding: 6px 14px;
+        border-radius: 8px;
+      }
+
+      .nav-links a.nav-resume:hover {
+        background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+        color: #e0f4f7;
+      }
+
+      a:focus-visible, button:focus-visible {
+        outline: 2px solid #4a9ba8;
+        outline-offset: 3px;
+        border-radius: 6px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .site-nav .nav-inner {
+          padding: 12px 16px;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .container { padding: 175px 15px 40px; }
       }
 
       header {
@@ -472,12 +565,25 @@
 
   <body>
     <div class="background-grid"></div>
-    
+
+    <nav class="site-nav" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a class="nav-logo" href="/">ICEMAN404</a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/bio">Bio</a></li>
+          <li><a href="/skills">Skills</a></li>
+          <li><a href="/contacts" class="active" aria-current="page">Contact</a></li>
+          <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+        </ul>
+      </div>
+    </nav>
+
     <div class="container">
       <header>
         <img src="./images/profile/mine3.avif" alt="Profile Picture of John Subba (iceman404)" class="profilePic" />
         <h1>GET IN TOUCH</h1>
-        <p class="subtitle">GPU-Accelerated Computer Vision Engineer</p>
+        <p class="subtitle">Systems &amp; Heterogeneous Compute Engineer</p>
       </header>
 
       <div class="contact-section">
@@ -489,7 +595,13 @@
           <a href="https://github.com/iceman404" target="_blank" aria-label="GitHub Profile" rel="noopener noreferrer">
             <i class="fab fa-github socialIcon" aria-hidden="true"></i>
           </a>
+          <a href="mailto:johnsubba404@gmail.com" aria-label="Email John Subba">
+            <i class="fas fa-envelope socialIcon" aria-hidden="true"></i>
+          </a>
         </div>
+        <p style="text-align:center; color:#b0d4d9; font-size:15px; margin-top:-10px;">
+          Prefer email? <a href="mailto:johnsubba404@gmail.com" style="color:#4a9ba8;">johnsubba404@gmail.com</a>
+        </p>
       </div>
 
       <div class="contact-section">
@@ -521,7 +633,7 @@
             <input type="text" name="firstName" class="input" placeholder="First Name" required />
             <input type="text" name="lastName" class="input" placeholder="Last Name" required />
             <input type="email" name="email" class="input" placeholder="Email Address" required />
-            <input type="tel" name="phone" class="input" placeholder="Phone Number (Optional)" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" />
+            <input type="tel" name="phone" class="input" placeholder="Phone Number (Optional)" pattern="\+?[0-9\s\-]{7,15}" title="Enter a valid phone number (digits, spaces, dashes — with optional country code)" />
             <textarea name="message" class="input" placeholder="Your message..." required></textarea>
             <button type="submit" class="submit">Send Message</button>
           </div>

@@ -7,7 +7,7 @@
     <!-- Homepage - Highest Priority -->
     <url>
         <loc>https://www.iceman404.com/</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -15,21 +15,21 @@
     <!-- Main Pages -->
     <url>
         <loc>https://www.iceman404.com/bio</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/skills</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/contacts</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -37,56 +37,56 @@
     <!-- Project Pages - High Priority for Portfolio -->
     <url>
         <loc>https://www.iceman404.com/project-html-files/mira</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/lora_geofencing</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/vision_guardian_commander</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/facemood_music_player</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/face_counter_system</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/fine_tuning_resnet50</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/advanced_redis_clone</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <url>
         <loc>https://www.iceman404.com/project-html-files/open_hardware_drone</loc>
-        <lastmod>2026-02-24</lastmod>
+        <lastmod>2026-11-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>

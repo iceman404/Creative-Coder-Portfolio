@@ -1,49 +1,19 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
-
-# Testing
-coverage/
-.nyc_output
-
-# Production
-dist/
-build/
-
-# Vite dev server (local testing only - ignored when uploading to GitHub)
-.vite/
-vite.config.js
-start-dev.sh
-DEV_SERVER.md
-
-# SSL certificates (local development only)
-localhost.pem
-localhost-key.pem
-
-# Misc
-.DS_Store
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+# Editor
+.vscode/
+.idea/
 *.sw?
 
-# TypeScript
-*.tsbuildinfo
+# OS
+.DS_Store
+Thumbs.db
+
+# Local dev artifacts
+*.pem
+*.log
+dist/
+build/
+node_modules/
+
+# Secrets
+.env
+.env.*

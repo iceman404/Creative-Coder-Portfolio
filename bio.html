@@ -2,61 +2,62 @@
 <html lang="en">
 <head>
 <!--
-  Author: iceman404 (John Subba)
-  Last Modified: 2026-02-24
+  Author: John Subba (iceman404)
+  Last Modified: 2026-11-12
 -->
 <meta charset="UTF-8">
-<title>Iceman404 Bio | AR/VR/CV Showcase | John Subba</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Bio page of John Subba (iceman404) - World-class AR/VR and Computer Vision expertise demonstrated through real-time interactive demos.">
-<meta name="author" content="iceman404" />
-<meta name="last-modified" content="2026-02-24" />
+<title>Bio | Live CV Demo | John Subba (iceman404)</title>
+<meta name="description" content="John Subba (iceman404) — systems & heterogeneous compute engineer. Try the live in-browser computer-vision demo: MediaPipe hand tracking driving a 3D object you can grab and move.">
+<meta name="author" content="John Subba" />
+<meta name="last-modified" content="2026-11-12" />
 <link rel="canonical" href="https://www.iceman404.com/bio" />
-<link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+
+<!-- Social sharing -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.iceman404.com/bio">
+<meta property="og:title" content="John Subba (iceman404) | Live CV Demo">
+<meta property="og:description" content="A real-time computer-vision demo running entirely in your browser: MediaPipe hand tracking drives a 3D object you can grab, move, and resize with your hands.">
+<meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+<meta property="og:site_name" content="John Subba | iceman404">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="John Subba (iceman404) | Live CV Demo">
+<meta name="twitter:description" content="A real-time computer-vision demo running entirely in your browser — grab a 3D object with your bare hands.">
+<meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
 <!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <!-- GLTFLoader - Load after Three.js and ensure it's available -->
 <script>
-  // Wait for Three.js to load, then load GLTFLoader
   (function() {
     function loadGLTFLoader() {
       if (typeof THREE === 'undefined') {
-        // Three.js not loaded yet, wait a bit
         setTimeout(loadGLTFLoader, 100);
         return;
       }
-      
+
       if (THREE.GLTFLoader) {
         window.dispatchEvent(new Event('gltfloader-loaded'));
         return;
       }
-      
-      // Try compatible version first (r128 = 0.128.0)
+
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
       script.onload = function() {
         window.dispatchEvent(new Event('gltfloader-loaded'));
       };
       script.onerror = function() {
-        console.warn('[Bio] Failed to load GLTFLoader from compatible version, trying latest...');
-        // Try latest version as fallback
-        const altScript = document.createElement('script');
-        altScript.src = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js';
-        altScript.onload = function() {
-          window.dispatchEvent(new Event('gltfloader-loaded'));
-        };
-        altScript.onerror = function() {
-          console.error('[Bio] Failed to load GLTFLoader from all sources');
-        };
-        document.head.appendChild(altScript);
+        console.warn('[Bio] GLTFLoader unavailable — 3D model swap disabled');
       };
       document.head.appendChild(script);
     }
-    
-    // Start loading when DOM is ready
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', loadGLTFLoader);
     } else {
@@ -65,19 +66,11 @@
   })();
 </script>
 
-<!-- Path Helper -->
-<script src="js/path-helper.js"></script>
-<!-- Settings Manager -->
-<script src="js/settings-manager.js"></script>
-<!-- Protection -->
-<script src="js/protection.js"></script>
-
 <!-- CV Showcase - Load before MediaPipe -->
 <script src="js/cv-showcase.js"></script>
 
 <!-- MediaPipe Vision - Loaded from CDN (works on GitHub Pages) -->
 <script type="module">
-  // All dependencies loaded from CDN - compatible with static hosting
   import vision from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0';
   window.MediaPipeVision = vision;
   window.dispatchEvent(new Event('mediapipe-loaded'));
@@ -125,7 +118,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
       linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -133,17 +126,87 @@
     z-index: 0;
   }
 
+  /* Shared site navigation */
+  .site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(10, 15, 17, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(74, 155, 168, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .site-nav .nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 14px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 26px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a {
+    color: #e0f4f7;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active { color: #4a9ba8; }
+
+  .nav-links a.nav-resume {
+    border: 2px solid rgba(74, 155, 168, 0.5);
+    background: linear-gradient(135deg, #1a4d54, #2d7a87);
+    color: #e0f4f7;
+    padding: 6px 14px;
+    border-radius: 8px;
+  }
+
+  .nav-links a.nav-resume:hover {
+    background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+    color: #e0f4f7;
+  }
+
   .container {
     position: relative;
     z-index: 1;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 110px 20px 40px;
   }
 
   header {
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 50px;
     padding: 40px 20px;
     background: linear-gradient(135deg, rgba(26, 77, 84, 0.3), rgba(45, 122, 135, 0.2));
     border-radius: 20px;
@@ -153,13 +216,13 @@
 
   h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 48px;
+    font-size: clamp(30px, 5vw, 48px);
     font-weight: 900;
     background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 30px rgba(74, 155, 168, 0.5);
+    text-shadow: 0 0 30px rgba(74, 155, 168, 0.3);
     margin-bottom: 10px;
     letter-spacing: 2px;
   }
@@ -172,7 +235,7 @@
   }
 
   .cv-showcase {
-    margin: 60px 0;
+    margin: 50px 0;
     background: rgba(10, 15, 17, 0.8);
     border-radius: 20px;
     padding: 30px;
@@ -187,12 +250,6 @@
     margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 20px;
-  }
-
-  .cv-controls {
-    display: flex;
-    gap: 15px;
-    align-items: center;
   }
 
   .camera-btn {
@@ -218,20 +275,6 @@
     border-color: #4a9ba8;
   }
 
-  .camera-btn:active {
-    transform: translateY(0);
-  }
-
-  .camera-btn.stop {
-    background: linear-gradient(135deg, #7a1a1a, #a82d2d);
-    border-color: rgba(168, 45, 45, 0.5);
-  }
-
-  .camera-btn.stop:hover {
-    background: linear-gradient(135deg, #a82d2d, #c84a4a);
-    border-color: #c84a4a;
-  }
-
   .camera-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -240,7 +283,7 @@
 
   .cv-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 28px;
+    font-size: clamp(20px, 3vw, 28px);
     color: #4a9ba8;
     font-weight: 700;
   }
@@ -280,7 +323,6 @@
     height: 100%;
     display: block;
     object-fit: contain;
-    /* No transform needed - we flip coordinates in code */
     background: transparent !important;
     opacity: 0;
     pointer-events: none;
@@ -289,16 +331,11 @@
     left: 0;
     z-index: 1;
   }
-  
+
   #cv-canvas.show-video {
     opacity: 1;
     pointer-events: auto;
     z-index: 1;
-  }
-
-  /* Hide favicon 404 error (harmless) */
-  link[rel="icon"] {
-    display: none;
   }
 
   #cv-3d-container {
@@ -313,7 +350,7 @@
     background: transparent !important;
     overflow: visible !important;
   }
-  
+
   #cv-3d-container canvas {
     display: block !important;
     visibility: visible !important;
@@ -322,159 +359,6 @@
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
-  }
-
-  .cv-controls {
-    margin-top: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .control-btn {
-    background: linear-gradient(135deg, #1a4d54, #2d7a87);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(74, 155, 168, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .control-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(74, 155, 168, 0.4);
-    background: linear-gradient(135deg, #2d7a87, #4a9ba8);
-  }
-
-  .control-btn.active {
-    background: linear-gradient(135deg, #4a9ba8, #2d7a87);
-    box-shadow: 0 0 20px rgba(74, 155, 168, 0.6);
-  }
-
-  .bio-content {
-    margin: 60px 0;
-  }
-
-  .bio-section {
-    background: rgba(26, 77, 84, 0.2);
-    padding: 30px;
-    margin: 30px 0;
-    border-radius: 15px;
-    border-left: 4px solid #4a9ba8;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-  }
-
-  .bio-section:hover {
-    background: rgba(26, 77, 84, 0.3);
-    transform: translateX(5px);
-    box-shadow: 0 5px 20px rgba(74, 155, 168, 0.2);
-  }
-
-  .bio-section h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
-    color: #4a9ba8;
-    margin-bottom: 15px;
-    font-weight: 700;
-  }
-
-  .bio-section .typing {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #e0f4f7;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    max-width: 100%;
-    min-height: 20px;
-    display: block;
-    visibility: visible;
-    opacity: 1;
-  }
-
-  .tech-stack {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin: 40px 0;
-  }
-
-  .tech-item {
-    background: rgba(26, 77, 84, 0.3);
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    border: 1px solid rgba(74, 155, 168, 0.3);
-    transition: all 0.3s ease;
-  }
-
-  .tech-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(74, 155, 168, 0.3);
-    border-color: #4a9ba8;
-  }
-
-  .tech-item i {
-    font-size: 32px;
-    color: #4a9ba8;
-    margin-bottom: 10px;
-  }
-
-  .tech-item h3 {
-    font-size: 18px;
-    color: #4a9ba8;
-    margin-bottom: 5px;
-  }
-
-  .tech-item p {
-    font-size: 14px;
-    color: #b0d4d9;
-  }
-
-  footer {
-    text-align: center;
-    margin-top: 60px;
-    padding: 30px;
-    border-top: 1px solid rgba(74, 155, 168, 0.3);
-  }
-
-  footer a {
-    color: #4a9ba8;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: 700;
-    transition: all 0.3s ease;
-  }
-
-  footer a:hover {
-    color: #2d7a87;
-    text-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
-  }
-
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: #4a9ba8;
-    font-size: 18px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    background: rgba(10, 15, 17, 0.9);
-    border-radius: 10px;
-  }
-  
-  .loading.hidden {
-    display: none;
   }
 
   .cv-instructions {
@@ -509,64 +393,143 @@
 
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
     margin: 40px 0;
   }
 
   .stat-item {
     text-align: center;
-    padding: 20px;
+    padding: 22px 16px;
     background: rgba(26, 77, 84, 0.2);
     border-radius: 10px;
     border: 1px solid rgba(74, 155, 168, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .stat-item:hover {
+    border-color: rgba(74, 155, 168, 0.6);
+    transform: translateY(-4px);
   }
 
   .stat-number {
     font-family: 'Orbitron', sans-serif;
-    font-size: 36px;
+    font-size: clamp(24px, 3vw, 36px);
     font-weight: 900;
     color: #4a9ba8;
     display: block;
   }
 
   .stat-label {
-    font-size: 14px;
+    font-size: 13px;
     color: #b0d4d9;
-    margin-top: 5px;
+    margin-top: 6px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    line-height: 1.5;
+  }
+
+  .bio-content {
+    margin: 50px 0;
+  }
+
+  .bio-section {
+    background: rgba(26, 77, 84, 0.2);
+    padding: 30px;
+    margin: 24px 0;
+    border-radius: 15px;
+    border-left: 4px solid #4a9ba8;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .bio-section:hover {
+    background: rgba(26, 77, 84, 0.3);
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(74, 155, 168, 0.2);
+  }
+
+  .bio-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    color: #4a9ba8;
+    margin-bottom: 15px;
+    font-weight: 700;
+  }
+
+  .bio-section p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #e0f4f7;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .bio-section p b { color: #4a9ba8; }
+
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    padding: 30px;
+    border-top: 1px solid rgba(74, 155, 168, 0.3);
+  }
+
+  footer a {
+    color: #4a9ba8;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+  }
+
+  footer a:hover {
+    color: #2d7a87;
+    text-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #4a9ba8;
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    background: rgba(10, 15, 17, 0.9);
+    border-radius: 10px;
+  }
+
+  .loading.hidden {
+    display: none;
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #4a9ba8;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   @media (max-width: 768px) {
-    h1 {
-      font-size: 32px;
-    }
-    
-    .cv-title {
-      font-size: 20px;
-    }
-    
-    .bio-section {
-      padding: 20px;
-    }
-    
-    .tech-stack {
-      grid-template-columns: 1fr;
+    .site-nav .nav-inner {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .container {
-      padding: 20px 15px;
-    }
-
-    header {
-      padding: 30px 15px;
-      margin-bottom: 40px;
-    }
+    .container { padding: 160px 15px 30px; }
 
     .cv-showcase {
       padding: 20px 15px;
-      margin: 40px 0;
+      margin: 30px 0;
     }
 
     .cv-header {
@@ -574,23 +537,7 @@
       align-items: flex-start;
     }
 
-    .cv-badges {
-      margin-top: 15px;
-    }
-
-    .badge {
-      font-size: 10px;
-      padding: 6px 12px;
-    }
-
-    .cv-canvas-container {
-      max-width: 100%;
-    }
-
-    .cv-instructions {
-      padding: 12px 15px;
-      margin-top: 15px;
-    }
+    .cv-canvas-container { max-width: 100%; }
 
     .cv-instructions p {
       font-size: 13px;
@@ -601,150 +548,137 @@
 
     .stats {
       grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+      gap: 12px;
     }
 
-    .stat-item {
-      padding: 15px;
-    }
-
-    .stat-number {
-      font-size: 28px;
-    }
-
-    .stat-label {
-      font-size: 12px;
-    }
-  }
-
-  @media (max-width: 375px) {
-    h1 {
-      font-size: 24px;
-      letter-spacing: 1px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-    }
-
-    .container {
-      padding: 15px 10px;
-    }
-
-    header {
-      padding: 20px 10px;
-      margin-bottom: 30px;
-    }
-
-    .cv-title {
-      font-size: 18px;
-    }
-
-    .cv-showcase {
-      padding: 15px 10px;
-      margin: 30px 0;
-    }
-
-    .cv-badges {
-      gap: 8px;
-    }
-
-    .badge {
-      font-size: 9px;
-      padding: 5px 10px;
-    }
-
-    .cv-instructions {
-      padding: 10px 12px;
-      margin-top: 12px;
-    }
-
-    .cv-instructions p {
-      font-size: 12px;
-    }
-
-    .bio-section {
-      padding: 15px 10px;
-      margin: 20px 0;
-    }
-
-    .bio-section h2 {
-      font-size: 20px;
-    }
-
-    .bio-section .typing {
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .stats {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 30px 0;
-    }
-
-    .stat-item {
-      padding: 12px;
-    }
-
-    .stat-number {
-      font-size: 24px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-    }
-
-    footer {
-      padding: 20px;
-      margin-top: 40px;
-    }
-
-    footer a {
-      font-size: 16px;
-    }
+    .bio-section { padding: 20px; }
   }
 </style>
+</head>
+<body>
+
+<div class="background-grid"></div>
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">ICEMAN404</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/bio" class="active" aria-current="page">Bio</a></li>
+      <li><a href="/skills">Skills</a></li>
+      <li><a href="/contacts">Contact</a></li>
+      <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <header>
+    <h1>Live CV Demo &amp; Bio</h1>
+    <p class="subtitle">Real-time computer vision, running in your browser</p>
+  </header>
+
+  <!-- CV Showcase Section -->
+  <div class="cv-showcase">
+    <div class="cv-header">
+      <div>
+        <h2 class="cv-title">Real-Time Computer Vision Showcase</h2>
+        <p style="color: #b0d4d9; margin-top: 10px; font-size: 14px;">
+          MediaPipe hand/face/pose tracking + WebGL — 100% client-side, no server involved
+        </p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+        <button id="start-camera-btn" class="camera-btn">Start Camera</button>
+        <button id="stop-camera-btn" class="camera-btn stop" style="display: none;">Stop Camera</button>
+        <div class="cv-badges">
+          <span class="badge">MediaPipe</span>
+          <span class="badge">WebGL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cv-canvas-container">
+      <canvas id="cv-canvas"></canvas>
+      <div id="cv-3d-container"></div>
+      <div class="loading" id="cv-loading">
+        <i class="fas fa-spinner fa-spin"></i> Initializing Computer Vision Engine...
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="cv-instructions">
+      <p><i class="fas fa-hand-pointer" aria-hidden="true"></i> <strong>Hold the cube with your hand and move it</strong> — minimum 2 fingers required.</p>
+      <p><i class="fas fa-hand-rock" aria-hidden="true"></i> <strong>Use both hands to change the cube's size.</strong></p>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="stats" aria-label="Engineering metrics">
+    <div class="stat-item">
+      <span class="stat-number">&lt;15ms</span>
+      <span class="stat-label">Real-time inference on mobile GPUs</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">3</span>
+      <span class="stat-label">GPU backends shipped — CUDA · Metal · HIP</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">&lt;10ms</span>
+      <span class="stat-label">Sensor-fusion loop on embedded targets</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">100%</span>
+      <span class="stat-label">Client-side — this demo phones home to no one</span>
+    </div>
+  </div>
+
+  <!-- Bio Content -->
+  <div class="bio-content">
+    <div class="bio-section">
+      <h2>Who Am I?</h2>
+      <p>I'm John — a systems engineer who likes software close to the metal. Over the last two years I've
+      ported real-time vision pipelines onto GPUs (<b>CUDA, Metal, ROCm/HIP</b>), architected production AI
+      systems with local LLMs, and fused <b>IMU/GNSS/LiDAR/RADAR</b> data on embedded targets. I learn by
+      building: sometimes that's a flight controller, sometimes it's teaching a quadcopter to fly with
+      reinforcement learning — occasionally it's this page, so you can put my work on your face.</p>
+    </div>
+
+    <div class="bio-section">
+      <h2>What I'm Working On</h2>
+      <p>An intensive deep-dive into <b>GPU architectures</b>: I ported foundational CUDA vision kernels to
+      AMD's ROCm platform (HIP) and built a benchmark suite comparing performance, memory bandwidth, and
+      thread occupancy across NVIDIA and AMD hardware. The goal is simple — know exactly why a kernel is
+      fast, not just that it is.</p>
+    </div>
+
+    <div class="bio-section">
+      <h2>How I Work</h2>
+      <p>Prototype fast, <b>measure everything</b>, and optimize only what the profiler indicts. At Himalogic
+      that meant replacing a failing KD-tree FLANN matcher with brute-force plus voxel grids to hit a latency
+      target, and shaving 30% off memory bandwidth on mobile GPUs under strict power constraints. I'd rather
+      delete complexity than heroically manage it.</p>
+    </div>
+
+    <div class="bio-section">
+      <h2>Beyond the Terminal</h2>
+      <p>I build and fly open-source UAVs, tune flight controllers by hand, and keep a Rubik's Cube on the desk
+      — it never survives past two minutes. The rest of the time I'm probably benchmarking something that
+      didn't need benchmarking.</p>
+    </div>
+  </div>
+
+  <footer>
+    <a href="/">Back to Home</a>
+  </footer>
+</div>
 
 <script>
-  const bioContent = {
-    whoAmI: `Hi! I'm John, a lifelong learner and tech enthusiast whose main goal is to get deep into AI and technology! My passion for AI is so strong that I've tried to teach my quadcopter how to fly by sending more voltages as a form of punishment reward. I'm basically a lifelong learner, mostly because I keep forgetting what I learned last week.`,
-    hiddenFacts: `I've logged 15,000 hours in Dota 2, most of which were spent farming and wondering who pressed the glyph and why my teammates can't read a map.`,
-    funFiles: `Oh, you know, I can recite the longest place name in the world: Taumatawhakatangihangakoauauotamateaturipukakapikimaungahoronukupokaiwhenuakitanatahu with my eyes closed. I can also solve a 3x3 Rubik's cube in under 2 minutes, both by color and spatial orientation too just using my bare hands. And I have a thing for high IQs too. I once tried to impress someone by solving a Rubik's Cube in under two minutes. They were impressed and I was relieved that I didn't mess it up.`,
-    spareTime: `In my spare time, I build custom neural networks for UAVs, for real-world applications.`,
-    quotes: `As my favorite philosopher once said: If you can't dazzle them with brilliance, baffle them with nonsense.`
-  };
-
-  const texts = [
-    { text: bioContent.whoAmI, id: "typingEffect1" },
-    { text: bioContent.hiddenFacts, id: "typingEffect2" },
-    { text: bioContent.funFiles, id: "typingEffect3" },
-    { text: bioContent.spareTime, id: "typingEffect4" },
-    { text: bioContent.quotes, id: "typingEffect5" }
-  ];
-
-  const delay = 35;
-
-  async function typeText({text, id}) {
-    const element = document.getElementById(id);
-    if (!element) return;
-    
-    element.textContent = '';
-    for (let char of text) {
-      element.textContent += char;
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    // Return promise that resolves when typing is complete
-    return Promise.resolve();
-  }
-
   document.addEventListener('DOMContentLoaded', async () => {
-    // PRIORITY 1: Initialize CV Showcase FIRST (top priority)
+    // PRIORITY 1: Initialize CV Showcase
     let retries = 0;
     const maxRetries = 50; // 5 seconds max wait
-    
+
     const initCVShowcase = async () => {
-      // Check if CVShowcase class is available
       if (typeof window.CVShowcase === 'undefined') {
         retries++;
         if (retries < maxRetries) {
@@ -759,15 +693,13 @@
         }
         return;
       }
-      
-      // CVShowcase is available, initialize it IMMEDIATELY
+
       try {
         const showcase = new window.CVShowcase();
         await showcase.init();
         window.cvShowcase = showcase;
         window.cvShowcaseInstance = showcase;
 
-        // Setup camera control buttons
         const startBtn = document.getElementById('start-camera-btn');
         const stopBtn = document.getElementById('stop-camera-btn');
 
@@ -776,24 +708,21 @@
             try {
               startBtn.disabled = true;
               startBtn.textContent = 'Starting...';
-              
+
               if (!window.cvShowcase) {
                 throw new Error('CVShowcase not initialized');
               }
-              
+
               await window.cvShowcase.startCamera();
               startBtn.style.display = 'none';
               if (stopBtn) stopBtn.style.display = 'inline-block';
               startBtn.disabled = false;
             } catch (error) {
-              console.error('[CV] Failed to start camera:', error);
               startBtn.disabled = false;
               startBtn.textContent = 'Start Camera';
-              alert('Failed to start camera: ' + error.message + '\n\nPlease check:\n1. Camera permissions\n2. Browser console for details');
+              alert('Failed to start camera: ' + error.message + '\n\nPlease check that camera permissions are granted for this site.');
             }
           });
-        } else {
-          console.error('[CV] Start camera button not found!');
         }
 
         if (stopBtn) {
@@ -817,143 +746,9 @@
         }
       }
     };
-    
-    // Start CV Showcase initialization IMMEDIATELY (top priority)
+
     initCVShowcase();
-
-    // PRIORITY 2: Start typing effects AFTER a short delay (non-blocking)
-    setTimeout(() => {
-      // Ensure all typing elements exist
-      const typingElements = texts.map(t => document.getElementById(t.id));
-      const missingElements = typingElements.filter(el => !el);
-      if (missingElements.length > 0) {
-        console.error('[Bio] Missing typing elements:', texts.filter((t, i) => !typingElements[i]).map(t => t.id));
-      }
-      
-      // Start typing effects sequentially - each section starts after previous finishes
-      (async () => {
-        for (let i = 0; i < texts.length; i++) {
-          const element = document.getElementById(texts[i].id);
-          if (element) {
-            await typeText(texts[i]);
-            // Small pause between sections (500ms)
-            await new Promise(resolve => setTimeout(resolve, 500));
-          } else {
-            console.warn(`[Bio] Element ${texts[i].id} not found, skipping`);
-          }
-        }
-      })();
-    }, 100); // Small delay to let CV Showcase start first
-
-    // Setup control buttons
-    const controlButtons = document.querySelectorAll('.control-btn');
-    controlButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        controlButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
   });
 </script>
-</head>
-<body>
-
-<div class="background-grid"></div>
-
-<div class="container">
-  <header>
-    <h1>ICEMAN404</h1>
-    <p class="subtitle">AR/VR & Computer Vision Engineer</p>
-  </header>
-
-  <!-- CV Showcase Section -->
-  <div class="cv-showcase">
-    <div class="cv-header">
-      <div>
-        <h2 class="cv-title">Real-Time Computer Vision Showcase</h2>
-        <p style="color: #b0d4d9; margin-top: 10px; font-size: 14px;">
-          Live demonstration of cutting-edge AR/VR and CV capabilities
-        </p>
-      </div>
-      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-        <button id="start-camera-btn" class="camera-btn">Start Camera</button>
-        <button id="stop-camera-btn" class="camera-btn stop" style="display: none;">Stop Camera</button>
-        <div class="cv-badges">
-          <span class="badge">MediaPipe</span>
-          <span class="badge">WebGL</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="cv-canvas-container">
-      <canvas id="cv-canvas"></canvas>
-      <div id="cv-3d-container"></div>
-      <div class="loading" id="cv-loading">
-        <i class="fas fa-spinner fa-spin"></i> Initializing Computer Vision Engine...
-      </div>
-    </div>
-
-    <!-- Instructions -->
-    <div class="cv-instructions">
-      <p><i class="fas fa-hand-pointer"></i> <strong>Try to hold the cube with your hand and move it</strong> - minimum 2 fingers required.</p>
-      <p><i class="fas fa-hand-rock"></i> <strong>To change the cube size use both hands.</strong></p>
-    </div>
-
-  </div>
-
-  <!-- Stats Section -->
-  <div class="stats">
-    <div class="stat-item">
-      <span class="stat-number">15K+</span>
-      <span class="stat-label">Hours Experience (Dota 2)</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">50+</span>
-      <span class="stat-label">CV Techniques</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">100%</span>
-      <span class="stat-label">Real-Time</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">∞</span>
-      <span class="stat-label">Innovation</span>
-    </div>
-  </div>
-
-  <!-- Bio Content -->
-  <div class="bio-content">
-    <div class="bio-section">
-      <h2>Who Am I?</h2>
-      <div id="typingEffect1" class="typing"></div>
-    </div>
-
-    <div class="bio-section">
-      <h2>My Hidden Facts:</h2>
-      <div id="typingEffect2" class="typing"></div>
-    </div>
-
-    <div class="bio-section">
-      <h2>Other Fun Files:</h2>
-      <div id="typingEffect3" class="typing"></div>
-    </div>
-
-    <div class="bio-section">
-      <h2>In My Spare Time:</h2>
-      <div id="typingEffect4" class="typing"></div>
-    </div>
-
-    <div class="bio-section">
-      <h2>My Favourite Quotes:</h2>
-      <div id="typingEffect5" class="typing"></div>
-    </div>
-  </div>
-
-
-  <footer>
-    <a href="/">Back to Main Page</a>
-  </footer>
-</div>
-
 </body>
 </html>

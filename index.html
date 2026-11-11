@@ -3,76 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICEMAN404 | AR/VR & Computer Vision Engineer | John Subba</title>
-  <meta name="description" content="Portfolio of John Subba | iceman404 - World-class AR/VR and Computer Vision Engineer. Explore cutting-edge projects, real-time CV demos, and systems-level expertise.">
-  <meta name="author" content="iceman404" />
-  <meta name="last-modified" content="2026-02-24" />
-  
+  <title>John Subba (iceman404) | Systems &amp; Heterogeneous Compute Engineer</title>
+  <meta name="description" content="Portfolio of John Subba — GPU/CUDA engineer and computer-vision specialist. Real-time AR/VR pipelines, kernel-level systems, embedded sensor fusion, and a live in-browser CV demo.">
+  <meta name="author" content="John Subba" />
+  <meta name="last-modified" content="2026-11-12" />
+  <link rel="canonical" href="https://www.iceman404.com" />
+
   <!-- Favicons -->
   <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="canonical" href="https://www.iceman404.com" />
-  
-  <!-- Fonts -->
+
+  <!-- Social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.iceman404.com/">
+  <meta property="og:title" content="John Subba (iceman404) | Systems &amp; Heterogeneous Compute Engineer">
+  <meta property="og:description" content="GPU/CUDA engineering, real-time computer vision, and embedded systems — with a live in-browser CV demo.">
+  <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+  <meta property="og:site_name" content="John Subba | iceman404">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="John Subba (iceman404) | Systems &amp; Heterogeneous Compute Engineer">
+  <meta name="twitter:description" content="GPU/CUDA engineering, real-time computer vision, and embedded systems — with a live in-browser CV demo.">
+  <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
+  <!-- Fonts & icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  
-  <!-- Three.js -->
-  <script>
-    if (typeof THREE === 'undefined') {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-      script.onload = () => console.log('Three.js loaded');
-      document.head.appendChild(script);
-    }
-  </script>
-  
-  <!-- SEO & Performance Scripts -->
-  <script src="js/path-helper.js"></script>
-  <script src="js/settings-manager.js"></script>
-  <script src="js/seo-helper.js"></script>
-  <script src="js/site-navigation.js"></script>
-  <script src="js/performance-monitor.js"></script>
-  <script src="js/error-handler.js"></script>
-  <script src="js/theme-manager.js"></script>
-  <script src="js/lazy-load.js"></script>
-  <script src="js/protection.js"></script>
-  
-  <!-- Three.js Scene & Effects -->
-  <script src="js/three-scene.js"></script>
-  <script src="js/signature-effects.js"></script>
-  
-  <!-- Structured Data -->
+
+  <!-- Structured data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://www.iceman404.com"
-      }
-    ]
+    "@type": "Person",
+    "name": "John Subba",
+    "alternateName": "iceman404",
+    "jobTitle": "Systems & Heterogeneous Compute Engineer",
+    "url": "https://www.iceman404.com",
+    "email": "mailto:johnsubba404@gmail.com",
+    "address": { "@type": "PostalAddress", "addressLocality": "Kathmandu", "addressCountry": "NP" },
+    "sameAs": [
+      "https://www.linkedin.com/in/john-subba-ic3man404/",
+      "https://github.com/iceman404"
+    ],
+    "knowsAbout": ["CUDA", "ROCm/HIP", "Metal", "Computer Vision", "Sensor Fusion", "Embedded Systems", "C++"]
   }
   </script>
-
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "url": "https://www.iceman404.com",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://www.iceman404.com/search?q={search_term_string}",
-      "query-input": {
-        "@type": "PropertyValueSpecification",
-        "valueRequired": "https://schema.org/True"
-      }
-    }
+    "name": "John Subba (iceman404) Portfolio",
+    "url": "https://www.iceman404.com"
   }
   </script>
 
@@ -97,7 +81,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
       background-size: 50px 50px;
@@ -115,7 +99,7 @@
       backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(74, 155, 168, 0.3);
       z-index: 1000;
-      padding: 15px 0;
+      padding: 14px 0;
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     }
 
@@ -137,75 +121,44 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: 2px;
-      display: flex;
-      align-items: center;
-      min-height: 30px;
-    }
-
-    nav .logo-text {
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    nav .logo-cursor {
-      display: inline-block;
-      width: 3px;
-      height: 1em;
-      background: #4a9ba8;
-      margin-left: 4px;
-      animation: blinkCursor 0.7s infinite;
-      vertical-align: middle;
-    }
-
-    @keyframes blinkCursor {
-      0%, 50% {
-        opacity: 1;
-      }
-      51%, 100% {
-        opacity: 0;
-      }
+      text-decoration: none;
     }
 
     nav .nav-links {
       display: flex;
-      gap: 30px;
+      gap: 26px;
       list-style: none;
+      align-items: center;
     }
 
     nav .nav-links a {
       color: #e0f4f7;
       text-decoration: none;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       font-family: 'Orbitron', sans-serif;
       text-transform: uppercase;
       letter-spacing: 1px;
-      padding: 8px 16px;
+      padding: 8px 12px;
       border-radius: 8px;
       transition: all 0.3s ease;
-      position: relative;
     }
 
-    nav .nav-links a::before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #4a9ba8, #2d7a87);
-      transition: all 0.3s ease;
-      transform: translateX(-50%);
-    }
-
-    nav .nav-links a:hover {
+    nav .nav-links a:hover,
+    nav .nav-links a.active {
       color: #4a9ba8;
     }
 
-    nav .nav-links a:hover::before {
-      width: 80%;
+    nav .nav-links a.nav-resume {
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      color: #e0f4f7;
+    }
+
+    nav .nav-links a.nav-resume:hover {
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+      color: #e0f4f7;
+      border-color: #4a9ba8;
     }
 
     /* Hero Section */
@@ -215,7 +168,7 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      padding-top: 80px;
+      padding-top: 90px;
       overflow: hidden;
     }
 
@@ -227,9 +180,22 @@
       padding: 0 20px;
     }
 
+    .hero .handle-chip {
+      display: inline-block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: #4a9ba8;
+      border: 1px solid rgba(74, 155, 168, 0.4);
+      border-radius: 20px;
+      padding: 6px 18px;
+      margin-bottom: 22px;
+      text-transform: uppercase;
+    }
+
     .hero h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: clamp(36px, 8vw, 96px);
+      font-size: clamp(40px, 8vw, 96px);
       font-weight: 900;
       background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54, #4a9ba8);
       background-size: 300% 300%;
@@ -237,10 +203,9 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: gradientShift 8s ease infinite;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       letter-spacing: 4px;
-      text-shadow: 0 0 40px rgba(74, 155, 168, 0.5);
-      line-height: 1.2;
+      line-height: 1.15;
     }
 
     @keyframes gradientShift {
@@ -249,22 +214,24 @@
     }
 
     .hero .subtitle {
-      font-size: clamp(18px, 2.5vw, 32px);
+      font-size: clamp(18px, 2.5vw, 30px);
       color: #4a9ba8;
       font-weight: 300;
       letter-spacing: 3px;
-      margin-bottom: 40px;
+      margin-bottom: 28px;
       text-transform: uppercase;
     }
 
     .hero .tagline {
-      font-size: clamp(14px, 1.5vw, 20px);
+      font-size: clamp(15px, 1.5vw, 19px);
       color: #b0d4d9;
       font-weight: 400;
-      max-width: 800px;
-      margin: 0 auto 50px;
+      max-width: 780px;
+      margin: 0 auto 44px;
       line-height: 1.8;
     }
+
+    .hero .tagline b { color: #e0f4f7; font-weight: 700; }
 
     .hero-buttons {
       display: flex;
@@ -331,21 +298,6 @@
       overflow: hidden;
     }
 
-    .social-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .social-card:hover::before {
-      left: 100%;
-    }
-
     .social-card i {
       font-size: 32px;
       transition: transform 0.3s ease;
@@ -361,32 +313,82 @@
 
     .social-card.linkedin {
       background: linear-gradient(135deg, rgba(0, 119, 181, 0.2), rgba(0, 119, 181, 0.1));
-      color: #0077b5;
+      color: #4aa8d8;
       border-color: rgba(0, 119, 181, 0.4);
     }
 
     .social-card.linkedin:hover {
       background: linear-gradient(135deg, rgba(0, 119, 181, 0.4), rgba(0, 119, 181, 0.2));
-      border-color: #0077b5;
+      border-color: #4aa8d8;
       transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(0, 119, 181, 0.4);
     }
 
     .social-card.github {
-      background: linear-gradient(135deg, rgba(36, 41, 46, 0.3), rgba(36, 41, 46, 0.2));
-      color: #24292e;
-      border-color: rgba(36, 41, 46, 0.4);
+      background: linear-gradient(135deg, rgba(120, 130, 140, 0.25), rgba(120, 130, 140, 0.15));
+      color: #e0f4f7;
+      border-color: rgba(120, 130, 140, 0.4);
     }
 
     .social-card.github:hover {
-      background: linear-gradient(135deg, rgba(36, 41, 46, 0.5), rgba(36, 41, 46, 0.3));
-      border-color: #24292e;
+      background: linear-gradient(135deg, rgba(120, 130, 140, 0.45), rgba(120, 130, 140, 0.25));
+      border-color: #e0f4f7;
       transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(36, 41, 46, 0.4);
+      box-shadow: 0 10px 30px rgba(120, 130, 140, 0.4);
     }
 
     .social-card:hover i {
-      transform: scale(1.2) rotate(5deg);
+      transform: scale(1.15);
+    }
+
+    /* Metrics Strip */
+    .metrics-section {
+      padding: 70px 20px;
+      position: relative;
+      z-index: 5;
+      background: rgba(10, 15, 17, 0.6);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(74, 155, 168, 0.15);
+      border-bottom: 1px solid rgba(74, 155, 168, 0.15);
+    }
+
+    .metrics-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .metric-card {
+      text-align: center;
+      padding: 28px 16px;
+      background: rgba(26, 77, 84, 0.2);
+      border-radius: 15px;
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(74, 155, 168, 0.6);
+      transform: translateY(-4px);
+    }
+
+    .metric-number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(26px, 3.2vw, 40px);
+      font-weight: 900;
+      color: #4a9ba8;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: #b0d4d9;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.5;
     }
 
     /* Profile Section */
@@ -394,8 +396,6 @@
       padding: 100px 20px;
       position: relative;
       z-index: 5;
-      background: rgba(10, 15, 17, 0.6);
-      backdrop-filter: blur(10px);
     }
 
     .profile-container {
@@ -404,7 +404,7 @@
       display: grid;
       grid-template-columns: auto 1fr;
       gap: 40px;
-      align-items: center;
+      align-items: start;
       background: rgba(10, 15, 17, 0.8);
       padding: 50px;
       border-radius: 20px;
@@ -419,26 +419,20 @@
       border: 4px solid rgba(74, 155, 168, 0.5);
       box-shadow: 0 0 30px rgba(74, 155, 168, 0.4);
       object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .profile-img:hover {
-      transform: scale(1.05) rotate(5deg);
     }
 
     .profile-info h2 {
       font-family: 'Orbitron', sans-serif;
       font-size: 32px;
       color: #4a9ba8;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       font-weight: 700;
     }
 
-    .profile-info .real-name {
-      font-size: 20px;
+    .profile-info .profile-role {
+      font-size: 17px;
       color: #b0d4d9;
-      margin-bottom: 30px;
-      font-style: italic;
+      margin-bottom: 26px;
     }
 
     .accordion {
@@ -456,35 +450,42 @@
     }
 
     .accordion h3 {
+      margin: 0;
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      background: transparent;
+      border: none;
       font-family: 'Orbitron', sans-serif;
       font-size: 18px;
       color: #4a9ba8;
       padding: 20px 25px;
       cursor: pointer;
-      margin: 0;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: #4a9ba8;
     }
 
-    .accordion h3::after {
+    .accordion-trigger::after {
       content: '+';
       font-size: 24px;
       color: #4a9ba8;
       transition: transform 0.3s ease;
     }
 
-    .accordion.active h3::after {
+    .accordion.active .accordion-trigger::after {
       transform: rotate(45deg);
     }
 
     .panel {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.3s ease;
+      transition: max-height 0.4s ease;
       background: rgba(10, 15, 17, 0.6);
     }
 
@@ -535,7 +536,7 @@
     .projects-header p {
       font-size: 18px;
       color: #b0d4d9;
-      max-width: 600px;
+      max-width: 640px;
       margin: 0 auto;
     }
 
@@ -555,29 +556,14 @@
       transition: all 0.4s ease;
       position: relative;
       backdrop-filter: blur(10px);
-    }
-
-    .project-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(74, 155, 168, 0.1), transparent);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .project-card:hover {
       transform: translateY(-10px);
       border-color: rgba(74, 155, 168, 0.6);
       box-shadow: 0 10px 40px rgba(74, 155, 168, 0.4);
-    }
-
-    .project-card:hover::before {
-      opacity: 1;
     }
 
     .project-image {
@@ -588,6 +574,7 @@
       transition: transform 0.4s ease;
       position: relative;
       z-index: 2;
+      display: block;
     }
 
     .project-card:hover .project-image {
@@ -598,11 +585,14 @@
       padding: 25px;
       position: relative;
       z-index: 2;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .project-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 20px;
+      font-size: 19px;
       color: #4a9ba8;
       margin-bottom: 12px;
       font-weight: 700;
@@ -613,9 +603,17 @@
     .project-description {
       color: #b0d4d9;
       font-size: 14px;
-      margin-bottom: 20px;
-      min-height: 20px;
-      line-height: 1.6;
+      margin-bottom: 18px;
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .project-stack {
+      font-size: 12px;
+      color: #7fb5be;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      font-family: 'Roboto Mono', 'Courier New', monospace;
     }
 
     .project-buttons {
@@ -641,6 +639,7 @@
       text-decoration: none;
       text-align: center;
       display: inline-block;
+      min-width: 120px;
     }
 
     .project-btn:hover {
@@ -650,12 +649,13 @@
     }
 
     .project-btn.youtube {
-      background: linear-gradient(135deg, #c4302b, #a02020);
+      background: linear-gradient(135deg, #8c2320, #6e1a18);
       border-color: rgba(196, 48, 43, 0.5);
+      flex: 0 0 auto;
     }
 
     .project-btn.youtube:hover {
-      background: linear-gradient(135deg, #a02020, #c4302b);
+      background: linear-gradient(135deg, #a02020, #8c2320);
       border-color: #c4302b;
     }
 
@@ -729,7 +729,7 @@
       display: flex;
       justify-content: center;
       gap: 25px;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
     .social-icons a {
@@ -750,7 +750,7 @@
     .social-icons a:hover {
       background: rgba(74, 155, 168, 0.2);
       border-color: #4a9ba8;
-      transform: translateY(-5px) scale(1.1);
+      transform: translateY(-5px);
       box-shadow: 0 5px 20px rgba(74, 155, 168, 0.4);
     }
 
@@ -801,27 +801,65 @@
       z-index: 1;
     }
 
+    /* Fade-in Animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Accessibility */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #4a9ba8;
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+
     /* Responsive Design */
+    @media (max-width: 900px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 768px) {
       nav .nav-container {
-        padding: 0 20px;
+        padding: 0 16px;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
       }
 
       nav .nav-links {
-        gap: 15px;
+        gap: 12px;
         flex-wrap: wrap;
         justify-content: center;
       }
 
       nav .nav-links a {
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 6px 10px;
       }
 
       .hero {
-        padding-top: 120px;
+        padding-top: 150px;
       }
 
       .profile-container {
@@ -849,9 +887,16 @@
       }
     }
 
+    @media (max-width: 480px) {
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+    }
+
     @media (max-width: 375px) {
       .hero h1 {
-        font-size: 32px;
+        font-size: 34px;
         letter-spacing: 2px;
       }
 
@@ -862,31 +907,6 @@
       .profile-container {
         padding: 20px 15px;
       }
-
-      .project-card {
-        border-radius: 15px;
-      }
-    }
-
-    /* Smooth Scroll */
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Fade-in Animation */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-in {
-      animation: fadeInUp 0.8s ease-out;
     }
   </style>
 </head>
@@ -895,17 +915,16 @@
   <div class="background-grid"></div>
 
   <!-- Navigation -->
-  <nav>
+  <nav aria-label="Main navigation">
     <div class="nav-container">
-      <div class="logo">
-        <span class="logo-text" id="nav-logo-text"></span>
-        <span class="logo-cursor" id="nav-logo-cursor"></span>
-      </div>
+      <a class="logo" href="/">ICEMAN404</a>
       <ul class="nav-links">
+        <li><a href="/" class="active" aria-current="page">Home</a></li>
         <li><a href="/bio">Bio</a></li>
         <li><a href="/skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
       </ul>
     </div>
   </nav>
@@ -914,24 +933,50 @@
   <section class="hero">
     <div id="particles-js"></div>
     <div class="hero-content fade-in">
-      <h1 id="hero-name">ICEMAN404</h1>
-      <p class="subtitle">GPU-Accelerated Computer Vision Engineer</p>
-      <p class="tagline">Building the future of immersive technology through cutting-edge computer vision, augmented reality, and systems-level engineering expertise.</p>
+      <span class="handle-chip">@iceman404</span>
+      <h1>John Subba</h1>
+      <p class="subtitle">Systems &amp; Heterogeneous Compute Engineer</p>
+      <p class="tagline">
+        I build real-time systems close to the metal — <b>CUDA/HIP kernels</b>, <b>GPU-accelerated
+        computer vision</b> for AR/VR, and <b>embedded sensor fusion</b>. Currently researching GPU
+        architectures: benchmarking memory hierarchies and warp-level primitives across NVIDIA and AMD.
+      </p>
       <div class="hero-buttons">
-        <a href="/bio" class="hero-btn primary">Explore Bio</a>
+        <a href="/bio" class="hero-btn primary">Live CV Demo</a>
         <a href="#projects" class="hero-btn">View Projects</a>
       </div>
-      
-      <!-- Professional Social Cards -->
+
       <div class="social-cards">
         <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" class="social-card linkedin" rel="noopener noreferrer">
-          <i class="fab fa-linkedin"></i>
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
           <span>LinkedIn</span>
         </a>
         <a href="https://github.com/iceman404" target="_blank" class="social-card github" rel="noopener noreferrer">
-          <i class="fab fa-github"></i>
+          <i class="fab fa-github" aria-hidden="true"></i>
           <span>GitHub</span>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics Strip -->
+  <section class="metrics-section" aria-label="Engineering metrics">
+    <div class="metrics-grid fade-in">
+      <div class="metric-card">
+        <span class="metric-number">&lt;15ms</span>
+        <span class="metric-label">Real-time inference on mobile GPUs</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">30%</span>
+        <span class="metric-label">Memory bandwidth saved in AR/VR pipelines</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">&lt;10ms</span>
+        <span class="metric-label">End-to-end sensor-fusion latency</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-number">3+</span>
+        <span class="metric-label">Production AI systems architected &amp; mentored</span>
       </div>
     </div>
   </section>
@@ -939,33 +984,41 @@
   <!-- Profile Section -->
   <section class="profile-section">
     <div class="profile-container fade-in">
-      <img src="images/profile/mine3.avif" alt="John Subba | iceman404" class="profile-img">
+      <img src="images/profile/mine3.avif" alt="Portrait of John Subba (iceman404)" class="profile-img" width="200" height="200" loading="lazy" decoding="async">
       <div class="profile-info">
         <h2>John Subba</h2>
-        <p class="real-name">Real Name: John Subba</p>
-        
+        <p class="profile-role">GPU &amp; Computer Vision Engineer · Kathmandu, Nepal · B.IT, Purbanchal University</p>
+
         <div class="accordion">
-          <h3>Technical Skills</h3>
+          <h3><button class="accordion-trigger" aria-expanded="false">Technical Skills</button></h3>
           <div class="panel">
             <div class="panel-content">
-              <p><b>Core Programming Languages:</b> C, C++, Python, SQL</p>
-              <p><b>ML/DL/NLP/CV Frameworks:</b> TensorFlow, PyTorch, Scikit-Learn, NLTK, OpenCV, Transformers (Hugging Face)</p>
-              <p><b>Reinforcement Learning:</b> Gymnasium, Stable Baselines</p>
-              <p><b>Version Control & Collaboration:</b> Git/GitHub/GitLab, Jupyter, Google Colab, Kaggle</p>
-              <p><b>Cloud Platforms:</b> GCP, AWS</p>
-              <p><b>Deployment Tools:</b> Docker, Kubernetes, MLflow</p>
-              <p><b>Microcontrollers:</b> Espressif SoCs, Raspberry Pi Pico</p>
+              <p><b>Languages:</b> C++17/20, C, Python, SQL, x86/8052 Assembly</p>
+              <p><b>Heterogeneous Compute:</b> CUDA, HIP/ROCm, Metal Shading Language, OpenGL ES 3.1/3.2, Vulkan, WebAssembly</p>
+              <p><b>Computer Vision &amp; ML:</b> OpenCV, MediaPipe, PyTorch, TensorFlow, scikit-learn, Hugging Face Transformers</p>
+              <p><b>Systems:</b> Linux kernel modules &amp; syscalls, Windows kernel drivers (WinDbg), POSIX threads, IPC</p>
+              <p><b>Robotics &amp; Embedded:</b> ROS2, sensor fusion (KF/EKF/UKF, SO(3)/SE(3)), ESP32, 8052, Raspberry Pi, LoRa</p>
+              <p><b>Tooling:</b> Git/GitHub Actions, Docker, CMake, Clang-Tidy/PVS-Studio, ASan/UBSan/TSan</p>
             </div>
           </div>
         </div>
 
         <div class="accordion">
-          <h3>Personal Info</h3>
+          <h3><button class="accordion-trigger" aria-expanded="false">Currently</button></h3>
+          <div class="panel">
+            <div class="panel-content">
+              <p><b>Independent GPU architecture research:</b> porting CUDA vision kernels to AMD ROCm (HIP) and benchmarking performance, memory bandwidth, and thread occupancy across NVIDIA and AMD hardware.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <h3><button class="accordion-trigger" aria-expanded="false">Personal Info</button></h3>
           <div class="panel">
             <div class="panel-content">
               <p><b>Spoken Languages:</b> English, Nepali, Hindi</p>
-              <p><b>Education:</b> Bachelor's in Information Technology (Intelligent Systems and Business Analytics)</p>
-              <p><b>Hobbies:</b> Open-source UAVs</p>
+              <p><b>Education:</b> Bachelor's in Information Technology (Purbanchal University, 2021–2025)</p>
+              <p><b>Beyond the terminal:</b> Open-source UAVs, quadcopter flight tuning, and a Rubik's Cube that never survives past two minutes.</p>
             </div>
           </div>
         </div>
@@ -977,272 +1030,201 @@
   <section id="projects" class="projects-section">
     <div class="projects-header fade-in">
       <h2>Project Showcase</h2>
-      <p>Cutting-edge projects demonstrating expertise in AR/VR, Computer Vision, Embedded Systems, and AI/ML</p>
+      <p>Selected work across GPU systems, computer vision, embedded hardware, and backend infrastructure — each with a full write-up.</p>
     </div>
 
     <div class="project-grid">
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/mira.avif" alt="MIRA" class="project-image" onclick="openLightbox('project-screenshots-files/mira.avif')">
+        <img src="project-screenshots-files/mira.avif" alt="MIRA — DTMF appliance automation hardware" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/mira.avif')">
         <div class="project-details">
           <h3 class="project-title">MIRA</h3>
-          <p class="project-description" id="project1-description"></p>
+          <p class="project-description">Dial-in home automation: DTMF tones from any phone are decoded by an 8052 MCU and toggled into relay commands, with IR sensors and SMS alerts.</p>
+          <p class="project-stack">Embedded C · 8052 Assembly · SIM800L</p>
           <div class="project-buttons">
             <a href="project-html-files/mira" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/watch?v=Ln1M1jYKkDc" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/mira" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://www.youtube.com/watch?v=Ln1M1jYKkDc" target="_blank" rel="noopener noreferrer" class="project-btn youtube"><i class="fab fa-youtube" aria-hidden="true"></i> Video</a>
+            <a href="https://github.com/iceman404/mira" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/lora_geofencing.avif" alt="LORA Geofencing" class="project-image" onclick="openLightbox('project-screenshots-files/lora_geofencing.avif')">
+        <img src="project-screenshots-files/lora_geofencing.avif" alt="LoRa geofencing tracker hardware" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/lora_geofencing.avif')">
         <div class="project-details">
-          <h3 class="project-title">LORA Geofencing</h3>
-          <p class="project-description" id="project2-description"></p>
+          <h3 class="project-title">LoRa Geofencing</h3>
+          <p class="project-description">ESP32 + LoRa RA02 (433&nbsp;MHz) GPS tracker with geofence alerting — long-range, low-power boundary monitoring for UAVs and remote assets.</p>
+          <p class="project-stack">ESP32 · LoRa · GPS · Embedded C</p>
           <div class="project-buttons">
             <a href="project-html-files/lora_geofencing" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/esp32_lora_geofencing" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://github.com/iceman404/esp32_lora_geofencing" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/java_project.avif" alt="VisionGuardianCommander" class="project-image" onclick="openLightbox('project-screenshots-files/java_project.avif')">
+        <img src="project-screenshots-files/java_project.avif" alt="VisionGuardianCommander surveillance dashboard" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/java_project.avif')">
         <div class="project-details">
-          <h3 class="project-title">VisionGuardianCommander</h3>
-          <p class="project-description" id="project3-description"></p>
+          <h3 class="project-title">VisionGuardian Commander</h3>
+          <p class="project-description">JavaFX MVC surveillance suite: real-time OpenCV face detection with email alerts and MySQL-backed event logging.</p>
+          <p class="project-stack">Java · JavaFX · OpenCV · MySQL</p>
           <div class="project-buttons">
             <a href="project-html-files/vision_guardian_commander" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/watch?v=xlK7uBWht90" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/visionguardiancommander" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://www.youtube.com/watch?v=xlK7uBWht90" target="_blank" rel="noopener noreferrer" class="project-btn youtube"><i class="fab fa-youtube" aria-hidden="true"></i> Video</a>
+            <a href="https://github.com/iceman404/visionguardiancommander" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/facemusic_mood.avif" alt="Facemood Music Player" class="project-image" onclick="openLightbox('project-screenshots-files/facemusic_mood.avif')">
+        <img src="project-screenshots-files/facemusic_mood.avif" alt="FaceMood music player interface" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/facemusic_mood.avif')">
         <div class="project-details">
-          <h3 class="project-title">Facemood Music Player</h3>
-          <p class="project-description" id="project4-description"></p>
+          <h3 class="project-title">FaceMood Music Player</h3>
+          <p class="project-description">Mood-aware desktop player: MediaPipe reads your facial expression in real time and the queue follows — with cross-platform audio fallbacks.</p>
+          <p class="project-stack">Python · MediaPipe · OpenCV · PyQt6 · Spotify API</p>
           <div class="project-buttons">
             <a href="project-html-files/facemood_music_player" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/facemoodmusicplayer" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://github.com/iceman404/facemoodmusicplayer" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/facecounter_server.avif" alt="Face Counter System" class="project-image" onclick="openLightbox('project-screenshots-files/facecounter_server.avif')">
+        <img src="project-screenshots-files/facecounter_server.avif" alt="Face counter system with ESP32 hardware" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/facecounter_server.avif')">
         <div class="project-details">
           <h3 class="project-title">Face Counter System</h3>
-          <p class="project-description" id="project5-description"></p>
+          <p class="project-description">Distributed ESP32-CAM edge-ML system: streams video, counts faces on-device, and triggers alerts over a live server dashboard.</p>
+          <p class="project-stack">ESP32 · Edge ML · Python Server</p>
           <div class="project-buttons">
             <a href="project-html-files/face_counter_system" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/esp32-face-counter-system" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://github.com/iceman404/esp32-face-counter-system" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/resnet50_finetuning.avif" alt="Fine-Tuning with ResNet50" class="project-image" onclick="openLightbox('project-screenshots-files/resnet50_finetuning.avif')">
+        <img src="project-screenshots-files/resnet50_finetuning.avif" alt="Fine-tuning with ResNet50 training visuals" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/resnet50_finetuning.avif')">
         <div class="project-details">
           <h3 class="project-title">Fine-Tuning with ResNet50</h3>
-          <p class="project-description" id="project6-description"></p>
+          <p class="project-description">Transfer learning for flower classification: 88% accuracy via augmentation and head replacement — without significant overfitting.</p>
+          <p class="project-stack">Python · PyTorch · ResNet50 · Transfer Learning</p>
           <div class="project-buttons">
             <a href="project-html-files/fine_tuning_resnet50" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/iceman404/fine_tuning_resnet50" target="_blank" class="project-btn">GitHub</a>
+            <a href="https://github.com/iceman404/fine_tuning_resnet50" target="_blank" rel="noopener noreferrer" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/redis_clone.avif" alt="Advanced Redis Clone" class="project-image" onclick="openLightbox('project-screenshots-files/redis_clone.avif')">
+        <img src="project-screenshots-files/redis_clone.avif" alt="Advanced Redis clone server rack visual" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/redis_clone.avif')">
         <div class="project-details">
           <h3 class="project-title">Advanced Redis Clone</h3>
-          <p class="project-description" id="project7-description"></p>
+          <p class="project-description">High-performance in-memory key-value store in modern C++: RESP protocol, event-driven I/O, caching, and replication for distributed setups.</p>
+          <p class="project-stack">C++17/20 · Networking · Systems Design</p>
           <div class="project-buttons">
             <a href="project-html-files/advanced_redis_clone" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/" target="_blank" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
 
       <div class="project-card fade-in">
-        <img src="project-screenshots-files/esp32_drone.avif" alt="Open Hardware Drone" class="project-image" onclick="openLightbox('project-screenshots-files/esp32_drone.avif')">
+        <img src="project-screenshots-files/esp32_drone.avif" alt="Open hardware ESP32 drone in flight" class="project-image" width="640" height="360" loading="lazy" decoding="async" onclick="openLightbox('project-screenshots-files/esp32_drone.avif')">
         <div class="project-details">
           <h3 class="project-title">Open Hardware Drone</h3>
-          <p class="project-description" id="project8-description"></p>
+          <p class="project-description">Fully customizable quadcopter on a 330 frame — 4× BLDC motors, 8-inch props, ESP32 telemetry, and hands-on PID flight tuning.</p>
+          <p class="project-stack">ESP32 · BLDC · Flight Control · Hardware</p>
           <div class="project-buttons">
             <a href="project-html-files/open_hardware_drone" class="project-btn">View Details</a>
-            <a href="https://www.youtube.com/" target="_blank" class="project-btn youtube">YouTube</a>
-            <a href="https://github.com/" target="_blank" class="project-btn">GitHub</a>
           </div>
         </div>
       </div>
     </div>
 
     <div class="lightbox" onclick="closeLightbox()">
-      <span class="close-btn">&times;</span>
-      <img class="lightbox-img" src="" alt="Project Image">
+      <span class="close-btn" role="button" aria-label="Close image preview">&times;</span>
+      <img class="lightbox-img" src="" alt="Enlarged project screenshot">
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
     <div class="footer-content">
-      <p class="copyright">&copy; 2024 iceman404 | Designed by John Subba</p>
+      <div class="social-icons">
+        <a href="https://www.linkedin.com/in/john-subba-ic3man404/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://github.com/iceman404" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile"><i class="fab fa-github"></i></a>
+        <a href="mailto:johnsubba404@gmail.com" aria-label="Email John Subba"><i class="fas fa-envelope"></i></a>
+        <a href="/resume/John-Resume.pdf" aria-label="Download résumé PDF"><i class="fas fa-file-pdf"></i></a>
+      </div>
+      <p class="copyright">&copy; 2026 John Subba (iceman404) · Designed &amp; built by hand — no site builder, no template.</p>
     </div>
   </footer>
 
   <!-- Scroll to Top Button -->
   <button class="scroll-top" onclick="scrollToTop()" aria-label="Scroll to top">
-    <i class="fas fa-arrow-up"></i>
+    <i class="fas fa-arrow-up" aria-hidden="true"></i>
   </button>
 
   <!-- Scripts -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="js/three-scene.js"></script>
   <script src="particles.js"></script>
   <script src="particle.js/app.js"></script>
-  <script src="js/particles-limiter.js"></script>
 
   <script>
-    // Continuous typing effect for navigation logo
-    const navLogoElement = document.getElementById('nav-logo-text');
-    const navLogoCursor = document.getElementById('nav-logo-cursor');
-    const navLogoText = "ICEMAN404";
-    let navLogoCharIndex = 0;
-    let isDeleting = false;
-    let typingSpeed = 120;
-    let pauseTime = 2000; // Pause after typing completes
-
-    function typeNavLogo() {
-      const currentText = navLogoElement.textContent;
-
-      if (!isDeleting && navLogoCharIndex < navLogoText.length) {
-        // Typing forward
-        navLogoElement.textContent = navLogoText.slice(0, navLogoCharIndex + 1);
-        navLogoCharIndex++;
-        typingSpeed = 120;
-        setTimeout(typeNavLogo, typingSpeed);
-      } else if (!isDeleting && navLogoCharIndex === navLogoText.length) {
-        // Finished typing, pause then start deleting
-        isDeleting = true;
-        typingSpeed = 50; // Faster deletion
-        setTimeout(typeNavLogo, pauseTime);
-      } else if (isDeleting && navLogoCharIndex > 0) {
-        // Deleting backward
-        navLogoCharIndex--;
-        navLogoElement.textContent = navLogoText.slice(0, navLogoCharIndex);
-        typingSpeed = 50;
-        setTimeout(typeNavLogo, typingSpeed);
-      } else if (isDeleting && navLogoCharIndex === 0) {
-        // Finished deleting, pause then start typing again
-        isDeleting = false;
-        navLogoElement.textContent = '';
-        typingSpeed = 120;
-        setTimeout(typeNavLogo, 500); // Short pause before restarting
-      }
-    }
-
-    // Typing effect for hero name
-    const heroNameElement = document.getElementById('hero-name');
-    const heroNameText = "ICEMAN404";
-    let heroCharIndex = 0;
-
-    function typeHeroName() {
-      if (heroCharIndex < heroNameText.length) {
-        heroNameElement.textContent = heroNameText.slice(0, heroCharIndex + 1);
-        heroCharIndex++;
-        setTimeout(typeHeroName, 150);
-      } else {
-        heroNameElement.textContent = heroNameText;
-      }
-    }
-
-    // Typing effect for project descriptions
-    const descriptions = document.querySelectorAll('.project-description');
-    const textArrays = [
-      "8052 & SIM800L Project",
-      "ESP-32 & LoRa Project",
-      "Java & OpenCV Project",
-      "Raspberry-PI Project",
-      "Edge-ML with ESP32 Server Project",
-      "Computer Vision Project",
-      "Coming Soon...",
-      "Coming Soon..."
-    ];
-
-    function typeDescriptions() {
-      descriptions.forEach((description, index) => {
-        let charIndex = 0;
-        const textToType = textArrays[index]?.trim() || '';
-
-        function type() {
-          if (charIndex < textToType.length) {
-            description.textContent = textToType.slice(0, charIndex + 1);
-            charIndex++;
-            setTimeout(type, 100);
-          } else {
-            description.textContent = textToType;
-          }
-        }
-        setTimeout(() => type(), index * 300);
-      });
-    }
-
-    // Accordion functionality
-    const accordions = document.querySelectorAll('.accordion');
-    accordions.forEach(accordion => {
-      const header = accordion.querySelector('h3');
-      header.addEventListener('click', () => {
-        const isActive = accordion.classList.contains('active');
-        accordions.forEach(acc => acc.classList.remove('active'));
-        if (!isActive) {
+    // Accordion (accessible: real buttons + aria-expanded)
+    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const accordion = trigger.closest('.accordion');
+        const isOpen = accordion.classList.contains('active');
+        document.querySelectorAll('.accordion.active').forEach(acc => {
+          acc.classList.remove('active');
+          acc.querySelector('.accordion-trigger').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
           accordion.classList.add('active');
+          trigger.setAttribute('aria-expanded', 'true');
         }
       });
     });
 
-    // Lightbox functionality
-    function openLightbox(imageSrc) {
+    // Lightbox (Escape closes, focus returns to opener)
+    let lightboxOpener = null;
+    function openLightbox(imageSrc, opener) {
       const lightbox = document.querySelector('.lightbox');
       const lightboxImg = document.querySelector('.lightbox-img');
-      lightbox.classList.add('active');
+      lightboxOpener = opener || null;
       lightboxImg.src = imageSrc;
+      lightbox.classList.add('active');
+      lightbox.querySelector('.close-btn').focus();
     }
-
     function closeLightbox() {
       const lightbox = document.querySelector('.lightbox');
       lightbox.classList.remove('active');
+      lightbox.querySelector('.lightbox-img').src = '';
+      if (lightboxOpener) { lightboxOpener.focus(); lightboxOpener = null; }
     }
-
-    // Scroll to top functionality
-    function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+    // Give keyboard users the same enlarge affordance as mouse users
+    document.querySelectorAll('.project-image').forEach(img => {
+      img.setAttribute('tabindex', '0');
+      img.setAttribute('role', 'button');
+      img.setAttribute('aria-label', 'Enlarge screenshot: ' + img.alt);
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(img.src, img); }
       });
-    }
-
-    const scrollTopBtn = document.querySelector('.scroll-top');
-    window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 300) {
-        scrollTopBtn.classList.add('visible');
-      } else {
-        scrollTopBtn.classList.remove('visible');
-      }
     });
 
-    // Intersection Observer for fade-in animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+    // Scroll to top
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    const scrollTopBtn = document.querySelector('.scroll-top');
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('visible', window.pageYOffset > 400);
+    }, { passive: true });
 
+    // Intersection Observer for fade-ins
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -1250,22 +1232,15 @@
           entry.target.style.transform = 'translateY(0)';
         }
       });
-    }, observerOptions);
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    // Observe all fade-in elements
     document.addEventListener('DOMContentLoaded', () => {
-      const fadeElements = document.querySelectorAll('.fade-in');
-      fadeElements.forEach(el => {
+      document.querySelectorAll('.fade-in').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         observer.observe(el);
       });
-
-      // Start typing effects
-      typeNavLogo();
-      setTimeout(typeHeroName, 1500);
-      setTimeout(typeDescriptions, 3000);
     });
 
     // Smooth scroll for anchor links
@@ -1273,41 +1248,9 @@
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
-  </script>
-
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('Service Worker registered:', registration.scope);
-            // Check for updates
-            registration.update();
-          })
-          .catch((error) => {
-            console.warn('Service Worker registration failed:', error);
-          });
-        
-        // Unregister old service workers if needed
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          registrations.forEach((registration) => {
-            if (registration.active && registration.active.scriptURL.includes('sw.js')) {
-              // Check if it's an old version
-              registration.update();
-            }
-          });
-        });
-      });
-    }
   </script>
 </body>
 </html>

@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!--
-    Author: iceman404 (John Subba)
-    Last Modified: 2026-02-24
+    Author: John Subba (iceman404)
+    Last Modified: 2026-11-12
   -->
   <title>404 - Page Not Found | ICEMAN404</title>
   <meta name="description" content="404 Error - The page you're looking for doesn't exist. Return to ICEMAN404 portfolio.">
-  <meta name="author" content="iceman404" />
-  <meta name="last-modified" content="2026-02-24" />
+  <meta name="author" content="John Subba" />
+  <meta name="last-modified" content="2026-11-12" />
   
   <!-- Favicons -->
   <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
@@ -31,11 +31,6 @@
       document.head.appendChild(script);
     }
   </script>
-  
-  <!-- Path Helper -->
-  <script src="js/path-helper.js"></script>
-  <!-- Protection -->
-  <script src="js/protection.js"></script>
   
   <style>
     * {
@@ -261,25 +256,11 @@
 
     <div class="button-container">
       <a href="/" class="btn primary">Back to Home</a>
-      <button onclick="playAudio()" class="btn">Really?</button>
+      <a href="/bio" class="btn">Try the Live CV Demo</a>
     </div>
   </div>
 
-  <audio id="error-audio" preload="auto">
-    <source src="404audio.MP3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
   <script>
-    // Play audio function
-    function playAudio() {
-      const audio = document.getElementById('error-audio');
-      if (audio) {
-        audio.play().catch(error => {
-          console.log('Audio play failed:', error);
-        });
-      }
-    }
     // Create 3D error visualization
     function init3DError() {
       if (typeof THREE === 'undefined') {

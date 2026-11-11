@@ -1,55 +1,55 @@
-<!--
-/* -----------------------------------------------
-/* Author: iceman404.com
-/* Creative Commons Attribution 3.0 License: http://creativecommons.org/licenses/by/3.0/
-/* Original GitHub: https://github.com/iceman404/Creative-Coder-Portfolio
-/* How to use? Check the GitHub README
-/* v1
-/* Last Modified: 2026-02-24
-/* -----------------------------------------------
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!--
-    Author: iceman404 (John Subba)
-    Last Modified: 2026-02-24
-  -->
+<!--
+  Author: John Subba (iceman404)
+  Last Modified: 2026-11-12
+-->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="author" content="iceman404" />
-  <meta name="last-modified" content="2026-02-24" />
+  <title>Skills | Systems &amp; Heterogeneous Compute | John Subba (iceman404)</title>
+  <meta name="description" content="Technical expertise of John Subba (iceman404): CUDA/HIP/Metal GPU programming, modern C++ systems work, real-time computer vision, sensor fusion, and embedded platforms — each skill linked to the work that proves it.">
+  <meta name="author" content="John Subba" />
+  <meta name="last-modified" content="2026-11-12" />
   <link rel="canonical" href="https://www.iceman404.com/skills" />
   <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+
+  <!-- Social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.iceman404.com/skills">
+  <meta property="og:title" content="Skills | John Subba (iceman404)">
+  <meta property="og:description" content="CUDA/HIP/Metal GPU programming, modern C++ systems, real-time CV, sensor fusion, embedded platforms — evidence over percentages.">
+  <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+  <meta property="og:site_name" content="John Subba | iceman404">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Skills | John Subba (iceman404)">
+  <meta name="twitter:description" content="CUDA/HIP/Metal GPU programming, modern C++ systems, real-time CV, sensor fusion, embedded platforms.">
+  <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.iceman404.com" },
+      { "@type": "ListItem", "position": 2, "name": "Skills", "item": "https://www.iceman404.com/skills" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <title>Skills | AR/VR & CV Engineer | John Subba | iceman404</title>
-  <meta
-    name="description"
-    content="Technical expertise of John Subba (iceman404) - AR/VR & Computer Vision Engineer. Programming languages, AI technologies, cloud platforms, and systems-level engineering skills."
-  >
-  <meta name="author" content="John Subba | iceman404" />
-  <script async src="https://cse.google.com/cse.js?cx=676bcb85202744034"></script>
-  <!-- Three.js for 3D AR effects -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- Path Helper -->
-  <script src="js/path-helper.js"></script>
-  <!-- Settings Manager -->
-  <script src="js/settings-manager.js"></script>
-  <!-- Holographic Skills Visualization -->
-  <script src="js/skills-holographic.js"></script>
-  <!-- Protection -->
-  <script src="js/protection.js"></script>
+
   <style>
     :root {
-      --header-height: 12vh;
-      --footer-height: 1.2vh;
-      --content-padding: 2vh;
       --primary-color: #1a4d54;
       --secondary-color: #2d7a87;
       --accent-color: #4a9ba8;
+      --text: #e0f4f7;
+      --text-dim: #b0d4d9;
     }
 
     * {
@@ -60,11 +60,9 @@
 
     body {
       font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
       background: #0a0f11;
-      color: #e0f4f7;
+      color: var(--text);
+      overflow-x: hidden;
       position: relative;
       min-height: 100vh;
     }
@@ -75,7 +73,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         linear-gradient(rgba(45, 122, 135, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(45, 122, 135, 0.1) 1px, transparent 1px);
       background-size: 50px 50px;
@@ -83,1305 +81,342 @@
       z-index: 0;
     }
 
-    #three-bg {
+    /* Shared site navigation */
+    .site-nav {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.3;
-    }
-
-    /* Raindrops effect - AR theme */
-    .raindrop {
-      position: fixed;
-      width: 3px;
-      height: 25px;
-      background: linear-gradient(
-        to bottom,
-        transparent,
-        rgba(74, 155, 168, 0.9),
-        rgba(74, 155, 168, 0.7)
-      );
-      border-radius: 0 0 3px 3px;
-      animation: rainFall linear forwards;
-      z-index: 0;
-      pointer-events: none;
-      filter: drop-shadow(0 0 2px rgba(74, 155, 168, 0.5));
-    }
-
-    .raindrop::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        rgba(224, 244, 247, 0.3),
-        transparent
-      );
-      border-radius: 0 0 3px 3px;
-    }
-
-    .raindrop::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      background: rgba(74, 155, 168, 0.6);
-      border-radius: 50%;
-      animation: ripple 5s ease-out forwards;
-      opacity: 0;
-      box-shadow: 0 0 8px rgba(74, 155, 168, 0.8);
-    }
-
-    @keyframes rainFall {
-      to { 
-        transform: translateY(100vh);
-        opacity: 0.7;
-      }
-    }
-
-    @keyframes ripple {
-      0% {
-        transform: translateX(-50%) scale(0);
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.8;
-      }
-      100% {
-        transform: translateX(-50%) scale(3);
-        opacity: 0;
-      }
-    }
-
-
-    /* Rest of your existing CSS remains the same */
-    header {
-      background: linear-gradient(135deg, rgba(26, 77, 84, 0.9), rgba(45, 122, 135, 0.8));
-      color: #e0f4f7;
-      text-align: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      box-shadow: 0 2px 20px rgba(74, 155, 168, 0.3);
-      backdrop-filter: blur(10px);
+      z-index: 1000;
+      background: rgba(10, 15, 17, 0.95);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(74, 155, 168, 0.3);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     }
 
-    #name-container {
-      font-size: clamp(1rem, 3vw, 2rem);
-      display: flex;
-      align-items: center;
-    }
-
-    .cursor {
-      animation: blinkCursor 1s infinite;
-    }
-
-    footer {
-      background: linear-gradient(135deg, rgba(26, 77, 84, 0.9), rgba(45, 122, 135, 0.8));
-      color: #e0f4f7;
-      text-align: center;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: var(--footer-height);
-      z-index: 10;
-      backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(74, 155, 168, 0.3);
-    }
-
-    .top-button {
-      position: fixed;
-      top: calc(var(--header-height) + 10px);
-      left: 10px;
-      z-index: 11;
-    }
-
-    .button-description {
-      text-decoration: none;
-      display: inline-block;
-      background: linear-gradient(135deg, #1a4d54, #2d7a87);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-block;
-      width: 110px;
-      height: 40px;
-      padding: 8px 12px;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 20px;
-      color: #e0f4f7;
-      border: 1px solid rgba(74, 155, 168, 0.5);
-      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .button-description:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(74, 155, 168, 0.5);
-      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
-      border-color: #4a9ba8;
-    }
-
-    /* Floating Tech Icons Background - Updated for AR theme */
-    .floating-tech {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .tech-icon {
-      position: absolute;
-      font-size: 24px;
-      opacity: 0.15;
-      color: #4a9ba8;
-      animation: float 20s infinite linear;
-      text-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
-    }
-
-    @keyframes float {
-      0% {
-        transform: translateY(0) rotate(0deg);
-      }
-      100% {
-        transform: translateY(-100vh) rotate(360deg);
-      }
-    }
-
-    /* Transparent overlay - Updated for AR theme */
-    .overlay {
-      position: fixed;
-      top: calc(var(--header-height) + var(--content-padding));
-      bottom: calc(var(--footer-height) + var(--content-padding));
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(10, 15, 17, 0.85);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 50px rgba(74, 155, 168, 0.3);
-      border: 2px solid rgba(74, 155, 168, 0.3);
-      z-index: 2;
-      width: 84vw;
+    .site-nav .nav-inner {
       max-width: 1400px;
-      overflow: auto;
-      border-radius: 20px;
-    }
-
-    .overlay-content {
-      font-size: clamp(0.9rem, 1.7vw, 1.5rem);
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      color: #e0f4f7;
-      padding: 30px;
-      border-radius: 20px;
-      pointer-events: auto;
-      position: relative;
-      z-index: 3;
-    }
-
-    .overlay-content img {
-      width: 144px;
-      height: 144px;
-      border-radius: 50%;
-      margin-bottom: 15px;
-      border: 3px solid rgba(74, 155, 168, 0.5);
-      box-shadow: 0 0 20px rgba(74, 155, 168, 0.4);
-    }
-
-    .overlay-content h2 {
-      font-family: 'Orbitron', sans-serif;
-      color: #4a9ba8;
-      font-size: clamp(1.2rem, 2vw, 1.8rem);
-      margin-bottom: 15px;
-      font-weight: 700;
-    }
-
-    .overlay-content p {
-      color: #b0d4d9;
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
-
-    .overlay-content a {
-      color: #4a9ba8;
-      text-decoration: none;
-      font-size: 18px;
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: 2px solid rgba(74, 155, 168, 0.3);
-      background: rgba(26, 77, 84, 0.3);
-      transition: all 0.3s ease;
-      pointer-events: auto;
-    }
-
-    .overlay-content a:hover {
-      color: #2d7a87;
-      border-color: #4a9ba8;
-      box-shadow: 0 0 20px rgba(74, 155, 168, 0.3);
-      transform: translateY(-2px);
-    }
-
-    .skills-section {
+      margin: 0 auto;
+      padding: 14px 40px;
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
-      margin-top: 20px;
-      width: 100%;
-      gap: 0;
+      align-items: center;
+      gap: 20px;
     }
 
-    .skills-column {
-      width: 48%;
-      text-align: left;
-      margin-bottom: 20px;
-      padding: 15px;
-      border-radius: 15px;
-      background: rgba(26, 77, 84, 0.2);
-      border: 1px solid rgba(74, 155, 168, 0.3);
-      backdrop-filter: blur(5px);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .skills-column h3 {
+    .nav-logo {
       font-family: 'Orbitron', sans-serif;
-      color: #4a9ba8;
-      font-size: clamp(1rem, 1.5vw, 1.3rem);
-      margin-bottom: 15px;
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 26px;
+      list-style: none;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
+      transition: color 0.3s ease;
     }
 
-    .progress-bar {
-      height: 10px;
-      width: 85%;
-      background-color: rgba(26, 77, 84, 0.5);
-      border-radius: 15px;
-      overflow: visible;
-      margin-bottom: 4px;
-      margin-left: 10px;
-      position: relative;
-      border: 1px solid rgba(74, 155, 168, 0.3);
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--accent-color); }
+
+    .nav-links a.nav-resume {
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #1a4d54, #2d7a87);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 8px;
     }
 
-    .progress-bar span {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      min-height: 10px;
-      border-radius: 15px;
-      position: absolute;
-      top: 0;
-      width: 0;
-      transition: width 1s ease;
-      line-height: 10px;
-      text-align: center;
-      color: #e0f4f7;
-      font-size: 0.65rem;
-      font-weight: 700;
+    .nav-links a.nav-resume:hover {
       background: linear-gradient(135deg, #2d7a87, #4a9ba8);
-      box-shadow: 0 0 10px rgba(74, 155, 168, 0.5);
-      white-space: nowrap;
-    }
-
-    .progress-container {
-      display: flex;
-      align-items: center;
-    }
-
-    .programming-language {
-      width: 100%;
-      height: auto;
-      padding: 0;
-      z-index: 3;
-      border-radius: 20px;
-      margin-bottom: 30px;
-      position: relative;
-      background: transparent;
-      border: none;
-      backdrop-filter: none;
-      transition: all 0.3s ease;
-      overflow: visible;
-    }
-    
-    .holographic-card-wrapper {
-      position: relative;
-      width: 100%;
-      transform-style: preserve-3d;
-      perspective: 1000px;
-    }
-    
-    .holographic-container {
-      position: relative;
-      width: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease-out;
-    }
-    
-    .holographic-main {
-      position: relative;
-      background: rgba(26, 77, 84, 0.4);
-      backdrop-filter: blur(20px) saturate(180%);
-      border-radius: 20px;
-      border: 1px solid rgba(74, 155, 168, 0.3);
-      padding: 25px;
-      box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transform: translateZ(0);
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-      overflow: hidden;
-    }
-    
-    .holographic-card-wrapper:hover .holographic-main {
-      transform: translateZ(20px) scale(1.02);
-      border-color: rgba(74, 155, 168, 0.6);
-      box-shadow: 
-        0 20px 60px rgba(0, 185, 204, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-    
-    .holographic-glow {
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      background: linear-gradient(135deg, 
-        rgba(0, 185, 204, 0.1) 0%,
-        rgba(6, 232, 255, 0.05) 50%,
-        rgba(0, 185, 204, 0.1) 100%);
-      border-radius: 20px;
-      filter: blur(20px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-    
-    .holographic-card-wrapper:hover .holographic-glow {
-      opacity: 1;
-    }
-    
-    .holographic-reflection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: linear-gradient(180deg, 
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 100%);
-      border-radius: 20px 20px 0 0;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      z-index: 2;
-    }
-    
-    .holographic-card-wrapper:hover .holographic-reflection {
-      opacity: 1;
-    }
-    
-    .holographic-gradient {
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, 
-        transparent,
-        rgba(74, 155, 168, 0.2),
-        transparent);
-      transition: left 0.6s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-    
-    .progress-container {
-      position: relative;
-      z-index: 2;
-    }
-    
-    .code-block {
-      position: relative;
-      z-index: 2;
+      color: var(--text);
     }
 
     .page {
-      width: 100%;
-      height: auto;
-      max-height: 30vh;
-      overflow-y: auto;
-      color: #fff;
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 20px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      padding: 44px 24px;
+      background: linear-gradient(135deg, rgba(26, 77, 84, 0.3), rgba(45, 122, 135, 0.2));
       border-radius: 20px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-      background-color: #0094a3;
-      font-size: clamp(0.8rem, 1.4vw, 1.2rem);
-      padding: 2px;
-      text-align: left;
-      margin: 4px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(74, 155, 168, 0.3);
     }
 
-    .code-block {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-family: 'Roboto', monospace;
-      background-color: rgba(10, 15, 17, 0.6);
+    header img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(74, 155, 168, 0.5);
+      box-shadow: 0 0 20px rgba(74, 155, 168, 0.4);
+      margin-bottom: 18px;
+    }
+
+    header h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent-color);
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      margin-bottom: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    header .headline {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: var(--text-dim);
+      max-width: 720px;
+      margin: 0 auto 24px;
+      line-height: 1.7;
+    }
+
+    .resume-btn {
+      display: inline-block;
+      padding: 12px 28px;
       border-radius: 10px;
-      padding: 12px;
-      border: 1px solid rgba(74, 155, 168, 0.2);
-      color: #b0d4d9;
-      font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid rgba(74, 155, 168, 0.5);
+      box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .resume-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(74, 155, 168, 0.5);
+      background: linear-gradient(135deg, #2d7a87, #4a9ba8);
+    }
+
+    .skills-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .skill-card {
+      background: rgba(10, 15, 17, 0.8);
+      border: 1px solid rgba(74, 155, 168, 0.3);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .skill-card:hover {
+      border-color: rgba(74, 155, 168, 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 35px rgba(74, 155, 168, 0.25);
+    }
+
+    .skill-card h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent-color);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .skill-card .evidence {
+      display: inline-block;
+      font-size: 0.78rem;
+      color: #7fb5be;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
+      font-style: italic;
+    }
+
+    .skill-card ul {
+      list-style: none;
+    }
+
+    .skill-card li {
+      padding: 9px 0 9px 22px;
+      position: relative;
+      border-bottom: 1px solid rgba(74, 155, 168, 0.12);
+      font-size: 0.95rem;
       line-height: 1.6;
+      color: var(--text);
     }
 
-    .code-block pre {
-      margin: 0;
-      color: #b0d4d9;
+    .skill-card li:last-child { border-bottom: none; }
+
+    .skill-card li::before {
+      content: '\25B8';
+      position: absolute;
+      left: 2px;
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      top: 11px;
     }
 
-    .code-block b {
-      color: #4a9ba8;
+    .skill-card li b { color: var(--accent-color); font-weight: 700; }
+
+    .skill-card li a {
+      color: var(--accent-color);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(74, 155, 168, 0.5);
+    }
+
+    .skill-card li a:hover { border-bottom-style: solid; }
+
+    .note {
+      margin-top: 36px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .note a { color: var(--accent-color); }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px 40px;
+      border-top: 1px solid rgba(74, 155, 168, 0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer a {
+      color: var(--accent-color);
+      text-decoration: none;
       font-weight: 700;
     }
 
-    /* Enhanced progress bar */
-    .progress-bar {
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .progress-bar span {
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    
-    .holographic-card-wrapper:hover .progress-bar span {
-      box-shadow: 0 0 20px rgba(74, 155, 168, 0.8);
-      filter: brightness(1.2);
-    }
-    
-    /* Code block enhancement */
-    .holographic-card-wrapper:hover .code-block {
-      background-color: rgba(10, 15, 17, 0.8);
-      border-color: rgba(74, 155, 168, 0.4);
-      transform: translateZ(5px);
-    }
-    
-    /* Image enhancement */
-    .holographic-card-wrapper:hover .progress-container img {
-      transform: scale(1.1) rotate(5deg);
-      filter: drop-shadow(0 0 10px rgba(74, 155, 168, 0.6));
-    }
-    
-    .progress-container img {
-      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    /* Add the media query for mobile responsiveness */
-    @media (max-width: 879px) {
-      .skills-section {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        gap: 0;
-      }
-      
-      .skills-column {
-        width: 100% !important;
-        max-width: 100% !important;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 20px;
-        padding: 10px;
-        box-sizing: border-box;
-      }
-
-      .programming-language {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: auto;
-        padding: 0;
-        z-index: 3;
-        border-radius: 15px;
-        margin-bottom: 16px;
-        position: relative;
-        background: transparent;
-        border: none;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        cursor: pointer;
-        transform: translateY(0);
-        overflow: visible;
-        box-sizing: border-box;
-      }
-      
-      .holographic-card-wrapper {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-      }
-      
-      .holographic-main {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-      }
-      
-      /* Disable 3D transforms on mobile */
-      .holographic-card-wrapper {
-        perspective: none;
-      }
-      
-      .holographic-container {
-        transform: none !important;
-      }
-      
-      .holographic-card-wrapper:hover .holographic-container {
-        transform: none !important;
-      }
-      
-      .holographic-main {
-        transform: translateZ(0) scale(1) !important;
-      }
-      
-      .holographic-card-wrapper:hover .holographic-main {
-        transform: translateZ(0) scale(1.02) !important;
-      }
-
-      /* Mobile touch support */
-      .programming-language:active,
-      .holographic-card-wrapper:active {
-        transform: translateY(-3px);
-      }
-      
-      .holographic-card-wrapper:active .holographic-main {
-        transform: translateZ(0) scale(1.02) !important;
-        box-shadow: 
-          0 12px 40px rgba(0, 185, 204, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.15);
-      }
-
-      .page {
-        width: 100%;
-        height: auto;
-        max-height: none;
-      }
-      
-      .overlay {
-        width: 95vw;
-        top: calc(var(--header-height) + 5px);
-        bottom: calc(var(--footer-height) + 5px);
-      }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 3px;
+      border-radius: 6px;
     }
 
     @media (max-width: 768px) {
-      .skills-section {
-        gap: 0;
+      .site-nav .nav-inner {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 10px;
       }
-      
-      .skills-column {
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 8px;
-        margin-bottom: 15px;
-      }
-      
-      .programming-language {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-bottom: 12px;
-      }
-      
-      .holographic-main {
-        padding: 15px !important;
-      }
-    }
 
-    @media (max-width: 480px) {
-      .overlay-content {
-        padding: 10px;
-      }
-      
-      .skills-column {
-        padding: 5px;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      
-      .programming-language {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-bottom: 10px;
-      }
-      
-      .holographic-main {
-        padding: 12px !important;
-      }
-    }
-
-    @keyframes blinkCursor {
-      0% {
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
+      .page { padding: 165px 15px 40px; }
+      .skill-card { padding: 20px; }
     }
   </style>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.iceman404.com"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Skills",
-          "item": "https://www.iceman404.com/skills"
-        }
-      ]
-    }
-  </script>
 </head>
 <body>
-  <header>
-    <div id="name-container">
-      <span id="name"></span>
-      <span id="cursor" class="cursor">|</span>
-    </div>
-  </header>
-  
-  <div class="top-button">
-    <a href="/" class="button-description">
-      <span>Home</span>
-    </a>
-  </div>
-  
   <div class="background-grid"></div>
-  
-  <!-- Three.js 3D Background -->
-  <div id="three-bg"></div>
-  
-  <!-- Floating Tech Icons Background -->
-  <div class="floating-tech" id="floatingTech"></div>
-  
-  <!-- Raindrops Container -->
-  <div id="raindropsContainer"></div>
-  
-  <!-- Transparent overlay -->
-  <div class="overlay" id="overlay">
-    <div class="overlay-content">
-      <img src="images/profile/mine4.avif" alt="John Subba | iceman404 | Photo">
-      <h2> 🤓 Geek by nature | Programmer by choice</h2>
-      <p>Proficient in a range of programming languages and technologies, spanning from beginner to expert levels. Equipped with hands-on experience and a strong foundation in software development.</p>
-      <div class="skills-section">
-        <!-- Programming Languages Section -->
-        <div class="skills-column programming-languages">
-          <h3>Programming Languages:</h3>
-          <!-- C++ -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/cpp.png" alt="C++ Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- Advanced OOP & Patterns
-- Template Metaprogramming
-- STL & Custom Containers
-- Concurrency & Threads
-- Modern C++ (11/14/17/20)
-- Memory & Performance Tuning
-- Cross-platform Build Tools
-- Low-Level System Calls</pre>
-            </div>
-          </div>
-          <!-- C -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/c.png" alt="C Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- Pointers & Mem Mgmt
-- Kernel & Syscalls
-- Writing LKMs & Debug
-- POSIX Threads & Sync
-- Driver Dev & Real-time
-- Network Sockets (Raw/BSD)
-- IPC (FIFO, Shared Mem)
-- Low-latency Optimization</pre>
-            </div>
-          </div>
-          <!-- Python -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/python.png" alt="Python Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 95%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">95%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- Numpy & Pandas
-- AsyncIO & Scripting
-- Flask/Requests for APIs
-- Unit Testing & Coverage
-- Data Wrangling & ETL
-- Virtualenv & Packaging
-- CLI Tools & Automation</pre>
-            </div>
-          </div>
-          <!-- SQL -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/sql.png" alt="SQL Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 95%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">95%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- DB Schema & Normal Forms
-- Complex Joins & Subqueries
-- Stored Proc & Triggers
-- Index Tuning & Partitioning
-- Window Functions & OLAP
-- Data Warehousing & Marts
-- Backup & Recovery Plans</pre>
-            </div>
-          </div>
-        </div>
 
-        <!--AI Technologies Section -->
-        <div class="skills-column tools-technologies">
-          <h3>AI Technologies:</h3>
-          <!-- ML -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/ml.png" alt="Machine Learning">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 85%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">85%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-ML Algos & Skills:
-- Supervised (Lin/Log Reg)
-- Unsupervised (KMeans/DBSCAN)
-- SVM, KNN, Random Forest
-- Cross-val & Hyperparam Tuning
-- PCA, t-SNE Dimension Reduct</pre>
-            </div>
-          </div>
-          <!-- DL -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/dl.png" alt="Deep Learning">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-DL Algos & Skills:
-- CNN (ResNet/VGG)
-- RNN (LSTM/GRU)
-- GANs & Variational AEs
-- Transformer (BERT-style)
-- Transfer Learning & Fine-tune</pre>
-            </div>
-          </div>
-          <!-- CV -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/cv.png" alt="Computer Vision">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 75%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">75%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-CV Algos & Skills:
-- Img Classification (MobileNet)
-- Object Detection (SSD/YOLO)
-- Image Seg (Mask R-CNN)
-- Real-time Video & OpenCV
-- Data Aug & Preprocessing</pre>
-            </div>
-          </div>
-          <!-- NLP -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/nlp.png" alt="Natural Language Processing">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 80%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">80%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-NLP Algos & Skills:
-- Tokenization & Stemming
-- Seq2Seq (Machine Translation)
-- Transformers (BERT/GPT)
-- Summarization & QnA
-- Sentiment & Topic Model</pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Frameworks Section -->
-        <div class="skills-column frameworks">
-          <h3>Other Technologies:</h3>
-
-          <!-- Git/GitHub -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/github.png" alt="Github Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- Git Flow & Branch Strat
-- GitHub Actions & CI
-- Merge & Rebase Tactics
-- Git Hooks & Automation
-- Handling Large Repos</pre>
-            </div>
-          </div>
-
-          <!-- Python-based frameworks (Flask/FastAPI) -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/restful.png" alt="RESTful Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Knowledge about:
-- Flask & FastAPI
-- RESTful Arch & JWT
-- Async Endpoints
-- OAuth & Security
-- ORM & Data Models</pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Other Technologies Section -->
-        <div class="skills-column spoken-languages">
-          <h3>Cloud Technologies</h3>
-          <!-- GCP -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/google_cloud.png" alt="GCP Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-GCP Knowledge:
-- Compute Eng, Cloud Run
-- GKE & Cloud Functions
-- BigQuery & DataProc
-- Pub/Sub & Dataflow
-- Load Balancing & VPC</pre>
-            </div>
-          </div>
-          <!-- Azure -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/azure.png" alt="Azure Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 85%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">85%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Azure Knowledge:
-- App Svcs & Functions
-- Azure DevOps & Pipelines
-- Cosmos DB & Table APIs
-- AKS & Container Instances
-- Monitoring & Security</pre>
-            </div>
-          </div>
-          <!-- AWS -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/amazon_aws.png" alt="AWS Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-AWS Knowledge:
-- EC2, Lambda & ECS
-- S3 & CloudFormation
-- IAM, Cognito & ALB
-- Auto-scaling & Alarms
-- EKS & Containerization</pre>
-            </div>
-          </div>
-          <!-- Docker -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/docker.png" alt="Docker Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-Docker Knowledge:
-- Dockerfiles & Multi-stage
-- Image Optimization
-- Compose & Swarm
-- Container Security
-- CI/CD Integration</pre>
-            </div>
-          </div>
-          <!-- Kubernetes -->
-          <div class="programming-language">
-            <div class="progress-container">
-              <img src="assets/icon-images/kubernetes.png" alt="Kubernetes Logo">
-              <div class="progress-bar" id="programmingProgressBar">
-                <span style="width: 90%; background: linear-gradient(135deg, #2d7a87, #4a9ba8)">90%</span>
-              </div>
-            </div>
-            <div class="code-block">
-<pre><b>Level</b>: intermediate or above
-K8s Knowledge:
-- Cluster Mgmt & Scaling
-- Helm Charts & Operators
-- Ingress & Networking
-- Observability (Prom/Grafana)
-- Secrets & ConfigMaps</pre>
-            </div>
-          </div>
-        </div>
-      </div>
-      <span style="font-family: monospace; font-weight: bold;">
-        <a id="resume-download-link" href="https://hackerresume-prod.s3.us-east-1.amazonaws.com/resumes/iceman404/8af7631f-dbb4-4c5d-952d-9439ac75342d.pdf" download="John-Subba-Resume.pdf" target="_blank" rel="noopener noreferrer">Download Resume</a>
-      </span>
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">ICEMAN404</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills" class="active" aria-current="page">Skills</a></li>
+        <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+      </ul>
     </div>
+  </nav>
+
+  <div class="page">
+    <header>
+      <img src="images/profile/mine4.avif" alt="Portrait of John Subba (iceman404)" width="140" height="140" loading="lazy" decoding="async">
+      <h1>Skills, with receipts</h1>
+      <p class="headline">No percentage bars — a skill claim without evidence is decoration. Everything below is
+      backed by shipped work: production AR/VR pipelines, kernel drivers, benchmark suites, and the live demo on my bio page.</p>
+      <a class="resume-btn" href="/resume/John-Resume.pdf" download>
+        <i class="fas fa-file-pdf" aria-hidden="true"></i> Download Résumé (PDF)
+      </a>
+    </header>
+
+    <div class="skills-section">
+      <section class="skill-card" aria-labelledby="skills-gpu">
+        <h2 id="skills-gpu">Heterogeneous Compute</h2>
+        <span class="evidence">Proven at: Himalogic (AR/VR) · GPU architecture research</span>
+        <ul>
+          <li><b>CUDA</b> — Gaussian pyramid, DoG &amp; scale-space kernels; descriptor testing; memory hierarchy &amp; warp-level tuning</li>
+          <li><b>HIP / AMD ROCm</b> — ported foundational CUDA vision kernels to AMD platforms</li>
+          <li><b>Metal (iOS)</b> — Objective-C++ backend with threadgroup sizing for mobile power budgets</li>
+          <li><b>OpenGL ES 3.1/3.2 &amp; WebAssembly</b> — cross-platform execution under strict latency limits</li>
+          <li><b>Benchmarking</b> — NVIDIA vs AMD: throughput, memory bandwidth, occupancy</li>
+        </ul>
+      </section>
+
+      <section class="skill-card" aria-labelledby="skills-systems">
+        <h2 id="skills-systems">Systems Programming</h2>
+        <span class="evidence">Proven at: GuardWare Australia (kernel &amp; security)</span>
+        <ul>
+          <li><b>Modern C++17/20</b> — RAII, move semantics, templates &amp; concepts, lock-free structures, coroutines</li>
+          <li><b>C &amp; the kernel</b> — Linux LKMs, syscalls, raw/BSD sockets, shared-memory IPC</li>
+          <li><b>Windows kernel drivers</b> — C/C++ security enforcement, WinDbg root-cause analysis</li>
+          <li><b>Tooling discipline</b> — Clang-Tidy, PVS-Studio, ASan/UBSan/TSan, GDB/LLDB</li>
+          <li><b>Build systems</b> — CMake, cross-platform CI</li>
+        </ul>
+      </section>
+
+      <section class="skill-card" aria-labelledby="skills-cv">
+        <h2 id="skills-cv">Computer Vision &amp; ML</h2>
+        <span class="evidence">Proven at: <a href="/bio">the live demo on my bio page</a> · SkyReCon · FaceMood</span>
+        <ul>
+          <li><b>Real-time in-browser CV</b> — MediaPipe face/hand/pose landmarkers on GPU delegate + WebGL (running <a href="/bio">right here</a>)</li>
+          <li><b>Feature pipelines</b> — SIFT ported to GPU; brute-force + voxel-grid matching that replaced a failing KD-tree FLANN</li>
+          <li><b>Detection &amp; segmentation</b> — YOLO/SSD, Mask R-CNN, ReFineNet/DLinkNet on satellite imagery</li>
+          <li><b>Frameworks</b> — PyTorch, TensorFlow, OpenCV, MediaPipe, scikit-learn</li>
+          <li><b>Applied LLMs</b> — local-LLM RAG pipeline with real-time 3D avatar rendering; VLM posture feedback</li>
+        </ul>
+      </section>
+
+      <section class="skill-card" aria-labelledby="skills-robotics">
+        <h2 id="skills-robotics">Robotics &amp; Embedded</h2>
+        <span class="evidence">Proven at: sensor-fusion contracting · UAV builds</span>
+        <ul>
+          <li><b>Sensor fusion</b> — KF/EKF/UKF, Lie-group state estimation (SO(3)/SE(3)), SLAM prototyping; &lt;10ms loops on embedded targets</li>
+          <li><b>ROS2</b> — custom low-latency pub/sub with real-time determinism; Carla simulation</li>
+          <li><b>MCU work</b> — ESP32, 8052 assembly, Raspberry Pi; LoRa 433&nbsp;MHz links; Camera2-to-C++ bridges with near-zero-copy buffers</li>
+          <li><b>Flight</b> — custom quadcopter: 330 frame, 4× BLDC, hands-on PID tuning</li>
+        </ul>
+      </section>
+    </div>
+
+    <p class="note">Languages: English (fluent) · Nepali · Hindi &nbsp;|&nbsp; Databases: MySQL, SQL &nbsp;|&nbsp;
+    Cloud &amp; ops exposure: GCP, AWS, Docker &nbsp;|&nbsp; Full history on the <a href="/resume/John-Resume.pdf">résumé</a>.</p>
   </div>
-  
+
   <footer>
+    <a href="/">Back to Home</a>
   </footer>
-  
-  <script>
-    // Example code to handle project selection
-    function handleProjectSelection(projectUrl) {
-      if (projectUrl !== "") {
-        window.location.href = projectUrl;
-      }
-    }
-
-    // Create floating tech icons
-    function createFloatingTech() {
-      const container = document.getElementById('floatingTech');
-      const techIcons = ['{}', '[]', '()', '<>', ';', '=', '+', '#', '$', '%', '&', '*'];
-      
-      for (let i = 0; i < 30; i++) {
-        const icon = document.createElement('div');
-        icon.className = 'tech-icon';
-        icon.textContent = techIcons[Math.floor(Math.random() * techIcons.length)];
-        icon.style.left = Math.random() * 100 + 'vw';
-        icon.style.animationDelay = Math.random() * 20 + 's';
-        icon.style.fontSize = (Math.random() * 20 + 12) + 'px';
-        container.appendChild(icon);
-      }
-    }
-    
-    // Typing effect for the name
-    const nameElement = document.getElementById('name');
-    const cursorElement = document.getElementById('cursor');
-    const nameTexts = [
-      "Embedded-C Developer",
-      "C++ Developer",
-      "Kernel Specialist",
-      "Python Developer",
-      "SQL Expert",
-      "ML Practitioner",
-      "Deep Learning Guru",
-      "Computer Vision Engineer",
-      "GPU Engineer",
-      "NLP Enthusiast",
-      "Cloud Strategist",
-    ];
-    let textIndex = 0;
-    let charIndex = 0;
-
-    function type() {
-      if (charIndex <= nameTexts[textIndex].length) {
-        nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
-        charIndex++;
-        setTimeout(type, 100);
-      } else {
-        cursorElement.style.visibility = 'visible';
-        setTimeout(erase, 2000);
-      }
-    }
-
-    function erase() {
-      if (charIndex >= 0) {
-        nameElement.textContent = nameTexts[textIndex].slice(0, charIndex);
-        charIndex--;
-        setTimeout(erase, 50);
-      } else {
-        textIndex++;
-        if (textIndex >= nameTexts.length) {
-          textIndex = 0;
-        }
-        cursorElement.style.visibility = 'hidden';
-        setTimeout(() => {
-          nameElement.textContent = nameTexts[textIndex];
-          charIndex = 0;
-          type();
-        }, 100);
-      }
-    }
-
-    // Enhanced Raindrops animation - AR theme
-    function createRaindrops() {
-      const container = document.getElementById('raindropsContainer');
-      if (!container) return;
-      
-      const maxDrops = 40;
-      
-      // Clean up finished raindrops
-      const existingDrops = container.querySelectorAll('.raindrop');
-      if (existingDrops.length > maxDrops) {
-        for (let i = 0; i < existingDrops.length - maxDrops; i++) {
-          if (existingDrops[i].parentNode) {
-            existingDrops[i].parentNode.removeChild(existingDrops[i]);
-          }
-        }
-      }
-      
-      // Create new raindrops
-      const dropsToCreate = Math.min(2, maxDrops - container.children.length);
-      
-      for (let i = 0; i < dropsToCreate; i++) {
-        setTimeout(() => {
-          const drop = document.createElement('div');
-          drop.className = 'raindrop';
-          
-          // Random position with slower animation
-          drop.style.left = Math.random() * 100 + 'vw';
-          drop.style.animationDuration = (Math.random() * 2 + 6) + 's';
-          
-          container.appendChild(drop);
-          
-          // Remove the drop after animation completes
-          drop.addEventListener('animationend', () => {
-            if (drop.parentNode) {
-              drop.parentNode.removeChild(drop);
-            }
-          });
-        }, i * 400);
-      }
-    }
-    
-    // Start rain animation
-    function startRain() {
-      createRaindrops();
-      setInterval(createRaindrops, 500);
-    }
-
-    // Initialize Three.js 3D background
-    function init3DBackground() {
-      if (typeof THREE === 'undefined') return;
-      
-      const container = document.getElementById('three-bg');
-      if (!container) return;
-      
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      container.appendChild(renderer.domElement);
-      
-      camera.position.z = 5;
-      
-      // Create floating skill icons in 3D space
-      const icons = ['C++', 'Python', 'ML', 'CV', 'AR', 'VR', 'AI', 'GPU'];
-      const meshes = [];
-      
-      icons.forEach((icon, i) => {
-        const geometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-        const material = new THREE.MeshPhongMaterial({
-          color: 0x4a9ba8,
-          emissive: 0x2d7a87,
-          emissiveIntensity: 0.3,
-          transparent: true,
-          opacity: 0.6
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(
-          (Math.random() - 0.5) * 10,
-          (Math.random() - 0.5) * 10,
-          (Math.random() - 0.5) * 5
-        );
-        mesh.userData = { speed: Math.random() * 0.02 + 0.01 };
-        scene.add(mesh);
-        meshes.push(mesh);
-      });
-      
-      // Add ambient light
-      const ambientLight = new THREE.AmbientLight(0x4a9ba8, 0.5);
-      scene.add(ambientLight);
-      
-      // Add point light
-      const pointLight = new THREE.PointLight(0x4a9ba8, 0.5, 100);
-      pointLight.position.set(5, 5, 5);
-      scene.add(pointLight);
-      
-      // Animation loop
-      function animate() {
-        requestAnimationFrame(animate);
-        
-        meshes.forEach(mesh => {
-          mesh.rotation.x += mesh.userData.speed;
-          mesh.rotation.y += mesh.userData.speed;
-          mesh.position.y += Math.sin(Date.now() * 0.001 + mesh.position.x) * 0.001;
-        });
-        
-        renderer.render(scene, camera);
-      }
-      
-      // Handle resize
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-      
-      animate();
-    }
-
-    // Resume download with fallback
-    function setupResumeDownload() {
-      const resumeLink = document.getElementById('resume-download-link');
-      if (!resumeLink) return;
-      
-      const hackerRankUrl = 'https://hackerresume-prod.s3.us-east-1.amazonaws.com/resumes/iceman404/8af7631f-dbb4-4c5d-952d-9439ac75342d.pdf';
-      const fallbackUrl = './resume/John-Resume.pdf';
-      
-      // Set HackerRank URL as primary
-      resumeLink.href = hackerRankUrl;
-      resumeLink.download = 'John-Subba-Resume.pdf';
-      
-      // Handle click event for fallback
-      resumeLink.addEventListener('click', function(e) {
-        // Try to fetch HackerRank URL first
-        fetch(hackerRankUrl, { method: 'HEAD', mode: 'no-cors' })
-          .then(() => {
-            // HackerRank URL works, let the link proceed normally
-            // The href is already set to hackerRankUrl
-          })
-          .catch(() => {
-            // If HackerRank fails, use fallback
-            e.preventDefault();
-            const fallbackLink = document.createElement('a');
-            fallbackLink.href = fallbackUrl;
-            fallbackLink.download = 'John-Resume.pdf';
-            fallbackLink.target = '_blank';
-            fallbackLink.rel = 'noopener noreferrer';
-            document.body.appendChild(fallbackLink);
-            fallbackLink.click();
-            document.body.removeChild(fallbackLink);
-          });
-      });
-      
-      // Also check on page load and update href if needed
-      fetch(hackerRankUrl, { method: 'HEAD', mode: 'no-cors' })
-        .then(() => {
-          // HackerRank URL is accessible, keep it
-          resumeLink.href = hackerRankUrl;
-        })
-        .catch(() => {
-          // HackerRank URL not accessible, use fallback
-          resumeLink.href = fallbackUrl;
-          resumeLink.download = 'John-Resume.pdf';
-        });
-    }
-
-    // Initialize the page
-    window.addEventListener('load', function() {
-      createFloatingTech();
-      startRain();
-      init3DBackground();
-      type();
-      setupResumeDownload();
-      
-      // Initialize holographic skills after a short delay to ensure DOM is ready
-      setTimeout(() => {
-        if (window.HolographicSkills) {
-          window.HolographicSkills.init();
-        }
-      }, 500);
-    });
-  </script>
 </body>
 </html>
