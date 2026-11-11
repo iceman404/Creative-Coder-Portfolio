@@ -91,20 +91,4 @@
         <priority>0.85</priority>
     </url>
     
-    <!-- Other Pages -->
-    <url>
-        <loc>https://www.iceman404.com/language</loc>
-        <lastmod>2026-02-24</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.5</priority>
-    </url>
-    
-    <!-- 404 Page - Low Priority but included for completeness -->
-    <url>
-        <loc>https://www.iceman404.com/404</loc>
-        <lastmod>2026-02-24</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.1</priority>
-    </url>
-    
 </urlset>
