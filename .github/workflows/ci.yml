@@ -24,20 +24,14 @@ jobs:
       
       - name: Run ESLint
         run: npm run lint
-      
+
       - name: Type check
         run: npm run type-check
-      
-      - name: Run tests
-        run: npm test
-      
+
       - name: Build
         run: npm run build
-      
-      - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v10
-        with:
-          urls: |
-            http://localhost:4173
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+
+      # Note: no `npm test` step — the repo has no test files yet
+      # (vitest exits 1 with "No test files found"). Re-add when tests exist.
+      # Note: no Lighthouse step — nothing serves localhost:4173 in CI,
+      # so the action could never connect.
