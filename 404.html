@@ -20,7 +20,7 @@
   <link rel="canonical" href="https://www.iceman404.com/404" />
   
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   
   <!-- Three.js -->
@@ -40,7 +40,7 @@
     }
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #0a0f11;
       color: #e0f4f7;
       overflow-x: hidden;
@@ -74,34 +74,22 @@
     }
 
     .error-code {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(80px, 20vw, 200px);
-      font-weight: 900;
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54, #4a9ba8);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 8s ease infinite;
+      font-weight: 700;
+      color: #4a9ba8;
       margin-bottom: 20px;
-      letter-spacing: 10px;
-      text-shadow: 0 0 40px rgba(74, 155, 168, 0.5);
+      letter-spacing: 1px;
       line-height: 1;
     }
 
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
     .error-title {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(24px, 4vw, 36px);
       color: #4a9ba8;
       margin-bottom: 30px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 1px;
     }
 
     .error-message {
@@ -158,13 +146,12 @@
       color: #e0f4f7;
       font-size: 16px;
       font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       text-decoration: none;
       display: inline-block;
     }
@@ -177,7 +164,7 @@
     }
 
     .btn.primary {
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      color: #4a9ba8;
     }
 
     .btn.primary:hover {
@@ -186,7 +173,7 @@
 
     .btn:not(a) {
       border: none;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
     }
 
     audio {

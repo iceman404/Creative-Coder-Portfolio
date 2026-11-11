@@ -30,7 +30,7 @@
   <!-- Fonts & icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <!-- Structured data -->
@@ -68,7 +68,7 @@
     }
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #0a0f11;
       color: #e0f4f7;
       overflow-x: hidden;
@@ -113,14 +113,11 @@
     }
 
     nav .logo {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 24px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 2px;
+      font-weight: 700;
+      color: #4a9ba8;
+      letter-spacing: 1px;
       text-decoration: none;
     }
 
@@ -136,8 +133,7 @@
       text-decoration: none;
       font-size: 15px;
       font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
-      text-transform: uppercase;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       letter-spacing: 1px;
       padding: 8px 12px;
       border-radius: 8px;
@@ -182,44 +178,32 @@
 
     .hero .handle-chip {
       display: inline-block;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 14px;
-      letter-spacing: 3px;
+      letter-spacing: 1px;
       color: #4a9ba8;
       border: 1px solid rgba(74, 155, 168, 0.4);
       border-radius: 20px;
       padding: 6px 18px;
       margin-bottom: 22px;
-      text-transform: uppercase;
     }
 
     .hero h1 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(40px, 8vw, 96px);
-      font-weight: 900;
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54, #4a9ba8);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 8s ease infinite;
+      font-weight: 700;
+      color: #4a9ba8;
       margin-bottom: 18px;
-      letter-spacing: 4px;
+      letter-spacing: 1px;
       line-height: 1.15;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
     }
 
     .hero .subtitle {
       font-size: clamp(18px, 2.5vw, 30px);
       color: #4a9ba8;
       font-weight: 300;
-      letter-spacing: 3px;
+      letter-spacing: 1px;
       margin-bottom: 28px;
-      text-transform: uppercase;
     }
 
     .hero .tagline {
@@ -247,13 +231,12 @@
       color: #e0f4f7;
       font-size: 16px;
       font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       text-decoration: none;
       display: inline-block;
     }
@@ -266,7 +249,7 @@
     }
 
     .hero-btn.primary {
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87);
+      color: #4a9ba8;
     }
 
     .hero-btn.primary:hover {
@@ -304,10 +287,9 @@
     }
 
     .social-card span {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 600;
-      text-transform: uppercase;
       letter-spacing: 1px;
     }
 
@@ -375,9 +357,9 @@
     }
 
     .metric-number {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(26px, 3.2vw, 40px);
-      font-weight: 900;
+      font-weight: 700;
       color: #4a9ba8;
       display: block;
       margin-bottom: 8px;
@@ -422,7 +404,7 @@
     }
 
     .profile-info h2 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 32px;
       color: #4a9ba8;
       margin-bottom: 8px;
@@ -457,7 +439,7 @@
       width: 100%;
       background: transparent;
       border: none;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 18px;
       color: #4a9ba8;
       padding: 20px 25px;
@@ -466,7 +448,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      text-transform: uppercase;
       letter-spacing: 1px;
       color: #4a9ba8;
     }
@@ -522,15 +503,12 @@
     }
 
     .projects-header h2 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(32px, 5vw, 56px);
-      font-weight: 900;
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-weight: 700;
+      color: #4a9ba8;
       margin-bottom: 20px;
-      letter-spacing: 3px;
+      letter-spacing: 1px;
     }
 
     .projects-header p {
@@ -591,12 +569,11 @@
     }
 
     .project-title {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: 19px;
       color: #4a9ba8;
       margin-bottom: 12px;
       font-weight: 700;
-      text-transform: uppercase;
       letter-spacing: 1px;
     }
 
@@ -630,11 +607,10 @@
       color: #e0f4f7;
       font-size: 13px;
       font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
       border-radius: 8px;
-      text-transform: uppercase;
       letter-spacing: 1px;
       text-decoration: none;
       text-align: center;
@@ -757,7 +733,7 @@
     .copyright {
       color: #b0d4d9;
       font-size: 14px;
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     /* Scroll to Top Button */
@@ -897,7 +873,7 @@
     @media (max-width: 375px) {
       .hero h1 {
         font-size: 34px;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
       }
 
       .hero .subtitle {

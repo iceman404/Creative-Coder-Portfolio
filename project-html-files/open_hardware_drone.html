@@ -30,7 +30,7 @@
   <meta name="twitter:title" content="ESP32 Open Hardware Drone | John Subba | iceman404">
   <meta name="twitter:description" content="Custom 330-frame quadcopter: 4× BLDC motors, ESP32 telemetry, hands-on PID flight tuning.">
   <meta name="twitter:image" content="https://www.iceman404.com/og/open_hardware_drone.jpg">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <meta name="description" content="ESP32 Open Hardware Drone by John Subba (iceman404). Custom UAV project with ESP32 microcontroller and open hardware design.">
   <script type="application/ld+json">
   {
@@ -67,7 +67,7 @@
     }
 
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #0a0f11;
       color: #e0f4f7;
       overflow-x: hidden;
@@ -106,14 +106,10 @@
     }
 
     header h1 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(24px, 4vw, 36px);
-      font-weight: 900;
-      background: linear-gradient(135deg, #4a9ba8, #2d7a87, #1a4d54);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 0 30px rgba(74, 155, 168, 0.5);
+      font-weight: 700;
+      color: #4a9ba8;
       letter-spacing: 1px;
     }
 
@@ -131,7 +127,7 @@
     }
 
     h2 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(20px, 2.5vw, 28px);
       margin-bottom: 20px;
       color: #4a9ba8;
@@ -225,12 +221,11 @@
       color: #e0f4f7;
       font-size: 16px;
       font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(74, 155, 168, 0.3);
-      text-transform: uppercase;
       letter-spacing: 1px;
     }
 
@@ -301,12 +296,12 @@
   /* Shared site navigation (injected) */
   .site-nav{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(10,15,17,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(74,155,168,.3);box-shadow:0 4px 30px rgba(0,0,0,.5)}
   .site-nav .nav-inner{max-width:1400px;margin:0 auto;padding:14px 40px;display:flex;justify-content:space-between;align-items:center;gap:20px}
-  .nav-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:2px;background:linear-gradient(135deg,#4a9ba8,#2d7a87);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+  .nav-logo{font-family:'Space Grotesk','Inter',sans-serif;font-weight:900;font-size:24px;letter-spacing: 1px;color: #4a9ba8;text-decoration:none}
   .nav-links{display:flex;gap:26px;list-style:none;align-items:center;flex-wrap:wrap}
-  .nav-links a{color:#e0f4f7;text-decoration:none;font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;transition:color .3s ease}
+  .nav-links a{color:#e0f4f7;text-decoration:none;font-family:'Space Grotesk','Inter',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;transition:color .3s ease}
   .nav-links a:hover,.nav-links a.active{color:#4a9ba8}
   .nav-links a.nav-resume{border:2px solid rgba(74,155,168,.5);background:linear-gradient(135deg,#1a4d54,#2d7a87);color:#e0f4f7;padding:6px 14px;border-radius:8px}
-  .nav-links a.nav-resume:hover{background:linear-gradient(135deg,#2d7a87,#4a9ba8);color:#e0f4f7}
+  .nav-links a.nav-resume:hover{background:linear-gradient(135deg,#2d7a87,#4a9ba8);color:#e0f4f7}.site-nav .nav-links li{list-style:none!important;margin:0!important;padding:0!important}.site-nav .nav-links li::before{content:none!important}.site-nav .nav-links li::marker{content:none!important}
   body{padding-top:64px}
   @media(max-width:768px){.site-nav .nav-inner{padding:12px 16px;flex-direction:column;gap:10px}body{padding-top:110px}}
   a:focus-visible,button:focus-visible{outline:2px solid #4a9ba8;outline-offset:3px;border-radius:6px}
