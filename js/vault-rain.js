@@ -1,9 +1,11 @@
 /**
  * vault-rain.js — GPU Lab lock-screen background.
  *
- * A falling-droplet field rendered with WebGPU when the browser exposes
- * it, falling back to a 2D canvas implementation otherwise. Theme-aware
- * via the `--rain-rgb` token (white drops on dark, blue on light).
+ * The same look as the skills-page rain (glowing streaks with a bright
+ * droplet tip), rendered with a WebGPU instanced pipeline when the
+ * browser exposes one, and a 2D canvas implementation otherwise.
+ * Theme-aware via the `--rain-rgb` token: white drops on dark, blue on
+ * light, recolored live on `themechange`.
  *
  * Behaviour contract:
  *   - Disabled entirely under prefers-reduced-motion.
@@ -18,8 +20,8 @@
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  var DROP_COUNT = 140;
-  var mode = null; // 'webgpu' | 'canvas2d'
+  var DROP_COUNT = 22;    // matches the skills-page density (20 concurrent)
+  var mode = null;        // 'webgpu' | 'canvas2d'
   var container = null;
   var rafId = null;
   var running = false;
@@ -31,7 +33,7 @@
       .getPropertyValue('--rain-rgb')
       .trim()
       .split(',')
-      .map(function (x) { return parseFloat(x) / 255; });
+      .map(function (x) { return parseFloat(x); });
     if (raw.length !== 3 || raw.some(isNaN)) return [0.62, 0.76, 0.79];
     return raw;
   }
@@ -57,9 +59,6 @@
   }
 
   window.addEventListener('vault-unlocked', fadeOutAndStop);
-  document.addEventListener('visibilitychange', function () {
-    // rAF is throttled by the browser when hidden; the loop simply skips.
-  });
 
   /* ---------- WebGPU path ---------- */
 
@@ -91,16 +90,15 @@
     '  let r3 = fract(sin(seed * 39.3468) * 43758.5453);',
     '  let r4 = fract(sin(seed * 95.1345) * 43758.5453);',
     '',
-    '  let dropW = 1.5 + r1 * 2.0;',
-    '  let dropH = 16.0 + r2 * 30.0;',
-    '  let speed = 90.0 + r3 * 160.0;',
-    '  let x = r4 * u.width;',
-    '  let travelled = fract(r2 + u.time * speed / max(u.height, 1.0)) * (u.height + 80.0) - 40.0;',
-    '  let sway = sin(u.time * 0.7 + seed * 6.2831) * 8.0;',
+    '  let dropW = 9.0;',
+    '  let dropH = 25.0 + r2 * 20.0;',
+    '  let speed = 110.0 + r3 * 160.0;',
+    '  let x = r1 * u.width;',
+    '  let travelled = fract(r2 + u.time * speed / max(u.height, 1.0)) * (u.height + 60.0) - 30.0;',
     '',
-    '  let px = x + sway + cx * dropW;',
+    '  let px = x + cx * dropW;',
     '  let py = travelled + cy * dropH;',
-    '  let fadeEdges = clamp(min(max(py, 0.0) / 80.0, max(u.height - py, 0.0) / 90.0), 0.0, 1.0);',
+    '  let fadeEdges = clamp(min(max(py, 0.0) / 70.0, max(u.height - py, 0.0) / 80.0), 0.0, 1.0);',
     '',
     '  var vo : VertexOutput;',
     '  vo.pos = vec4<f32>(px / u.width * 2.0 - 1.0, 1.0 - py / u.height * 2.0, 0.0, 1.0);',
@@ -111,9 +109,12 @@
     '',
     '@fragment',
     'fn fs_main(vin : VertexOutput) -> @location(0) vec4<f32> {',
-    '  let head = smoothstep(0.55, 1.0, vin.uv.y);',
-    '  let tail = 0.18 + 0.5 * vin.uv.y;',
-    '  let alpha = u.color.a * vin.fade * (0.15 + 0.85 * head) * tail;',
+    '  let dx = abs(vin.uv.x - 0.5) * 9.0;',
+    '  let core = exp(-dx * dx / 1.1);',
+    '  let halo = exp(-dx * dx / 6.5);',
+    '  let body = mix(0.10, 0.92, vin.uv.y);',
+    '  let tip = smoothstep(0.75, 1.0, vin.uv.y);',
+    '  let alpha = u.color.a * vin.fade * clamp(core * body + halo * 0.38 * body + tip * 0.55, 0.0, 1.0);',
     '  return vec4<f32>(u.color.rgb * alpha, alpha);',
     '}'
   ].join('\n');
@@ -184,9 +185,9 @@
         uniforms[1] = container.clientWidth;
         uniforms[2] = container.clientHeight;
         uniforms[3] = DROP_COUNT;
-        uniforms[4] = rgb[0];
-        uniforms[5] = rgb[1];
-        uniforms[6] = rgb[2];
+        uniforms[4] = rgb[0] / 255;
+        uniforms[5] = rgb[1] / 255;
+        uniforms[6] = rgb[2] / 255;
         uniforms[7] = 0.9;
         device.queue.writeBuffer(uniformBuffer, 0, uniforms);
 
@@ -233,7 +234,7 @@
     if (!ctx) return;
 
     var drops = [];
-    var MAX_DROPS = 60;
+    var MAX_DROPS = 20;
     var rgb = rainRgb();
     var last = performance.now();
 
@@ -243,13 +244,14 @@
     }
     sizeCanvas();
     window.addEventListener('resize', sizeCanvas);
+    window.addEventListener('themechange', function () { rgb = rainRgb(); });
 
     function spawn() {
       drops.push({
-        x: Math.random() * canvas.width,
+        x: 4 + Math.random() * (canvas.width - 8),
         y: -40,
-        v: 90 + Math.random() * 160,
-        l: 16 + Math.random() * 30
+        v: 110 + Math.random() * 160,
+        l: 25 + Math.random() * 20
       });
     }
 
@@ -264,21 +266,32 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       while (drops.length < MAX_DROPS) spawn();
 
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 3;
+
       for (var i = drops.length - 1; i >= 0; i--) {
         var d = drops[i];
         d.y += d.v * dt;
         if (d.y - d.l > canvas.height) { drops.splice(i, 1); continue; }
 
-        var gradient = ctx.createLinearGradient(d.x, d.y - d.l, d.x, d.y);
-        gradient.addColorStop(0, 'rgba(' + rgb.join(',') + ',0)');
-        gradient.addColorStop(1, 'rgba(' + rgb.join(',') + ',0.85)');
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 2;
+        var grad = ctx.createLinearGradient(d.x, d.y - d.l, d.x, d.y);
+        grad.addColorStop(0, 'rgba(' + rgb.join(',') + ',0.08)');
+        grad.addColorStop(0.7, 'rgba(' + rgb.join(',') + ',0.7)');
+        grad.addColorStop(1, 'rgba(' + rgb.join(',') + ',0.9)');
+        ctx.strokeStyle = grad;
+        ctx.shadowColor = 'rgba(' + rgb.join(',') + ',0.45)';
+        ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.moveTo(d.x, d.y - d.l);
         ctx.lineTo(d.x, d.y);
         ctx.stroke();
+
+        ctx.fillStyle = 'rgba(' + rgb.join(',') + ',0.6)';
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, 3, 0, Math.PI * 2);
+        ctx.fill();
       }
+      ctx.shadowBlur = 0;
     }
 
     running = true;
