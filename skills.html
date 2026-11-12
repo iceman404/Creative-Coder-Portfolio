@@ -46,8 +46,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7}
-[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff}
+:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7;--rain-rgb:224,244,247}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff;--rain-rgb:14,114,133}
 
     :root {
       --primary-color: var(--accent-deep);
@@ -84,6 +84,61 @@
       background-size: 50px 50px;
       pointer-events: none;
       z-index: 0;
+    }
+
+
+    /* Raindrops background — white in dark theme, blue in light theme */
+    .raindrops-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .raindrop {
+      position: absolute;
+      top: -30px;
+      width: 3px;
+      height: 25px;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(var(--rain-rgb), 0.9),
+        rgba(var(--rain-rgb), 0.7)
+      );
+      border-radius: 0 0 3px 3px;
+      animation: rainFall linear forwards;
+      pointer-events: none;
+      filter: drop-shadow(0 0 2px rgba(var(--rain-rgb), 0.45));
+      opacity: 0.85;
+    }
+
+    .raindrop::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: rgba(var(--rain-rgb), 0.6);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(var(--rain-rgb), 0.8);
+    }
+
+    @keyframes rainFall {
+      to {
+        transform: translateY(calc(100vh + 60px));
+        opacity: 0.5;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .raindrops-container { display: none; }
     }
 
     /* Shared site navigation */
@@ -336,6 +391,7 @@
 </head>
 <body>
   <div class="background-grid"></div>
+  <div class="raindrops-container" id="raindropsContainer" aria-hidden="true"></div>
 
   <nav class="site-nav" aria-label="Main navigation">
     <div class="nav-inner">
@@ -437,5 +493,46 @@
     paintToggle();});
 })();
 </script>
+  <script>
+  (function () {
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var container = document.getElementById('raindropsContainer');
+    if (!container) return;
+
+    var MAX_DROPS = 40;
+
+    function createRaindrops() {
+      if (document.hidden) return;
+
+      var existing = container.querySelectorAll('.raindrop');
+      if (existing.length > MAX_DROPS) {
+        for (var i = 0; i < existing.length - MAX_DROPS; i++) {
+          if (existing[i].parentNode) existing[i].parentNode.removeChild(existing[i]);
+        }
+      }
+
+      var dropsToCreate = Math.min(2, MAX_DROPS - container.children.length);
+      for (var j = 0; j < dropsToCreate; j++) {
+        (function (delay) {
+          setTimeout(function () {
+            var drop = document.createElement('div');
+            drop.className = 'raindrop';
+            drop.style.left = Math.random() * 100 + 'vw';
+            drop.style.animationDuration = (Math.random() * 2 + 6) + 's';
+            container.appendChild(drop);
+            drop.addEventListener('animationend', function () {
+              if (drop.parentNode) drop.parentNode.removeChild(drop);
+            });
+          }, delay);
+        })(j * 400);
+      }
+    }
+
+    createRaindrops();
+    setInterval(createRaindrops, 500);
+  })();
+  </script>
 </body>
 </html>
