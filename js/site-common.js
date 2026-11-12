@@ -6,6 +6,9 @@
  *                   and broadcasts `themechange` for scene/canvas code.
  *   2. Context menu — blocks right-click with a transient notice;
  *                     form fields are exempt so paste keeps working.
+ *   3. Nav state    — highlights the nav item matching the current URL,
+ *                     so hardcoded "active" classes become a no-JS
+ *                     fallback instead of the source of truth.
  *
  * Contract
  *   - Storage key : 'iceman404-theme' ('light' | 'dark').
@@ -160,11 +163,49 @@
   }
 
   /* ------------------------------------------------------------------
+   * 3. Navigation state
+   * ------------------------------------------------------------------ */
+
+  /**
+   * Matches the current path against root-absolute nav hrefs. The
+   * hardcoded class="active" in the HTML stays as the no-JS fallback;
+   * this module corrects or completes it at runtime.
+   */
+  function initNav() {
+    var path = window.location.pathname
+      .replace(/\/+$/, '')
+      .replace(/\.html$/, '') || '/';
+    if (path === '/index') path = '/';
+
+    var links = document.querySelectorAll('.nav-links a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      var href = link.getAttribute('href');
+
+      // Only root-absolute page links participate; anchors (#projects),
+      // file downloads (resume) and external URLs are never auto-active.
+      if (!href || href.charAt(0) !== '/' || href.indexOf('.') !== -1) continue;
+
+      var target = href.replace(/\/+$/, '') || '/';
+      var isActive = target === path ||
+        (target !== '/' && path.indexOf(target + '/') === 0);
+
+      link.classList.toggle('active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------
    * Entry point
    * ------------------------------------------------------------------ */
 
   function init() {
     initTheme();
+    initNav();
     initContextMenu();
   }
 
