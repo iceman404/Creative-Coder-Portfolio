@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GPU Playground | Metal · CUDA · ROCm · Vulkan | John Subba (iceman404)</title>
-  <meta name="description" content="Metal Forge — a cross-vendor GPU engineering playground: 40 chapters across Metal, CUDA, ROCm/HIP and Vulkan, an in-browser Virtual GPU Lab that compiles and runs kernels, a Real GPU Bridge, and 3D hardware explorers. Live demos coming to this page.">
+  <meta name="description" content="Metal Forge, a cross-vendor GPU engineering playground: 40 chapters across Metal, CUDA, ROCm/HIP and Vulkan, an in-browser Virtual GPU Lab that compiles and runs kernels, a Real GPU Bridge, and 3D hardware explorers. Live demos coming to this page.">
   <meta name="author" content="John Subba" />
   <meta name="last-modified" content="2026-11-12" />
   <link rel="canonical" href="https://www.iceman404.com/gpu-playground" />
@@ -20,12 +20,12 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.iceman404.com/gpu-playground">
   <meta property="og:title" content="GPU Playground | John Subba (iceman404)">
-  <meta property="og:description" content="A cross-vendor GPU engineering lab — Metal, CUDA, ROCm/HIP, Vulkan — with an in-browser kernel lab and 3D hardware explorers. Live demos in development.">
+  <meta property="og:description" content="A cross-vendor GPU engineering lab (Metal, CUDA, ROCm/HIP, Vulkan) with an in-browser kernel lab and 3D hardware explorers. Live demos in development.">
   <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
   <meta property="og:site_name" content="John Subba | iceman404">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="GPU Playground | John Subba (iceman404)">
-  <meta name="twitter:description" content="A cross-vendor GPU engineering lab — Metal, CUDA, ROCm/HIP, Vulkan — with an in-browser kernel lab and 3D hardware explorers.">
+  <meta name="twitter:description" content="A cross-vendor GPU engineering lab (Metal, CUDA, ROCm/HIP, Vulkan) with an in-browser kernel lab and 3D hardware explorers.">
   <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
 
   <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
@@ -233,14 +233,14 @@
 
   <div class="page">
     <header>
-      <span class="status-chip">status: in active development — live demos land here</span>
+      <span class="status-chip">status: in active development · live demos land here</span>
       <h1>The GPU Playground</h1>
       <p class="lead">
-        A cross-vendor GPU engineering course and laboratory — <b>Metal</b> for Apple silicon,
+        A cross-vendor GPU engineering course and laboratory: <b>Metal</b> for Apple silicon,
         <b>CUDA</b> for NVIDIA, <b>ROCm/HIP</b> for AMD, and <b>Vulkan</b> for everything else.
         Forty chapters, a Virtual GPU Lab that compiles and executes kernels in your browser,
-        and a bridge that runs the same kernel on real silicon. The working prototypes exist —
-        they're being packaged for the web, and this page will host the live demos.
+        and a bridge that runs the same kernel on real silicon. The working prototypes exist.
+        They're being packaged for the web, and this page will host the live demos.
       </p>
       <div class="track-row">
         <span>🍎 <b>Metal</b> 17 ch</span>
@@ -255,7 +255,7 @@
       <section class="module-card" aria-labelledby="mod-vgpu">
         <i class="fas fa-microchip mod-icon" aria-hidden="true" id="mod-vgpu"></i>
         <h2>Virtual GPU Lab</h2>
-        <p>Write a kernel in the browser, compile it, and execute it against a simulated GPU —
+        <p>Write a kernel in the browser, compile it, and execute it against a simulated GPU,
         with the memory layout, warps, and occupancy visualized as it runs. No drivers, no install:
         the whole lab is plain HTML/CSS/JS.</p>
         <span class="mod-status">prototype working</span>
@@ -265,7 +265,7 @@
         <i class="fas fa-plug mod-icon" aria-hidden="true" id="mod-bridge"></i>
         <h2>Real GPU Bridge</h2>
         <p>The same kernel you wrote in the lab, compiled and executed on physical NVIDIA and AMD
-        hardware — results cross-verified identical across the Metal, CUDA, ROCm, and Vulkan
+        hardware, with results cross-verified identical across the Metal, CUDA, ROCm, and Vulkan
         engines. Runs locally; your silicon never talks to a server.</p>
         <span class="mod-status">prototype working (localhost)</span>
       </section>
@@ -274,7 +274,7 @@
         <i class="fas fa-cubes mod-icon" aria-hidden="true" id="mod-studio"></i>
         <h2>Hardware Studio</h2>
         <p>Orbit, explode, and click through 3D models of an Apple UMA package and a discrete
-        CPU + GPU board — dies, clusters, memory stacks, VRM and PCIe edges — every part
+        CPU + GPU board: dies, clusters, memory stacks, VRM and PCIe edges. Every part
         labelled, with provenance tiers. Drag in your own .glb to inspect it.</p>
         <span class="mod-status">prototype working</span>
       </section>
@@ -283,7 +283,7 @@
         <i class="fas fa-microscope mod-icon" aria-hidden="true" id="mod-isa"></i>
         <h2>ISA Lab</h2>
         <p>Step through RDNA microcode formats (VOP, SOP, SMEM, DS, MIMG), decode S_WAITCNT's
-        SIMM16 encoding, and watch DPP divergence mechanics — then disassemble one of your own
+        SIMM16 encoding, and watch DPP divergence mechanics, then disassemble one of your own
         kernels on the ROCm track.</p>
         <span class="mod-status">in development</span>
       </section>
@@ -291,9 +291,9 @@
       <section class="module-card" aria-labelledby="mod-infer">
         <i class="fas fa-brain mod-icon" aria-hidden="true" id="mod-infer"></i>
         <h2>Inference Engine Atlas</h2>
-        <p>Twelve units on how LLM inference engines actually work — the decode budget and KV-cache
+        <p>Twelve units on how LLM inference engines actually work: the decode budget and KV-cache
         arithmetic, kernel inventories, sampling math, continuous batching, paged KV, speculative
-        decoding — each with interactive visualizations.</p>
+        decoding, each with interactive visualizations.</p>
         <span class="mod-status">in development</span>
       </section>
 
@@ -302,14 +302,14 @@
         <h2>Four Full Tracks</h2>
         <p>Metal (MSL, TBDR, metal-cpp, Metal 4 tensors), CUDA (PTX/SASS, tensor cores by hand,
         async pipelines, FlashAttention), ROCm/HIP (a porting ladder from saxpy to tiled GEMM),
-        and Vulkan (explicit sync and the barrier model) — each with quizzes and a final exam.</p>
+        and Vulkan (explicit sync and the barrier model), each with quizzes and a final exam.</p>
         <span class="mod-status">in development</span>
       </section>
     </div>
 
     <div class="build-note">
       <b>Why a playground?</b> Because knowledge you can run beats knowledge you skim. Every concept in the
-      curriculum is backed by compilable code, a simulator, or a 3D model — built from the primary references:
+      curriculum is backed by compilable code, a simulator, or a 3D model, built from the primary references:
       the Metal Shading Language specification, the Metal feature-set tables, the metal-cpp API headers, and
       vendor curricula. The portfolio's <a href="/bio" style="color:var(--accent)">live CV demo</a> shows the same
       philosophy applied to computer vision: if it matters, it runs in your browser.

@@ -1,10 +1,10 @@
-# John Subba (iceman404) — Portfolio
+# John Subba (iceman404) Portfolio
 
 <div align="center">
 
 ![Portfolio Preview](./screenshots/0.png)
 
-**Systems & Heterogeneous Compute Engineer — GPU/CUDA · Computer Vision · Embedded Systems**
+**Systems & Heterogeneous Compute Engineer: GPU/CUDA · Computer Vision · Embedded Systems**
 
 [![License](https://img.shields.io/badge/License-CC%20BY%203.0-blue.svg)](http://creativecommons.org/licenses/by/3.0/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
@@ -21,20 +21,20 @@
 
 ## Overview
 
-A hand-built, dependency-free portfolio. No framework, no build step, no site builder —
+A hand-built, dependency-free portfolio. No framework, no build step, no site builder:
 plain HTML/CSS/JS with Three.js and MediaPipe, deployed as-is to GitHub Pages.
 
 The centerpiece is a **live computer-vision demo** on the [bio page](https://www.iceman404.com/bio):
 MediaPipe face/hand/pose tracking runs entirely in your browser and drives a 3D object you can
-grab, move, and resize with your bare hands. All inference is client-side — nothing leaves the device.
+grab, move, and resize with your bare hands. All inference is client-side, so nothing leaves the device.
 
 ## Highlights
 
-- **Real-time CV demo** — MediaPipe tasks-vision on GPU delegate + WebGL rendering
-- **Systems projects** — CUDA/ROCm kernel work, sensor fusion, embedded builds (see the résumé for the production work; the project pages cover the hardware builds)
-- **Zero build pipeline** — what's in the repo is exactly what ships
-- **Static-link CI** — every internal link and asset reference is checked on push
-- **Clean routing** — extensionless URLs handled natively by GitHub Pages
+- **Real-time CV demo**: MediaPipe tasks-vision on GPU delegate + WebGL rendering
+- **Systems projects**: CUDA/ROCm kernel work, sensor fusion, embedded builds (see the résumé for the production work; the project pages cover the hardware builds)
+- **Zero build pipeline**: what's in the repo is exactly what ships
+- **Static-link CI**: every internal link and asset reference is checked on push
+- **Clean routing**: extensionless URLs handled natively by GitHub Pages
 
 ## Tech Stack
 
@@ -86,7 +86,7 @@ GitHub Pages deployment. The custom domain (`www.iceman404.com`) is configured v
 
 ## License
 
-[Creative Commons Attribution 3.0](http://creativecommons.org/licenses/by/3.0/) — see `LICENSE.txt`.
+[Creative Commons Attribution 3.0](http://creativecommons.org/licenses/by/3.0/). See `LICENSE.txt`.
 
 ## Contact
 

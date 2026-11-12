@@ -24,12 +24,12 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.iceman404.com/project-html-files/fine_tuning_resnet50">
   <meta property="og:title" content="Fine-Tuning ResNet50 | John Subba | iceman404">
-  <meta property="og:description" content="Transfer learning on ResNet50 — 88% flower-classification accuracy without significant overfitting.">
+  <meta property="og:description" content="Transfer learning on ResNet50 for 88% flower-classification accuracy without significant overfitting.">
   <meta property="og:image" content="https://www.iceman404.com/og/fine_tuning_resnet50.jpg">
   <meta property="og:site_name" content="John Subba | iceman404">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Fine-Tuning ResNet50 | John Subba | iceman404">
-  <meta name="twitter:description" content="Transfer learning on ResNet50 — 88% flower-classification accuracy without significant overfitting.">
+  <meta name="twitter:description" content="Transfer learning on ResNet50 for 88% flower-classification accuracy without significant overfitting.">
   <meta name="twitter:image" content="https://www.iceman404.com/og/fine_tuning_resnet50.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -368,11 +368,11 @@
 
     <h2>Course Corrections</h2>
     <p>The original target was 95%+ validation accuracy. The first runs made the real constraint obvious:
-    the ceiling was not the model — it was the fine-grained overlap between the 102 flower categories and the
+    the ceiling was not the model, but the fine-grained overlap between the 102 flower categories and the
     per-class data available. Rather than chase the number with increasingly aggressive tuning, the approach
     changed: heavier augmentation, a replaced classification head with dropout for regularization, learning-rate
     scheduling with early stopping, and automatic mixed precision to keep iterations fast. The result was
-    ~88% accuracy without significant overfitting — short of the target, but an honest, deployable model, and
+    ~88% accuracy without significant overfitting: short of the target, but an honest, deployable model, and
     a durable lesson: the dataset sets the ceiling, and recognizing when to stop tuning is part of the job.</p>
     <h2>License</h2>
     <p>This project is licensed under the <strong>MIT License</strong>.</p>
