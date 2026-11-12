@@ -90,12 +90,5 @@
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
     </url>
-    
-    <url>
-        <loc>https://www.iceman404.com/gpu-playground</loc>
-        <lastmod>2026-11-12</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
 
 </urlset>

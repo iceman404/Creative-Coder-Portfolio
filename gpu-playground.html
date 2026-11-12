@@ -4,47 +4,29 @@
 <!--
   Author: John Subba (iceman404)
   Last Modified: 2026-11-12
+
+  PRIVATE PAGE. The content below is AES-256-GCM ciphertext; it renders
+  only after the correct passphrase decrypts it (Web Crypto, PBKDF2).
+  The plaintext lives in private/ (git-ignored) — re-encrypt with
+  tools/lock_page.py.
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPU Playground | Metal · CUDA · ROCm · Vulkan | John Subba (iceman404)</title>
-  <meta name="description" content="Metal Forge, a cross-vendor GPU engineering playground: 40 chapters across Metal, CUDA, ROCm/HIP and Vulkan, an in-browser Virtual GPU Lab that compiles and runs kernels, a Real GPU Bridge, and 3D hardware explorers. Live demos coming to this page.">
+  <meta name="robots" content="noindex">
+  <title>GPU Lab | John Subba (iceman404)</title>
+  <meta name="description" content="Private GPU engineering laboratory. Access requires a passphrase.">
   <meta name="author" content="John Subba" />
-  <meta name="last-modified" content="2026-11-12" />
   <link rel="canonical" href="https://www.iceman404.com/gpu-playground" />
   <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
 
-  <!-- Social sharing -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.iceman404.com/gpu-playground">
-  <meta property="og:title" content="GPU Playground | John Subba (iceman404)">
-  <meta property="og:description" content="A cross-vendor GPU engineering lab (Metal, CUDA, ROCm/HIP, Vulkan) with an in-browser kernel lab and 3D hardware explorers. Live demos in development.">
-  <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
-  <meta property="og:site_name" content="John Subba | iceman404">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GPU Playground | John Subba (iceman404)">
-  <meta name="twitter:description" content="A cross-vendor GPU engineering lab (Metal, CUDA, ROCm/HIP, Vulkan) with an in-browser kernel lab and 3D hardware explorers.">
-  <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
-
   <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.iceman404.com" },
-      { "@type": "ListItem", "position": 2, "name": "GPU Playground", "item": "https://www.iceman404.com/gpu-playground" }
-    ]
-  }
-  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <style>
 :root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7}
@@ -114,48 +96,153 @@
       padding: 120px 20px 60px;
     }
 
-    header {
+    /* ---------- Lock screen ---------- */
+    .vault-lock {
+      max-width: 460px;
+      margin: 8vh auto 0;
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 20px;
+      padding: 40px 36px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.15);
+    }
+
+    .vault-lock .lock-icon {
+      font-size: 30px;
+      color: var(--accent);
+      width: 68px; height: 68px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      border: 2px solid rgba(var(--accent-rgb), 0.4);
+      background: rgba(var(--wash-rgb), 0.25);
+      margin-bottom: 20px;
+    }
+
+    .vault-lock h1 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent);
+      font-size: clamp(1.3rem, 3vw, 1.7rem);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .vault-lock .hint {
+      color: var(--text-dim);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .vault-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(var(--wash-rgb), 0.2);
+      border: 2px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+
+    .vault-input:focus {
+      border-color: var(--accent);
+      background: rgba(var(--wash-rgb), 0.32);
+      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
+    }
+
+    .vault-input::placeholder { color: var(--text-dim); opacity: 0.7; }
+
+    .vault-error {
+      color: #e26d6d;
+      font-size: 0.86rem;
+      min-height: 1.3em;
+      margin-top: 12px;
+    }
+
+    .vault-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 10px;
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent);
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .vault-button:hover {
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(var(--accent-rgb), 0.4);
+    }
+
+    .vault-button:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+    .vault-session {
+      margin-top: 18px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ---------- Decrypted content ---------- */
+    #vault-content { display: none; }
+    #vault-content.visible { display: block; animation: vaultFade 0.5s ease; }
+
+    @keyframes vaultFade {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Content styles mirror the public pages */
+    #vault-content header {
       text-align: center; margin-bottom: 44px;
       padding: 44px 24px;
       background: linear-gradient(135deg, rgba(var(--wash-rgb), 0.3), rgba(var(--grid-rgb), 0.2));
       border-radius: 20px; backdrop-filter: blur(10px);
       border: 1px solid rgba(var(--accent-rgb), 0.3);
     }
-
-    .status-chip {
+    #vault-content .status-chip {
       display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px;
       color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.4);
-      border-radius: 20px; padding: 6px 18px; margin-bottom: 20px; letter-spacing: 0.5px;
+      border-radius: 20px; padding: 6px 18px; margin-bottom: 20px;
     }
-
-    header h1 {
+    #vault-content h1 {
       font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-size: clamp(30px, 5vw, 48px); font-weight: 700;
       color: var(--accent); margin-bottom: 14px; letter-spacing: 0.5px;
     }
-
-    header .lead {
+    #vault-content .lead {
       font-size: clamp(1rem, 1.7vw, 1.15rem); color: var(--text-dim);
       max-width: 780px; margin: 0 auto 26px; line-height: 1.75;
     }
-    header .lead b { color: var(--text); }
-
-    .track-row {
+    #vault-content .lead b { color: var(--text); }
+    #vault-content .track-row {
       display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
       font-family: 'JetBrains Mono', monospace; font-size: 13px;
     }
-    .track-row span {
+    #vault-content .track-row span {
       background: rgba(var(--wash-rgb), 0.25); border: 1px solid rgba(var(--accent-rgb), 0.3);
       border-radius: 8px; padding: 7px 14px; color: var(--text);
     }
-    .track-row span b { color: var(--accent); font-weight: 600; }
-
-    .modules {
+    #vault-content .track-row span b { color: var(--accent); font-weight: 600; }
+    #vault-content .modules {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
       gap: 24px; margin: 30px 0 40px;
     }
-
-    .module-card {
+    #vault-content .module-card {
       background: rgba(var(--bg-rgb), 0.8);
       border: 1px solid rgba(var(--accent-rgb), 0.3);
       border-radius: 16px; padding: 26px;
@@ -163,33 +250,32 @@
       transition: all 0.3s ease;
       display: flex; flex-direction: column;
     }
-    .module-card:hover {
+    #vault-content .module-card:hover {
       border-color: rgba(var(--accent-rgb), 0.65);
       transform: translateY(-4px);
       box-shadow: 0 10px 35px rgba(var(--accent-rgb), 0.22);
     }
-    .module-card .mod-icon { font-size: 26px; color: var(--accent); margin-bottom: 14px; }
-    .module-card h2 {
+    #vault-content .mod-icon { font-size: 26px; color: var(--accent); margin-bottom: 14px; }
+    #vault-content .module-card h2 {
       font-family: 'Space Grotesk', 'Inter', sans-serif;
       color: var(--accent); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;
     }
-    .module-card p { color: var(--text-dim); font-size: 0.94rem; line-height: 1.7; flex: 1; }
-    .module-card .mod-status {
+    #vault-content .module-card p { color: var(--text-dim); font-size: 0.94rem; line-height: 1.7; flex: 1; }
+    #vault-content .mod-status {
       margin-top: 16px; display: inline-block; align-self: flex-start;
       font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.5px;
       padding: 5px 12px; border-radius: 20px;
       background: rgba(var(--wash-rgb), 0.25); border: 1px solid rgba(var(--accent-rgb), 0.35);
       color: var(--accent);
     }
-
-    .build-note {
+    #vault-content .build-note {
       margin-top: 10px; padding: 24px 28px;
       background: rgba(var(--wash-rgb), 0.2);
       border-left: 4px solid var(--accent);
       border-radius: 12px;
       color: var(--text); line-height: 1.75; font-size: 0.97rem;
     }
-    .build-note b { color: var(--accent); }
+    #vault-content .build-note b { color: var(--accent); }
 
     footer {
       text-align: center; padding: 30px 20px 40px;
@@ -198,7 +284,7 @@
     }
     footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-    a:focus-visible, button:focus-visible {
+    a:focus-visible, button:focus-visible, input:focus-visible {
       outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
     }
 
@@ -209,10 +295,10 @@
     @media (max-width: 768px) {
       .site-nav .nav-inner { padding: 12px 16px; flex-direction: column; gap: 10px; }
       .page { padding: 165px 15px 40px; }
-      .module-card { padding: 20px; }
+      .vault-lock { margin-top: 4vh; padding: 30px 22px; }
+      #vault-content .module-card { padding: 20px; }
     }
   </style>
-  <script defer src="js/site-common.js?v=2"></script>
 </head>
 <body>
   <div class="background-grid"></div>
@@ -233,92 +319,211 @@
   </nav>
 
   <div class="page">
-    <header>
-      <span class="status-chip">status: in active development · live demos land here</span>
-      <h1>The GPU Playground</h1>
-      <p class="lead">
-        A cross-vendor GPU engineering course and laboratory: <b>Metal</b> for Apple silicon,
-        <b>CUDA</b> for NVIDIA, <b>ROCm/HIP</b> for AMD, and <b>Vulkan</b> for everything else.
-        Forty chapters, a Virtual GPU Lab that compiles and executes kernels in your browser,
-        and a bridge that runs the same kernel on real silicon. The working prototypes exist.
-        They're being packaged for the web, and this page will host the live demos.
+    <!-- Locked state -->
+    <div class="vault-lock" id="vault-lock">
+      <i class="fas fa-lock lock-icon" aria-hidden="true"></i>
+      <h1>Private GPU Lab</h1>
+      <p class="hint">
+        This area holds work-in-progress GPU engineering demos and is passphrase protected.
+        The page content is stored encrypted; only the correct passphrase can render it.
       </p>
-      <div class="track-row">
-        <span>🍎 <b>Metal</b> 17 ch</span>
-        <span>🟩 <b>CUDA</b> 17 ch</span>
-        <span>🔥 <b>ROCm</b> 15 ch</span>
-        <span>🌋 <b>Vulkan</b> 7 ch</span>
-        <span>📝 251 exam questions</span>
-      </div>
-    </header>
-
-    <div class="modules">
-      <section class="module-card" aria-labelledby="mod-vgpu">
-        <i class="fas fa-microchip mod-icon" aria-hidden="true" id="mod-vgpu"></i>
-        <h2>Virtual GPU Lab</h2>
-        <p>Write a kernel in the browser, compile it, and execute it against a simulated GPU,
-        with the memory layout, warps, and occupancy visualized as it runs. No drivers, no install:
-        the whole lab is plain HTML/CSS/JS.</p>
-        <span class="mod-status">prototype working</span>
-      </section>
-
-      <section class="module-card" aria-labelledby="mod-bridge">
-        <i class="fas fa-plug mod-icon" aria-hidden="true" id="mod-bridge"></i>
-        <h2>Real GPU Bridge</h2>
-        <p>The same kernel you wrote in the lab, compiled and executed on physical NVIDIA and AMD
-        hardware, with results cross-verified identical across the Metal, CUDA, ROCm, and Vulkan
-        engines. Runs locally; your silicon never talks to a server.</p>
-        <span class="mod-status">prototype working (localhost)</span>
-      </section>
-
-      <section class="module-card" aria-labelledby="mod-studio">
-        <i class="fas fa-cubes mod-icon" aria-hidden="true" id="mod-studio"></i>
-        <h2>Hardware Studio</h2>
-        <p>Orbit, explode, and click through 3D models of an Apple UMA package and a discrete
-        CPU + GPU board: dies, clusters, memory stacks, VRM and PCIe edges. Every part
-        labelled, with provenance tiers. Drag in your own .glb to inspect it.</p>
-        <span class="mod-status">prototype working</span>
-      </section>
-
-      <section class="module-card" aria-labelledby="mod-isa">
-        <i class="fas fa-microscope mod-icon" aria-hidden="true" id="mod-isa"></i>
-        <h2>ISA Lab</h2>
-        <p>Step through RDNA microcode formats (VOP, SOP, SMEM, DS, MIMG), decode S_WAITCNT's
-        SIMM16 encoding, and watch DPP divergence mechanics, then disassemble one of your own
-        kernels on the ROCm track.</p>
-        <span class="mod-status">in development</span>
-      </section>
-
-      <section class="module-card" aria-labelledby="mod-infer">
-        <i class="fas fa-brain mod-icon" aria-hidden="true" id="mod-infer"></i>
-        <h2>Inference Engine Atlas</h2>
-        <p>Twelve units on how LLM inference engines actually work: the decode budget and KV-cache
-        arithmetic, kernel inventories, sampling math, continuous batching, paged KV, speculative
-        decoding, each with interactive visualizations.</p>
-        <span class="mod-status">in development</span>
-      </section>
-
-      <section class="module-card" aria-labelledby="mod-curriculum">
-        <i class="fas fa-graduation-cap mod-icon" aria-hidden="true" id="mod-curriculum"></i>
-        <h2>Four Full Tracks</h2>
-        <p>Metal (MSL, TBDR, metal-cpp, Metal 4 tensors), CUDA (PTX/SASS, tensor cores by hand,
-        async pipelines, FlashAttention), ROCm/HIP (a porting ladder from saxpy to tiled GEMM),
-        and Vulkan (explicit sync and the barrier model), each with quizzes and a final exam.</p>
-        <span class="mod-status">in development</span>
-      </section>
+      <form id="vault-form" autocomplete="off">
+        <input type="password" id="vault-pass" class="vault-input" placeholder="passphrase"
+               aria-label="Passphrase" autocomplete="off" spellcheck="false" required>
+        <p class="vault-error" id="vault-error" role="alert"></p>
+        <button type="submit" class="vault-button" id="vault-submit">Unlock</button>
+      </form>
+      <p class="vault-session">session-scoped access &middot; clears when the tab closes</p>
     </div>
 
-    <div class="build-note">
-      <b>Why a playground?</b> Because knowledge you can run beats knowledge you skim. Every concept in the
-      curriculum is backed by compilable code, a simulator, or a 3D model, built from the primary references:
-      the Metal Shading Language specification, the Metal feature-set tables, the metal-cpp API headers, and
-      vendor curricula. The portfolio's <a href="/bio" style="color:var(--accent)">live CV demo</a> shows the same
-      philosophy applied to computer vision: if it matters, it runs in your browser.
-    </div>
+    <!-- Decrypted content target -->
+    <div id="vault-content" aria-hidden="true"></div>
   </div>
 
   <footer>
     <a href="/">Back to Home</a>
   </footer>
+
+  <script defer src="js/site-common.js?v=2"></script>
+
+  <script>
+  // ---------------------------------------------------------------------------
+  // Vault: PBKDF2 (SHA-256, 310k) -> AES-256-GCM. Blob = base64(salt || iv || ct).
+  // Plaintext never ships; re-encrypt via tools/lock_page.py.
+  // ---------------------------------------------------------------------------
+  (function () {
+    'use strict';
+
+    var STORAGE_KEY = 'iceman404-vault-pass'; // sessionStorage: tab-scoped by design
+    var PBKDF2_ITERATIONS = 310000;
+
+    function b64ToBuffer(b64) {
+      var bin = atob(b64.replace(/\s+/g, ''));
+      var buf = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      return buf;
+    }
+
+    function deriveKey(passphrase, salt) {
+      var enc = new TextEncoder();
+      return window.crypto.subtle
+        .importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey'])
+        .then(function (keyMaterial) {
+          return window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt: salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+            keyMaterial,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['decrypt']
+          );
+        });
+    }
+
+    function decryptBlob(passphrase) {
+      var raw = b64ToBuffer(VAULT_BLOB);
+      var salt = raw.slice(0, 16);
+      var iv = raw.slice(16, 28);
+      var ciphertext = raw.slice(28);
+      return deriveKey(passphrase, salt).then(function (key) {
+        return window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
+      }).then(function (plainBuffer) {
+        return new TextDecoder().decode(plainBuffer);
+      });
+    }
+
+    function reveal(html, passphrase) {
+      var target = document.getElementById('vault-content');
+      target.innerHTML = html;
+      target.classList.add('visible');
+      target.setAttribute('aria-hidden', 'false');
+      var lock = document.getElementById('vault-lock');
+      if (lock) lock.style.display = 'none';
+      try { sessionStorage.setItem(STORAGE_KEY, passphrase); } catch (err) { /* best effort */ }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showError(message) {
+      document.getElementById('vault-error').textContent = message;
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
+    }
+
+    function wireForm() {
+      var form = document.getElementById('vault-form');
+      var input = document.getElementById('vault-pass');
+      var submit = document.getElementById('vault-submit');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var pass = input.value;
+        if (!pass) return;
+
+        document.getElementById('vault-error').textContent = '';
+        submit.disabled = true;
+        submit.textContent = 'Deriving key…';
+
+        decryptBlob(pass)
+          .then(function (html) { reveal(html, pass); })
+          .catch(function () { showError('Wrong passphrase.'); })
+          .finally(function () {
+            submit.disabled = false;
+            submit.textContent = 'Unlock';
+            if (document.getElementById('vault-lock').style.display !== 'none') input.focus();
+          });
+      });
+    }
+
+    function tryStoredPass() {
+      var stored = null;
+      try { stored = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* noop */ }
+      if (!stored) return Promise.resolve(false);
+      return decryptBlob(stored)
+        .then(function (html) { reveal(html, stored); return true; })
+        .catch(function () { return false; });
+    }
+
+    function init() {
+      wireForm();
+      tryStoredPass().then(function (unlocked) {
+        if (!unlocked) document.getElementById('vault-pass').focus();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+
+  <script>
+// VAULT:BEGIN ( ciphertext of private/gpu-playground-content.html )
+  var VAULT_BLOB =
+    "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" +
+    "vc6/SXNUQbk=";
+  // VAULT:END
+  </script>
+
 </body>
 </html>

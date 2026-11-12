@@ -17,3 +17,6 @@ node_modules/
 # Secrets
 .env
 .env.*
+
+# Locked-page plaintext (never commit)
+private/
