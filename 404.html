@@ -224,7 +224,7 @@
     }
   </style>
 <style>.theme-toggle{background:transparent;border:2px solid rgba(var(--accent-rgb),.5);color:var(--accent);width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:15px;transition:all .3s ease;display:inline-flex;align-items:center;justify-content:center;margin-left:6px}.theme-toggle:hover{background:rgba(var(--accent-rgb),.15);border-color:var(--accent);transform:translateY(-2px)}.theme-toggle-item{display:flex}</style>
-  <script defer src="js/right-click-guard.js"></script>
+  <script defer src="js/site-common.js?v=1"></script>
 </head>
 
 <body>
@@ -338,22 +338,5 @@
       init3DError();
     }
   </script>
-<script>
-(function(){
-  function currentTheme(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
-  function paintToggle(){var b=document.getElementById('theme-toggle');if(!b)return;var c=currentTheme();
-    b.innerHTML='<i class="fas fa-'+(c==='light'?'moon':'sun')+'" aria-hidden="true"></i>';
-    b.setAttribute('aria-label',c==='light'?'Switch to dark theme':'Switch to light theme');}
-  document.addEventListener('DOMContentLoaded',function(){
-    var b=document.getElementById('theme-toggle');
-    if(b){b.addEventListener('click',function(){
-      var next=currentTheme()==='light'?'dark':'light';
-      document.documentElement.setAttribute('data-theme',next);
-      try{localStorage.setItem('iceman404-theme',next);}catch(e){}
-      document.dispatchEvent(new CustomEvent('themechange',{detail:{theme:next}}));
-      paintToggle();});}
-    paintToggle();});
-})();
-</script>
 </body>
 </html>
