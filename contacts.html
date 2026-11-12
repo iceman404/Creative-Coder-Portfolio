@@ -567,6 +567,7 @@
           <li><a href="/">Home</a></li>
           <li><a href="/bio">Bio</a></li>
           <li><a href="/skills">Skills</a></li>
+          <li><a href="/gpu-playground">GPU Lab</a></li>
           <li><a href="/contacts" class="active" aria-current="page">Contact</a></li>
           <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
         <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
@@ -594,9 +595,6 @@
             <i class="fas fa-envelope socialIcon" aria-hidden="true"></i>
           </a>
         </div>
-        <p style="text-align:center; color:#b0d4d9; font-size:15px; margin-top:-10px;">
-          Prefer email? <a href="mailto:johnsubba404@gmail.com" style="color:#4a9ba8;">johnsubba404@gmail.com</a>
-        </p>
       </div>
 
       <div class="contact-section">
@@ -610,10 +608,6 @@
             <i class="fab fa-instagram"></i>
             <span>Instagram</span>
           </a>
-          <a href="https://x.com/ic3man404" target="_blank" class="social-card-personal twitter" rel="noopener noreferrer">
-            <i class="fab fa-x-twitter"></i>
-            <span>Twitter/X</span>
-          </a>
           <a href="https://www.tiktok.com/@ic3man404" target="_blank" class="social-card-personal tiktok" rel="noopener noreferrer">
             <i class="fab fa-tiktok"></i>
             <span>TikTok</span>
@@ -625,8 +619,7 @@
         <h2 class="section-title">Send a Message</h2>
         <form class="contactForm" action="https://formspree.io/f/myzgrejq" method="POST">
           <div class="formBox">
-            <input type="text" name="firstName" class="input" placeholder="First Name" required />
-            <input type="text" name="lastName" class="input" placeholder="Last Name" required />
+            <input type="text" name="fullName" class="input" placeholder="Full Name" required />
             <input type="email" name="email" class="input" placeholder="Email Address" required />
             <input type="tel" name="phone" class="input" placeholder="Phone Number (Optional)" pattern="\+?[0-9\s\-]{7,15}" title="Enter a valid phone number (digits, spaces, dashes — with optional country code)" />
             <textarea name="message" class="input" placeholder="Your message..." required></textarea>

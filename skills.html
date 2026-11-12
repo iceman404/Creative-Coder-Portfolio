@@ -42,6 +42,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -343,6 +344,7 @@
         <li><a href="/">Home</a></li>
         <li><a href="/bio">Bio</a></li>
         <li><a href="/skills" class="active" aria-current="page">Skills</a></li>
+        <li><a href="/gpu-playground">GPU Lab</a></li>
         <li><a href="/contacts">Contact</a></li>
         <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
         <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
@@ -354,8 +356,9 @@
     <header>
       <img src="images/profile/mine4.avif" alt="Portrait of John Subba (iceman404)" width="140" height="140" loading="lazy" decoding="async">
       <h1>Skills, with receipts</h1>
-      <p class="headline">No percentage bars — a skill claim without evidence is decoration. Everything below is
-      backed by shipped work: production AR/VR pipelines, kernel drivers, benchmark suites, and the live demo on my bio page.</p>
+      <p class="headline">This page is a map of capability, not a self-assessment. Each discipline below is tied to the
+      work that demonstrates it — production GPU pipelines, kernel-mode systems, applied computer vision, and embedded
+      sensor fusion — so the evidence, not the claim, does the talking.</p>
       <a class="resume-btn" href="/resume/John-Resume.pdf" download>
         <i class="fas fa-file-pdf" aria-hidden="true"></i> Download Résumé (PDF)
       </a>
@@ -364,7 +367,7 @@
     <div class="skills-section">
       <section class="skill-card" aria-labelledby="skills-gpu">
         <h2 id="skills-gpu">Heterogeneous Compute</h2>
-        <span class="evidence">Where it shipped: production mobile AR/VR pipelines · <a href="/gpu-playground">the GPU Playground</a> (in development)</span>
+        <span class="evidence">Where it ships: production mobile AR/VR pipelines · <a href="/gpu-playground">the GPU Playground</a> (in development)</span>
         <ul>
           <li><b>CUDA</b> — vision kernels (Gaussian pyramid, DoG, descriptors); coalescing &amp; shared-memory swizzling; tensor cores (mma.sync, ldmatrix); cp.async/TMA pipelines; CUDA Graphs</li>
           <li><b>HIP / AMD ROCm</b> — CUDA-to-HIP porting of vision kernels; RDNA ISA reading (VOP/SOP/SMEM, S_WAITCNT, DPP); rocprof counters &amp; occupancy</li>
@@ -376,7 +379,7 @@
 
       <section class="skill-card" aria-labelledby="skills-systems">
         <h2 id="skills-systems">Systems Programming</h2>
-        <span class="evidence">Where it shipped: Windows security software, kernel-mode</span>
+        <span class="evidence">Where it ships: Windows security software, kernel-mode</span>
         <ul>
           <li><b>Modern C++17/20</b> — RAII, move semantics, templates &amp; concepts, lock-free structures, coroutines</li>
           <li><b>C &amp; the kernel</b> — Linux LKMs, syscalls, raw/BSD sockets, shared-memory IPC</li>
