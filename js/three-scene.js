@@ -12,8 +12,6 @@
     renderer: null,
     particles: null,
     mouse: { x: 0, y: 0 },
-    signatureGeometry: null,
-    signatureMesh: null,
     isInitialized: false,
 
     init() {
@@ -54,12 +52,6 @@
 
       // Create signature particle system
       this.createSignatureParticles();
-      
-      // Create 3D signature text
-      this.createSignatureText();
-      
-      // Create interactive mesh
-      this.createInteractiveMesh();
 
       // Mouse tracking
       this.setupMouseTracking();
@@ -98,18 +90,6 @@
         }
         attr.needsUpdate = true;
       }
-    }
-    if (this.signatureGeometry) {
-      this.signatureGeometry.traverse((o) => {
-        if (o.material && o.material.color) {
-          o.material.color.set(light ? 0x128397 : 0x00b9cc);
-          if (o.material.emissive) o.material.emissive.set(light ? 0xcfe6ea : 0x001122);
-        }
-      });
-    }
-    if (this.interactiveMesh && this.interactiveMesh.material) {
-      this.interactiveMesh.material.color.set(light ? 0x0e7285 : 0x06e8ff);
-      if (this.interactiveMesh.material.emissive) this.interactiveMesh.material.emissive.set(light ? 0xdceef2 : 0x001133);
     }
   },
 
@@ -202,66 +182,6 @@
       this.scene.add(this.particles);
     },
 
-    createSignatureText() {
-      // Create unique 3D geometry pattern
-      const group = new THREE.Group();
-      
-      // Create iceman404 signature pattern (reduced complexity)
-      const geometry = new THREE.TorusKnotGeometry(50, 10, 64, 12); // Reduced segments from 100/16 to 64/12
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x00b9cc,
-        emissive: 0x001122,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.6
-      });
-      
-      this.signatureMesh = new THREE.Mesh(geometry, material);
-      this.signatureMesh.position.set(0, 0, 0);
-      group.add(this.signatureMesh);
-
-      // Add rotating rings (reduced count and complexity)
-      for (let i = 0; i < 3; i++) { // Reduced from 5 to 3
-        const ringGeometry = new THREE.TorusGeometry(60 + i * 20, 2, 8, 32); // Reduced segments from 50 to 32
-        const ringMaterial = new THREE.MeshBasicMaterial({
-          color: new THREE.Color().setHSL(0.5 + i * 0.1, 1, 0.5),
-          transparent: true,
-          opacity: 0.3
-        });
-        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.rotation.x = Math.PI / 2;
-        ring.rotation.z = i * Math.PI / 5;
-        group.add(ring);
-      }
-
-      // Add lights
-      const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-      this.scene.add(ambientLight);
-      
-      const pointLight = new THREE.PointLight(0x00b9cc, 1, 1000);
-      pointLight.position.set(0, 0, 200);
-      this.scene.add(pointLight);
-
-      this.signatureGeometry = group;
-      this.scene.add(group);
-    },
-
-    createInteractiveMesh() {
-      // Create a unique interactive mesh that responds to mouse
-      const geometry = new THREE.IcosahedronGeometry(100, 1);
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x06e8ff,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.3,
-        emissive: 0x001133
-      });
-      
-      this.interactiveMesh = new THREE.Mesh(geometry, material);
-      this.interactiveMesh.position.set(0, 0, -200);
-      this.scene.add(this.interactiveMesh);
-    },
-
     setupMouseTracking() {
       let rafId = null;
       let lastUpdate = 0;
@@ -319,27 +239,6 @@
         this.particles.rotation.y = time * 0.1;
         this.particles.material.uniforms.time.value = time;
         // Removed expensive position recalculation - rotation handles movement
-      }
-
-      // Animate signature geometry
-      if (this.signatureGeometry) {
-        this.signatureGeometry.rotation.x = time * 0.2;
-        this.signatureGeometry.rotation.y = time * 0.3;
-        this.signatureGeometry.rotation.z = time * 0.1;
-        
-        // Pulse effect
-        const scale = 1 + Math.sin(time * 2) * 0.1;
-        this.signatureGeometry.scale.set(scale, scale, scale);
-      }
-
-      // Animate interactive mesh
-      if (this.interactiveMesh) {
-        this.interactiveMesh.rotation.x = time * 0.5;
-        this.interactiveMesh.rotation.y = time * 0.3;
-        
-        // Mouse interaction
-        this.interactiveMesh.position.x = this.mouse.x * 100;
-        this.interactiveMesh.position.y = this.mouse.y * 100;
       }
 
       // Camera movement (reduced sensitivity for smoother performance)
