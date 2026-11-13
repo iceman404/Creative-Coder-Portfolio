@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>GPU Lab | John Subba (iceman404)</title>
-  <meta name="robots" content="noindex">
   <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
   <style>
 :root{color-scheme:dark;--bg:#0a0f11;--text:#e0f4f7;--accent:#4a9ba8;--accent-rgb:74,155,168}
@@ -26,28 +25,7 @@
     }
     @keyframes bootspin { to { transform: rotate(360deg); } }
     #boot .msg { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; }
-    #boot .err { color: #e26d6d; font-size: 13px; max-width: 420px; text-align: center; line-height: 1.6; }
-    #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: none; display: none; background: transparent; }
-    #lab-lock {
-      position: fixed; right: 22px; bottom: 22px; z-index: 500;
-      width: 42px; height: 42px; border-radius: 50%;
-      display: none; align-items: center; justify-content: center;
-      background: rgba(10, 15, 17, 0.82);
-      color: var(--accent);
-      border: 2px solid rgba(var(--accent-rgb), 0.5);
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
-    }
-    [data-theme="light"] #lab-lock { background: rgba(255, 255, 255, 0.9); }
-    #lab-lock:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-      box-shadow: 0 8px 28px rgba(var(--accent-rgb), 0.35);
-    }
-    #lab-lock:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-    body.ready #lab-lock { display: inline-flex; }
-    @media (prefers-reduced-motion: reduce) { #lab-lock { transition: none; } }
+    #boot .err { color: #e26d6d; font-size: 13px; max-width: 460px; text-align: center; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -56,47 +34,21 @@
     <div class="msg" id="boot-msg">Decrypting playground…</div>
     <div class="err" id="boot-err" role="alert"></div>
   </div>
-  <iframe id="app-frame" title="GPU Playground application"></iframe>
-  <button id="lab-lock" type="button" aria-label="End session and lock the GPU Lab" title="End session &amp; lock">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="4" y="11" width="16" height="10" rx="2"></rect>
-      <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
-    </svg>
-  </button>
 
   <script>
   (function () {
     'use strict';
 
     var STORAGE_KEY = 'iceman404-vault-pass';
+    var RETRY_KEY = 'iceman404-lab-retry';
     var bootMsg = document.getElementById('boot-msg');
     var bootErr = document.getElementById('boot-err');
-    var frame = document.getElementById('app-frame');
-
-    function fail(message) {
-      bootErr.textContent = message;
-    }
-
-    var keyInterval = null;
-
-    function endSession() {
-      try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
-      if (keyInterval) { window.clearInterval(keyInterval); keyInterval = null; }
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then(function (regs) {
-          return Promise.all(regs.map(function (r) { return r.unregister(); }));
-        }).catch(function () { /* noop */ }).finally(function () {
-          window.location.replace('/gpu-lab/');
-        });
-        return;
-      }
-      window.location.replace('/gpu-lab/');
-    }
 
     function die(kind) {
       try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
       window.location.replace('/gpu-lab/?stale=1');
-      return new Promise(function () { /* navigation takes over */ });
+      // document.write from a later step replaces this page entirely
+      return new Promise(function () { /* navigation owns the page now */ });
     }
 
     function waitForController(attempt) {
@@ -115,14 +67,14 @@
       }
     }
 
-    function fetchInner(retries) {
+    function fetchInner(retries, pass) {
       return fetch('app-inner.html', { cache: 'no-store' }).then(function (response) {
         if (response.status === 503) {
           // Worker restarted and lost the key: hand it the passphrase again.
           postPass(pass);
           if (retries > 0) {
             return new Promise(function (res) { setTimeout(res, 300); })
-              .then(function () { return fetchInner(retries - 1); });
+              .then(function () { return fetchInner(retries - 1, pass); });
           }
           throw new Error('decryptor-not-ready');
         }
@@ -131,8 +83,6 @@
         return response.text();
       });
     }
-
-    document.getElementById('lab-lock').addEventListener('click', endSession);
 
     function run() {
       var pass = null;
@@ -145,23 +95,23 @@
       // A stale service worker (registered before a fix) can 404 the first
       // boot; reload once to let the updated worker take over, then give up.
       var retried = false;
-      try { retried = sessionStorage.getItem('iceman404-lab-retry') === '1'; } catch (err) { /* noop */ }
+      try { retried = sessionStorage.getItem(RETRY_KEY) === '1'; } catch (err) { /* noop */ }
 
       navigator.serviceWorker.register('sw.js')
         .then(function () { return navigator.serviceWorker.ready; })
         .then(function () { return waitForController(0); })
         .then(function () {
           postPass(pass);
-          return fetchInner(4);
+          return fetchInner(4, pass);
         })
         .then(function (html) {
-          frame.srcdoc = html;
-          frame.style.display = 'block';
-          document.getElementById('boot').style.display = 'none';
-          document.body.classList.add('ready');
-          try { sessionStorage.removeItem('iceman404-lab-retry'); } catch (err) { /* noop */ }
-          // Re-post periodically in case the worker is terminated.
-          keyInterval = window.setInterval(function () { postPass(pass); }, 15000);
+          // The decrypted document becomes this page. All of its subresource
+          // requests now come from a service-worker-controlled document, so
+          // every one of them flows through the decryptor. The boot overlay
+          // and this script are replaced along with the rest of the page.
+          document.open();
+          document.write(html);
+          document.close();
         })
         .catch(function (err) {
           if (String(err).indexOf('bad-pass') !== -1) {
@@ -169,19 +119,14 @@
             return;
           }
           if (!retried) {
-            try { sessionStorage.setItem('iceman404-lab-retry', '1'); } catch (e2) { /* noop */ }
+            try { sessionStorage.setItem(RETRY_KEY, '1'); } catch (e2) { /* noop */ }
             window.location.reload();
             return;
           }
-          try { sessionStorage.removeItem('iceman404-lab-retry'); } catch (e2) { /* noop */ }
-          fail('Could not decrypt the playground (' + String(err.message || err) + '). Go back and unlock again.');
+          try { sessionStorage.removeItem(RETRY_KEY); } catch (e2) { /* noop */ }
+          bootErr.textContent = 'Could not decrypt the playground (' + String(err.message || err) + '). Go back and unlock again.';
         });
     }
-
-    window.addEventListener('unhandledrejection', function (event) {
-      var reason = event.reason && event.reason.message;
-      if (reason === 'bad-pass' || reason === 'stale') die('bad-pass');
-    });
 
     run();
   })();
