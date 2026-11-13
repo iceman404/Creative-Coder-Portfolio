@@ -142,6 +142,11 @@
         return;
       }
 
+      // A stale service worker (registered before a fix) can 404 the first
+      // boot; reload once to let the updated worker take over, then give up.
+      var retried = false;
+      try { retried = sessionStorage.getItem('iceman404-lab-retry') === '1'; } catch (err) { /* noop */ }
+
       navigator.serviceWorker.register('sw.js')
         .then(function () { return navigator.serviceWorker.ready; })
         .then(function () { return waitForController(0); })
@@ -154,6 +159,7 @@
           frame.style.display = 'block';
           document.getElementById('boot').style.display = 'none';
           document.body.classList.add('ready');
+          try { sessionStorage.removeItem('iceman404-lab-retry'); } catch (err) { /* noop */ }
           // Re-post periodically in case the worker is terminated.
           keyInterval = window.setInterval(function () { postPass(pass); }, 15000);
         })
@@ -162,6 +168,12 @@
             die('bad-pass');
             return;
           }
+          if (!retried) {
+            try { sessionStorage.setItem('iceman404-lab-retry', '1'); } catch (e2) { /* noop */ }
+            window.location.reload();
+            return;
+          }
+          try { sessionStorage.removeItem('iceman404-lab-retry'); } catch (e2) { /* noop */ }
           fail('Could not decrypt the playground (' + String(err.message || err) + '). Go back and unlock again.');
         });
     }
