@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>GPU Lab | John Subba (iceman404)</title>
+  <meta name="robots" content="noindex">
+  <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+  <style>
+:root{color-scheme:dark;--bg:#0a0f11;--text:#e0f4f7;--accent:#4a9ba8;--accent-rgb:74,155,168}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--text:#182a2f;--accent:#0e7285;--accent-rgb:14,114,133}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
+    #boot {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      gap: 14px; background: var(--bg); z-index: 100;
+    }
+    #boot .spin {
+      width: 34px; height: 34px;
+      border: 3px solid rgba(var(--accent-rgb), 0.25);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: bootspin 0.9s linear infinite;
+    }
+    @keyframes bootspin { to { transform: rotate(360deg); } }
+    #boot .msg { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; }
+    #boot .err { color: #e26d6d; font-size: 13px; max-width: 420px; text-align: center; line-height: 1.6; }
+    #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: none; display: none; background: transparent; }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <div class="spin" aria-hidden="true"></div>
+    <div class="msg" id="boot-msg">Decrypting playground…</div>
+    <div class="err" id="boot-err" role="alert"></div>
+  </div>
+  <iframe id="app-frame" title="GPU Playground application"></iframe>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var STORAGE_KEY = 'iceman404-vault-pass';
+    var bootMsg = document.getElementById('boot-msg');
+    var bootErr = document.getElementById('boot-err');
+    var frame = document.getElementById('app-frame');
+
+    function fail(message) {
+      bootErr.textContent = message;
+    }
+
+    function die(kind) {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
+      window.location.replace('/gpu-lab/?stale=1');
+      return new Promise(function () { /* navigation takes over */ });
+    }
+
+    function waitForController(attempt) {
+      return new Promise(function (resolve, reject) {
+        if (navigator.serviceWorker.controller) { resolve(); return; }
+        if (attempt > 40) { reject(new Error('controller-timeout')); return; }
+        setTimeout(function () {
+          waitForController(attempt + 1).then(resolve, reject);
+        }, 100);
+      });
+    }
+
+    function postPass(pass) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'pass', pass: pass });
+      }
+    }
+
+    function fetchInner(retries) {
+      return fetch('app-inner.html', { cache: 'no-store' }).then(function (response) {
+        if (response.status === 503) {
+          // Worker restarted and lost the key: hand it the passphrase again.
+          postPass(pass);
+          if (retries > 0) {
+            return new Promise(function (res) { setTimeout(res, 300); })
+              .then(function () { return fetchInner(retries - 1); });
+          }
+          throw new Error('decryptor-not-ready');
+        }
+        if (response.status === 401) throw new Error('bad-pass');
+        if (!response.ok) throw new Error('inner-missing');
+        return response.text();
+      });
+    }
+
+    function run() {
+      var pass = null;
+      try { pass = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* noop */ }
+      if (!pass) {
+        window.location.replace('/gpu-lab/');
+        return;
+      }
+
+      navigator.serviceWorker.register('sw.js')
+        .then(function () { return navigator.serviceWorker.ready; })
+        .then(function () { return waitForController(0); })
+        .then(function () {
+          postPass(pass);
+          return fetchInner(4);
+        })
+        .then(function (html) {
+          frame.srcdoc = html;
+          frame.style.display = 'block';
+          document.getElementById('boot').style.display = 'none';
+          // Re-post periodically in case the worker is terminated.
+          window.setInterval(function () { postPass(pass); }, 15000);
+        })
+        .catch(function (err) {
+          if (String(err).indexOf('bad-pass') !== -1) {
+            die('bad-pass');
+            return;
+          }
+          fail('Could not decrypt the playground (' + String(err.message || err) + '). Go back and unlock again.');
+        });
+    }
+
+    window.addEventListener('unhandledrejection', function (event) {
+      var reason = event.reason && event.reason.message;
+      if (reason === 'bad-pass' || reason === 'stale') die('bad-pass');
+    });
+
+    run();
+  })();
+  </script>
+</body>
+</html>

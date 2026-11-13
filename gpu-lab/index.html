@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>GPU Lab | John Subba (iceman404)</title>
+  <meta name="description" content="Private GPU engineering laboratory. Access requires a passphrase.">
+  <meta name="author" content="John Subba" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+
+  <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7;--rain-rgb:224,244,247}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff;--rain-rgb:36,132,198}
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+    .background-grid {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(var(--grid-rgb), 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--grid-rgb), 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none; z-index: 0;
+    }
+
+    .site-nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(var(--bg-rgb), 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+      box-shadow: 0 4px 30px rgba(var(--shadow-rgb), 0.5);
+    }
+    .site-nav .nav-inner {
+      max-width: 1400px; margin: 0 auto; padding: 14px 40px;
+      display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; font-size: 24px;
+      letter-spacing: 1px; color: var(--accent); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 26px; list-style: none; align-items: center; flex-wrap: wrap; }
+    .nav-links a {
+      color: var(--text); text-decoration: none; font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600; transition: color 0.3s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-links a.nav-resume {
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent); padding: 6px 14px; border-radius: 8px;
+    }
+    .nav-links a.nav-resume:hover { background: linear-gradient(135deg, var(--accent-strong), var(--accent)); color: var(--on-accent); }
+    .theme-toggle {
+      background: transparent; border: 2px solid rgba(var(--accent-rgb), .5); color: var(--accent);
+      width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 15px;
+      transition: all .3s ease; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px;
+    }
+    .theme-toggle:hover { background: rgba(var(--accent-rgb), .15); border-color: var(--accent); transform: translateY(-2px); }
+    .theme-toggle-item { display: flex; }
+
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 120px 20px 60px;
+    }
+
+    .vault-lock {
+      max-width: 460px;
+      margin: 8vh auto 0;
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 20px;
+      padding: 40px 36px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.15);
+    }
+    .vault-lock .lock-icon {
+      font-size: 30px; color: var(--accent);
+      width: 68px; height: 68px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      border: 2px solid rgba(var(--accent-rgb), 0.4);
+      background: rgba(var(--wash-rgb), 0.25);
+      margin-bottom: 20px;
+    }
+    .vault-lock h1 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent);
+      font-size: clamp(1.3rem, 3vw, 1.7rem);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .vault-lock .hint { color: var(--text-dim); font-size: 0.92rem; line-height: 1.6; margin-bottom: 24px; }
+    .vault-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(var(--wash-rgb), 0.2);
+      border: 2px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .vault-input:focus {
+      border-color: var(--accent);
+      background: rgba(var(--wash-rgb), 0.32);
+      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
+    }
+    .vault-input::placeholder { color: var(--text-dim); opacity: 0.7; }
+    .vault-error { color: #e26d6d; font-size: 0.86rem; min-height: 1.3em; margin-top: 12px; }
+    .vault-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 10px;
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent);
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .vault-button:hover {
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(var(--accent-rgb), 0.4);
+    }
+    .vault-session {
+      margin-top: 18px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    @media (max-width: 768px) {
+      .site-nav .nav-inner { padding: 12px 16px; flex-direction: column; gap: 10px; }
+      .page { padding: 165px 15px 40px; }
+      .vault-lock { margin-top: 4vh; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-grid"></div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">ICEMAN404</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="/gpu-playground">Playground</a></li>
+        <li><a href="/gpu-lab/" class="active" aria-current="page">GPU Lab</a></li>
+        <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="vault-lock" id="vault-lock">
+      <i class="fas fa-lock lock-icon" aria-hidden="true"></i>
+      <h1>Private GPU Lab</h1>
+      <p class="hint">
+        Enter the passphrase to open the playground. Session-scoped access
+        clears when the tab closes.
+      </p>
+      <form id="vault-form" autocomplete="off">
+        <input type="password" id="vault-pass" class="vault-input" placeholder="passphrase"
+               aria-label="Passphrase" autocomplete="off" spellcheck="false" required>
+        <p class="vault-error" id="vault-error" role="alert"></p>
+        <button type="submit" class="vault-button" id="vault-submit">Unlock</button>
+      </form>
+      <p class="vault-session">same passphrase as the playground vault</p>
+    </div>
+  </div>
+
+  <footer>
+    <a href="/">Back to Home</a>
+  </footer>
+
+  <script defer src="../js/site-common.js?v=2"></script>
+  <script defer src="../js/vault-rain.js?v=1"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var STORAGE_KEY = 'iceman404-vault-pass';
+
+    function storedPass() {
+      try { return sessionStorage.getItem(STORAGE_KEY); } catch (err) { return null; }
+    }
+    function storePass(pass) {
+      try { sessionStorage.setItem(STORAGE_KEY, pass); } catch (err) { /* best effort */ }
+    }
+
+    function enter() {
+      window.location.replace('/gpu-lab/app.html');
+    }
+
+    function init() {
+      var params = new URLSearchParams(window.location.search);
+
+      // A session that already unlocked elsewhere goes straight in, unless
+      // the app bounced us back with a stale/expired passphrase.
+      if (params.get('stale') === '1') {
+        try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
+        document.getElementById('vault-error').textContent =
+          'Previous session expired. Enter the passphrase again.';
+      } else if (storedPass()) {
+        enter();
+        return;
+      }
+
+      var form = document.getElementById('vault-form');
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var pass = document.getElementById('vault-pass').value;
+        if (!pass) return;
+        storePass(pass);
+        enter();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+</body>
+</html>
