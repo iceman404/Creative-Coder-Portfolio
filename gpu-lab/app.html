@@ -28,6 +28,26 @@
     #boot .msg { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; }
     #boot .err { color: #e26d6d; font-size: 13px; max-width: 420px; text-align: center; line-height: 1.6; }
     #app-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: none; display: none; background: transparent; }
+    #lab-lock {
+      position: fixed; right: 22px; bottom: 22px; z-index: 500;
+      width: 42px; height: 42px; border-radius: 50%;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(10, 15, 17, 0.82);
+      color: var(--accent);
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+    }
+    [data-theme="light"] #lab-lock { background: rgba(255, 255, 255, 0.9); }
+    #lab-lock:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 28px rgba(var(--accent-rgb), 0.35);
+    }
+    #lab-lock:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    body.ready #lab-lock { display: inline-flex; }
+    @media (prefers-reduced-motion: reduce) { #lab-lock { transition: none; } }
   </style>
 </head>
 <body>
@@ -37,6 +57,12 @@
     <div class="err" id="boot-err" role="alert"></div>
   </div>
   <iframe id="app-frame" title="GPU Playground application"></iframe>
+  <button id="lab-lock" type="button" aria-label="End session and lock the GPU Lab" title="End session &amp; lock">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+      <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+    </svg>
+  </button>
 
   <script>
   (function () {
@@ -49,6 +75,22 @@
 
     function fail(message) {
       bootErr.textContent = message;
+    }
+
+    var keyInterval = null;
+
+    function endSession() {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) { /* noop */ }
+      if (keyInterval) { window.clearInterval(keyInterval); keyInterval = null; }
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          return Promise.all(regs.map(function (r) { return r.unregister(); }));
+        }).catch(function () { /* noop */ }).finally(function () {
+          window.location.replace('/gpu-lab/');
+        });
+        return;
+      }
+      window.location.replace('/gpu-lab/');
     }
 
     function die(kind) {
@@ -90,6 +132,8 @@
       });
     }
 
+    document.getElementById('lab-lock').addEventListener('click', endSession);
+
     function run() {
       var pass = null;
       try { pass = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* noop */ }
@@ -109,8 +153,9 @@
           frame.srcdoc = html;
           frame.style.display = 'block';
           document.getElementById('boot').style.display = 'none';
+          document.body.classList.add('ready');
           // Re-post periodically in case the worker is terminated.
-          window.setInterval(function () { postPass(pass); }, 15000);
+          keyInterval = window.setInterval(function () { postPass(pass); }, 15000);
         })
         .catch(function (err) {
           if (String(err).indexOf('bad-pass') !== -1) {
