@@ -328,19 +328,6 @@
   <script>
   (function () {
     'use strict';
-    function set(id, value) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = value;
-    }
-    function browserFamily() {
-      var ua = navigator.userAgent;
-      if (/Edg\//.test(ua)) return 'edge';
-      if (/OPR\//.test(ua)) return 'opera';
-      if (/Brave/.test(ua)) return 'brave';
-      if (/Firefox/.test(ua)) return 'firefox';
-      if (/Safari/.test(ua) && !/Chrom/.test(ua)) return 'safari';
-      return 'chromium';
-    }
 
     function detectedEnv() {
       var ua = navigator.userAgent;
@@ -357,6 +344,59 @@
       return browser + (ver ? ' ' + ver : '') + ' on ' + os;
     }
 
+    function el(id) { return document.getElementById(id); }
+    function set(id, value) { var e = el(id); if (e) e.textContent = value; }
+
+    var GOOD_FEATURES = ['shader-f16', 'timestamp-query', 'subgroups'];
+
+    function adapterName(a) {
+      var info = a.info || {};
+      var name = [info.vendor, info.device, info.architecture].filter(Boolean).join(' / ');
+      return name || 'WebGPU adapter';
+    }
+
+    function featureFlags(a) {
+      var f = Array.from(a.features || []);
+      return {
+        f16: f.indexOf('shader-f16') !== -1,
+        ts: f.indexOf('timestamp-query') !== -1,
+        sg: f.indexOf('subgroups') !== -1,
+        raw: f
+      };
+    }
+
+    function describe(a, tag) {
+      var feats = featureFlags(a);
+      var limits = a.limits || {};
+      var score = (feats.f16 ? 2 : 0) + (feats.ts ? 1 : 0) + (feats.sg ? 1 : 0) + (a.isFallbackAdapter ? -3 : 0);
+      return {
+        adapter: a,
+        tag: tag,
+        name: adapterName(a),
+        fallback: !!a.isFallbackAdapter,
+        features: feats,
+        score: score,
+        wg: limits.maxComputeWorkgroupSizeX || null,
+        buf: limits.maxStorageBufferBindingSize || null
+      };
+    }
+
+    function renderRow(d, best) {
+      var cls = d.fallback ? 'bad' : 'ok';
+      var stars = (d === best) ? ' ★ recommended for compute labs' : '';
+      var feats = [
+        d.features.f16 ? 'shader-f16' : null,
+        d.features.ts ? 'timestamp-query' : null,
+        d.features.sg ? 'subgroups' : null
+      ].filter(Boolean).join(', ') || 'no compute-relevant features';
+      var html = '<div class="' + cls + '"><b>' + d.name + '</b>' + stars +
+        ' <span style="opacity:0.65">[' + d.tag + ']' + (d.fallback ? ' ⚠ software fallback' : '') + '</span><br>' +
+        '<span style="font-size:0.85rem;opacity:0.8">features: ' + feats +
+        ' · max workgroup: ' + (d.wg ? d.wg + ' threads' : 'reported') +
+        ' · max buffer binding: ' + (d.buf ? Math.round(d.buf / (1024 * 1024)) + ' MB' : 'reported') + '</span></div>';
+      return html;
+    }
+
     function start() {
       if (!navigator.gpu) {
         set('gi-available', 'not available on ' + detectedEnv());
@@ -365,47 +405,62 @@
         set('gi-buf', 'n/a');
         set('gi-f16', 'n/a');
         set('gi-ts', 'n/a');
-        var guide = document.getElementById('enable-guide');
+        var guide = el('enable-guide');
         if (guide) {
           guide.hidden = false;
-          var fam = browserFamily();
-          var li = guide.querySelector('li[data-family="' + fam + '"]');
-          if (li) { li.style.borderLeft = '3px solid var(--accent)'; li.scrollIntoView({ block: 'nearest' }); }
+          var famli = guide.querySelector('li[data-family="' + browserFamily() + '"]');
+          if (famli) famli.style.borderLeft = '3px solid var(--accent)';
         }
         return;
       }
-      navigator.gpu.requestAdapter().then(function (adapter) {
-        if (!adapter) {
-          set('gi-available', 'no Vulkan adapter visible to ' + detectedEnv());
-          set('gi-adapter', 'flag or driver needed: guide below');
-          ['gi-wg', 'gi-buf', 'gi-f16', 'gi-ts'].forEach(function (id) { set(id, 'n/a'); });
-          var guide = document.getElementById('enable-guide');
-          if (guide) {
-            guide.hidden = false;
-            var famli = guide.querySelector('li[data-family="' + browserFamily() + '"]');
-            if (famli) famli.style.borderLeft = '3px solid var(--accent)';
-          }
+
+      set('gi-available', 'available on ' + detectedEnv());
+      set('gi-adapter', 'enumerating adapters…');
+
+      var requests = [
+        { opts: {}, tag: 'default' },
+        { opts: { powerPreference: 'high-performance' }, tag: 'high-performance' },
+        { opts: { powerPreference: 'low-power' }, tag: 'low-power' }
+      ];
+
+      var chain = Promise.resolve();
+      var seen = {};
+      var adapters = [];
+
+      requests.forEach(function (req) {
+        chain = chain.then(function () {
+          return navigator.gpu.requestAdapter(req.opts).then(function (a) {
+            if (!a) return;
+            var d = describe(a, req.tag);
+            var key = d.name + '|' + d.tag;
+            if (seen[key]) return;
+            seen[key] = 1;
+            adapters.push(d);
+          }).catch(function () { /* skip */ });
+        });
+      });
+
+      chain.then(function () {
+        var list = el('gpu-inspector');
+        if (!list) return;
+        if (!adapters.length) {
+          list.innerHTML = '<div class="bad">no adapters returned — enablement guide below</div>';
+          var g = el('enable-guide');
+          if (g) g.hidden = false;
           return;
         }
-        set('gi-available', 'available');
-        var info = adapter.info || {};
-        var adapterName = [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported';
-        set('gi-adapter', adapterName);
-        if (/swiftshader/i.test(adapterName)) {
-          set('gi-adapter', adapterName + ' (software renderer: flag or snap issue, guide below)');
-          var g = document.getElementById('enable-guide');
-          if (g) g.hidden = false;
-        }
-        var limits = adapter.limits || {};
-        set('gi-wg', limits.maxComputeWorkgroupSizeX ? limits.maxComputeWorkgroupSizeX + ' threads' : 'reported');
-        set('gi-buf', limits.maxStorageBufferBindingSize ? Math.round(limits.maxStorageBufferBindingSize / (1024 * 1024)) + ' MB' : 'reported');
-        var f = adapter.features ? Array.from(adapter.features) : [];
-        set('gi-f16', f.indexOf('shader-f16') !== -1 ? 'supported' : 'not exposed');
-        set('gi-ts', f.indexOf('timestamp-query') !== -1 ? 'supported' : 'not exposed');
-      }).catch(function () {
-        set('gi-available', 'adapter request failed');
+        var best = null;
+        adapters.forEach(function (d) {
+          if (!d.fallback && (!best || d.score > best.score)) best = d;
+        });
+        list.innerHTML = adapters
+          .slice()
+          .sort(function (a, b) { return b.score - a.score; })
+          .map(function (d) { return renderRow(d, best); })
+          .join('');
       });
     }
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', start);
     } else {
