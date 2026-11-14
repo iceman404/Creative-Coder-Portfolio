@@ -389,7 +389,13 @@
         }
         set('gi-available', 'available');
         var info = adapter.info || {};
-        set('gi-adapter', [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported');
+        var adapterName = [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported';
+        set('gi-adapter', adapterName);
+        if (/swiftshader/i.test(adapterName)) {
+          set('gi-adapter', adapterName + ' (software renderer: flag or snap issue, guide below)');
+          var g = document.getElementById('enable-guide');
+          if (g) g.hidden = false;
+        }
         var limits = adapter.limits || {};
         set('gi-wg', limits.maxComputeWorkgroupSizeX ? limits.maxComputeWorkgroupSizeX + ' threads' : 'reported');
         set('gi-buf', limits.maxStorageBufferBindingSize ? Math.round(limits.maxStorageBufferBindingSize / (1024 * 1024)) + ' MB' : 'reported');
