@@ -268,6 +268,13 @@
         <li data-family="safari"><b>Safari 26+:</b> shipped on macOS and iOS; update the OS.</li>
         <li data-family="linux"><b>Linux (any browser):</b> a working Vulkan driver is required; verify with
         <code>vulkaninfo</code>.</li>
+        <li><b>Linux, hybrid laptops (verified on RTX 5050 + Radeon 780M):</b> if adapter
+        requests hang or return empty, isolate the Vulkan driver per launch:
+        <code>VK_DRIVER_FILES=/usr/share/vulkan/icd.d/radeon_icd.x86_64.json chromium</code>
+        (AMD) or <code>nvidia_icd.x86_64.json</code> (NVIDIA). One driver may hang Dawn's
+        enumeration; the other may enumerate but get rejected. Chromium-family + NVIDIA
+        595.x confirmed hanging here; Firefox (wgpu) uses a different implementation and
+        may behave differently.</li>
       </ul>
       <p style="margin-top:10px; font-size:0.85rem; color:var(--text-dim);">
         A website cannot flip browser flags. These are the switches on your side, and the
