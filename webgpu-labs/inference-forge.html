@@ -255,6 +255,22 @@
     <div class="list-card"><h2>What it will demonstrate</h2><ul><li>Packed 4-bit weight GEMM with dequantize-on-load, benchmarked against fp16</li><li>RoPE and RMSNorm as fused WGSL passes</li><li>Causal attention with a persistent KV cache, visualized as it fills</li><li>Top-p sampling with a live token stream</li><li>A per-kernel latency dashboard driven by GPU timestamp queries</li></ul></div>
     <div class="list-card"><h2>Roadmap</h2><ul><li>Milestone 1: fp16 forward pass of a GPT-2 class model, correctness ledger vs fp32</li><li>Milestone 2: causal attention with a persistent KV cache</li><li>Milestone 3: 4-bit quantized kernels and packed weight loading</li><li>Milestone 4: streaming UI with per-kernel instrumentation</li></ul></div>
     <div class="list-card"><h2>The honest benchmark</h2><ul><li>Target: memory-bound decode within striking distance of llama.cpp, on every GPU vendor, from a single URL</li><li>Milestone 1 numbers will be published here, unedited</li></ul></div>
+    <div class="list-card">
+      <h2>Model registry (planned)</h2>
+      <ul>
+        <li><b>GPT-2 124M (fp16):</b> 0.25 GB, 4 shards &middot; tier: milestone 1 model</li>
+        <li><b>Qwen3-0.6B (Q4):</b> 0.4 GB, 6 shards &middot; tier B</li>
+        <li><b>Qwen3-1.7B (Q4):</b> 1.1 GB, 14 shards &middot; tier B</li>
+        <li><b>Qwen3-4B (Q4):</b> 2.5 GB, 32 shards &middot; tier A</li>
+        <li><b>Qwen3-8B (Q4):</b> 5.0 GB, 63 shards &middot; tier S</li>
+        <li><b>Source:</b> HuggingFace resolve endpoints (CORS enabled), streamed with progress, SHA-256 verified per shard, cached in the browser Cache API</li>
+        <li><b>Loader:</b> resume via byte-offset tracking and Range requests; cached shards are reused when the registry hash matches; the device tier gates which models unlock</li>
+      </ul>
+      <p style="margin-top:12px; font-size:0.88rem; color:var(--text-dim);">
+        The full engineering blueprint is public:
+        <a href="https://github.com/iceman404/Creative-Coder-Portfolio/blob/main/docs/webgpu-labs-blueprint.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">docs/webgpu-labs-blueprint.md</a></p>
+    </div>
+
     <div class="prose" style="text-align:center;">
       Questions or collaboration: <a href="/contacts" style="color:var(--accent);">contact</a>.
       Progress notes land on the <a href="/" style="color:var(--accent);">main page</a> as milestones ship.
