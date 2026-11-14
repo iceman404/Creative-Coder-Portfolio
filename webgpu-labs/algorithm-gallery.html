@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithm Gallery | GPU Solver Visualizations | John Subba (iceman404)</title>
+  <meta name="description" content="Interactive GPU solver visualizations from the research literature: multi-scale variational optical flow, material point method simulation, and ReSTIR-style path tracing. Base implementations open, optimized variants in the vault.">
+  <meta name="author" content="John Subba" />
+  <meta name="last-modified" content="2026-11-14" />
+  <link rel="canonical" href="https://www.iceman404.com/webgpu-labs/algorithm-gallery" />
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.iceman404.com/webgpu-labs/algorithm-gallery">
+  <meta property="og:title" content="Algorithm Gallery | GPU Solver Visualizations">
+  <meta property="og:description" content="Live WebGPU algorithm laboratories: hand-written quantized LLM inference, computer vision kernel races, 3D Gaussian Splatting, and AR/VR research.">
+  <meta property="og:image" content="https://www.iceman404.com/og/og-main.jpg">
+  <meta property="og:site_name" content="John Subba | iceman404">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Algorithm Gallery | GPU Solver Visualizations">
+  <meta name="twitter:description" content="Live WebGPU algorithm laboratories: hand-written quantized LLM inference, computer vision kernel races, 3D Gaussian Splatting, and AR/VR research.">
+  <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.iceman404.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "WebGPU Labs",
+      "item": "https://www.iceman404.com/webgpu-labs"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Algorithm Gallery",
+      "item": "https://www.iceman404.com/webgpu-labs/algorithm-gallery"
+    }
+  ]
+}
+  }
+  </script>
+
+  <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+:root{color-scheme:dark;--bg:#0a0f11;--bg-rgb:10,15,17;--text:#e0f4f7;--text-dim:#b0d4d9;--accent:#4a9ba8;--accent-rgb:74,155,168;--accent-strong:#2d7a87;--accent-deep:#1a4d54;--accent-muted:#7fb5be;--wash-rgb:26,77,84;--grid-rgb:45,122,135;--shadow-rgb:0,0,0;--on-accent:#e0f4f7}
+[data-theme="light"]{color-scheme:light;--bg:#f5f8f9;--bg-rgb:255,255,255;--text:#182a2f;--text-dim:#47626a;--accent:#0e7285;--accent-rgb:14,114,133;--accent-strong:#0c6070;--accent-deep:#084b57;--accent-muted:#44717a;--wash-rgb:14,114,133;--grid-rgb:14,114,133;--shadow-rgb:30,60,66;--on-accent:#ffffff}
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+    .background-grid {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(var(--grid-rgb), 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--grid-rgb), 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none; z-index: 0;
+    }
+
+    .site-nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(var(--bg-rgb), 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+      box-shadow: 0 4px 30px rgba(var(--shadow-rgb), 0.5);
+    }
+    .site-nav .nav-inner {
+      max-width: 1400px; margin: 0 auto; padding: 14px 40px;
+      display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; font-size: 24px;
+      letter-spacing: 1px; color: var(--accent); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 22px; list-style: none; align-items: center; flex-wrap: wrap; }
+    .nav-links a {
+      color: var(--text); text-decoration: none; font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600; transition: color 0.3s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-links a.nav-resume {
+      border: 2px solid rgba(var(--accent-rgb), 0.5);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent-strong));
+      color: var(--on-accent); padding: 6px 14px; border-radius: 8px;
+    }
+    .nav-links a.nav-resume:hover { background: linear-gradient(135deg, var(--accent-strong), var(--accent)); color: var(--on-accent); }
+    .theme-toggle {
+      background: transparent; border: 2px solid rgba(var(--accent-rgb), .5); color: var(--accent);
+      width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 15px;
+      transition: all .3s ease; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px;
+    }
+    .theme-toggle:hover { background: rgba(var(--accent-rgb), .15); border-color: var(--accent); transform: translateY(-2px); }
+    .theme-toggle-item { display: flex; }
+
+    .breadcrumbs {
+      position: relative; z-index: 1;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+    .breadcrumbs a { color: var(--accent); text-decoration: none; }
+    .breadcrumbs a:hover { text-decoration: underline; }
+    .breadcrumbs .sep { margin: 0 8px; opacity: 0.6; }
+
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    header {
+      text-align: center; margin-bottom: 44px;
+      padding: 44px 24px;
+      background: linear-gradient(135deg, rgba(var(--wash-rgb), 0.3), rgba(var(--grid-rgb), 0.2));
+      border-radius: 20px; backdrop-filter: blur(10px);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+    }
+    header .status-chip {
+      display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border-radius: 20px; padding: 6px 18px; margin-bottom: 20px;
+    }
+    header h1 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent); font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+      font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px;
+    }
+    header .headline {
+      color: var(--text-dim); font-size: clamp(1rem, 1.7vw, 1.15rem);
+      max-width: 820px; margin: 0 auto; line-height: 1.75;
+    }
+    header .headline b { color: var(--text); }
+
+    .card-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 24px; margin: 30px 0 40px;
+    }
+    a.module-card {
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 16px; padding: 26px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      display: flex; flex-direction: column;
+      text-decoration: none;
+    }
+    a.module-card:hover {
+      border-color: rgba(var(--accent-rgb), 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 35px rgba(var(--accent-rgb), 0.22);
+    }
+    .mod-icon { font-size: 26px; color: var(--accent); margin-bottom: 14px; }
+    .module-card h2 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;
+    }
+    .module-card p { color: var(--text-dim); font-size: 0.94rem; line-height: 1.7; flex: 1; }
+    .module-card p b { color: var(--text); }
+    .mod-status {
+      margin-top: 16px; display: inline-block; align-self: flex-start;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.5px;
+      padding: 5px 12px; border-radius: 20px;
+      background: rgba(var(--wash-rgb), 0.25); border: 1px solid rgba(var(--accent-rgb), 0.35);
+      color: var(--accent);
+    }
+
+    .list-card {
+      background: rgba(var(--wash-rgb), 0.2);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 24px 28px; margin: 26px 0;
+      line-height: 1.75; font-size: 0.97rem;
+    }
+    .list-card h2 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent); font-size: 1.05rem; margin-bottom: 12px;
+    }
+    .list-card ul { list-style: none; }
+    .list-card li {
+      padding: 7px 0 7px 22px; position: relative;
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+      color: var(--text); font-size: 0.95rem;
+    }
+    .list-card li:last-child { border-bottom: none; }
+    .list-card li::before { content: '\25B8'; position: absolute; left: 2px; color: var(--accent); }
+    .list-card li b { color: var(--text); }
+
+    footer {
+      text-align: center; padding: 30px 20px 40px;
+      border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+      position: relative; z-index: 1;
+    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    @media (max-width: 768px) {
+      .site-nav .nav-inner { padding: 12px 16px; flex-direction: column; gap: 10px; }
+      .page { padding: 165px 15px 40px; }
+      .module-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-grid"></div>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">ICEMAN404</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bio">Bio</a></li>
+        <li><a href="/skills">Skills</a></li>
+        <li><a href="/webgpu-labs">WebGPU Labs</a></li>
+        <li><a href="/gpu-lab/">GPU Lab</a></li>
+        <li><a href="/contacts">Contact</a></li>
+        <li><a href="/resume/John-Resume.pdf" class="nav-resume" download>Résumé</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"><i class="fas fa-sun" aria-hidden="true"></i></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a><span class="sep">/</span><span aria-current="page">Algorithm Gallery</span>
+    </nav>
+
+        <header>
+      <span class="status-chip">in development</span>
+      <h1>Algorithm Gallery</h1>
+      <p class="headline">Solver visualizations from the research literature, <b>interactive</b>: each entry ships with its base implementation open and its optimized variant sealed in the vault, with the measured delta on screen.</p>
+    </header>
+    <div class="list-card"><h2>Gallery entries</h2><ul><li>Flow Field: multi-scale variational optical flow (TV-L1) on the live webcam feed</li><li>Material World: material point method simulation with workgroup-shared neighbor search</li><li>Light Forge: a ReSTIR-style path tracer with progressive accumulation</li><li>Splat Scene: 3D Gaussian Splatting with a GPU radix sort and tile-binned rasterization</li></ul></div>
+    <div class="list-card"><h2>Roadmap</h2><ul><li>Milestone 1: Flow Field</li><li>Milestone 2: Material World</li><li>Milestone 3: Light Forge</li><li>Milestone 4: Splat Scene</li></ul></div>
+    <div class="prose" style="text-align:center;">
+      Questions or collaboration: <a href="/contacts" style="color:var(--accent);">contact</a>.
+      Progress notes land on the <a href="/" style="color:var(--accent);">main page</a> as milestones ship.
+    </div>
+
+    <footer>
+    <a href="/">Back to Home</a>
+  </footer>
+
+  <script defer src="../js/site-common.js?v=2"></script>
+  <script>
+  (function () {
+    'use strict';
+    function set(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+    function start() {
+      if (!navigator.gpu) {
+        set('gi-available', 'not available in this browser');
+        set('gi-adapter', 'demos fall back to WebGL');
+        set('gi-wg', 'n/a');
+        set('gi-buf', 'n/a');
+        set('gi-f16', 'n/a');
+        set('gi-ts', 'n/a');
+        return;
+      }
+      navigator.gpu.requestAdapter().then(function (adapter) {
+        if (!adapter) { set('gi-available', 'no GPU adapter found'); return; }
+        set('gi-available', 'available');
+        var info = adapter.info || {};
+        set('gi-adapter', [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported');
+        var limits = adapter.limits || {};
+        set('gi-wg', limits.maxComputeWorkgroupSizeX ? limits.maxComputeWorkgroupSizeX + ' threads' : 'reported');
+        set('gi-buf', limits.maxStorageBufferBindingSize ? Math.round(limits.maxStorageBufferBindingSize / (1024 * 1024)) + ' MB' : 'reported');
+        var f = adapter.features ? Array.from(adapter.features) : [];
+        set('gi-f16', f.indexOf('shader-f16') !== -1 ? 'supported' : 'not exposed');
+        set('gi-ts', f.indexOf('timestamp-query') !== -1 ? 'supported' : 'not exposed');
+      }).catch(function () {
+        set('gi-available', 'adapter request failed');
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+  })();
+  </script>
+</body>
+</html>

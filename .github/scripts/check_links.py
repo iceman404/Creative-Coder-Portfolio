@@ -36,7 +36,7 @@ def resolve(base_dir: pathlib.Path, link: str):
     return target
 
 
-SKIP_DIRS = {"node_modules", "dist", "build", ".git"}
+SKIP_DIRS = {"node_modules", "dist", "build", ".git", "private"}
 
 html_files = sorted(
     p for p in ROOT.rglob("*.html")
