@@ -342,9 +342,24 @@
       return 'chromium';
     }
 
+    function detectedEnv() {
+      var ua = navigator.userAgent;
+      var m = ua.match(/(Firefox|Edg|OPR|Chrome|Safari)\/([\d.]+)/);
+      var browser = m ? (m[1] === 'Edg' ? 'Edge' : m[1] === 'OPR' ? 'Opera' : m[1]) : 'unknown';
+      var ver = m ? m[2].split('.')[0] : '';
+      var os = /Windows/.test(ua) ? 'Windows'
+        : /Android/.test(ua) ? 'Android'
+        : /CrOS/.test(ua) ? 'ChromeOS'
+        : /Linux/.test(ua) ? 'Linux'
+        : /Mac/.test(ua) ? 'macOS'
+        : /iPhone|iPad/.test(ua) ? 'iOS'
+        : 'unknown OS';
+      return browser + (ver ? ' ' + ver : '') + ' on ' + os;
+    }
+
     function start() {
       if (!navigator.gpu) {
-        set('gi-available', 'not available in this browser');
+        set('gi-available', 'not available on ' + detectedEnv());
         set('gi-adapter', 'enablement guide below');
         set('gi-wg', 'n/a');
         set('gi-buf', 'n/a');
