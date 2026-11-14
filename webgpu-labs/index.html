@@ -259,8 +259,12 @@
         <li data-family="brave"><b>Brave:</b> <code>brave://flags/#enable-unsafe-webgpu</code> &rarr; Enabled, plus
         hardware acceleration on in settings.</li>
         <li data-family="opera"><b>Opera:</b> <code>opera://flags/#enable-unsafe-webgpu</code> &rarr; Enabled.</li>
-        <li data-family="firefox"><b>Firefox 141+:</b> Windows ships WebGPU by default; other platforms:
-        <code>about:config</code> &rarr; <code>dom.webgpu.enabled</code> &rarr; true, then restart.</li>
+        <li data-family="firefox"><b>Firefox on Linux (verified on 158, Kubuntu):</b> WebGPU is
+        not on by default. <code>about:config</code> &rarr; <code>dom.webgpu.enabled</code> &rarr; true,
+        restart, then re-run this page. Needs a working Vulkan driver (Linux line below). If the
+        inspector still reports missing with the pref set and Vulkan working, your Firefox build has
+        not shipped Linux WebGPU yet: use a Chromium-family browser for the labs and re-check after
+        updates.</li>
         <li data-family="safari"><b>Safari 26+:</b> shipped on macOS and iOS; update the OS.</li>
         <li data-family="linux"><b>Linux (any browser):</b> a working Vulkan driver is required; verify with
         <code>vulkaninfo</code>.</li>
@@ -427,22 +431,46 @@
       var seen = {};
       var adapters = [];
 
+      var timeouts = [];
+      function withTimeout(promise, ms) {
+        return Promise.race([
+          promise,
+          new Promise(function (res) { setTimeout(function () { res({ timedOut: true }); }, ms); })
+        ]);
+      }
+
       requests.forEach(function (req) {
         chain = chain.then(function () {
-          return navigator.gpu.requestAdapter(req.opts).then(function (a) {
-            if (!a) return;
-            var d = describe(a, req.tag);
-            var key = d.name + '|' + d.tag;
-            if (seen[key]) return;
-            seen[key] = 1;
-            adapters.push(d);
-          }).catch(function () { /* skip */ });
+          return withTimeout(
+            navigator.gpu.requestAdapter(req.opts).then(function (a) {
+              if (!a) return null;
+              var d = describe(a, req.tag);
+              var key = d.name + '|' + d.tag;
+              if (seen[key]) return null;
+              seen[key] = 1;
+              adapters.push(d);
+              return d;
+            }).catch(function () { return null; }),
+            4000
+          ).then(function (r) {
+            if (r && r.timedOut) timeouts.push(req.tag);
+          });
         });
       });
 
       chain.then(function () {
         var list = el('gpu-inspector');
         if (!list) return;
+        if (timeouts.length) {
+          adapters.push({
+            tag: timeouts.join(' + '),
+            name: 'adapter request timed out on ' + detectedEnv(),
+            fallback: false,
+            features: { f16: false, ts: false, sg: false },
+            score: -99,
+            wg: null, buf: null
+          });
+        }
         if (!adapters.length) {
           list.innerHTML = '<div class="bad">no adapters returned — enablement guide below</div>';
           var g = el('enable-guide');
