@@ -151,6 +151,14 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    footer {
+      text-align: center; padding: 30px 20px 40px;
+      border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+      position: relative; z-index: 1;
+    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5); }
+
     a:focus-visible, button:focus-visible, input:focus-visible {
       outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
     }
