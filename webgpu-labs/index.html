@@ -240,7 +240,7 @@
 
     <div class="list-card">
       <h2>Your browser, inspected</h2>
-      <ul>
+      <ul id="gpu-inspector">
         <li>WebGPU: <span id="gi-available">checking…</span></li>
         <li>Adapter: <span id="gi-adapter">checking…</span></li>
         <li>Max compute workgroup size: <span id="gi-wg">checking…</span></li>
@@ -441,8 +441,11 @@
 
       requests.forEach(function (req) {
         chain = chain.then(function () {
+          var p = null;
+          try { p = navigator.gpu.requestAdapter(req.opts); } catch (err) { p = null; }
+          if (!p || !p.then) return Promise.resolve(null);
           return withTimeout(
-            navigator.gpu.requestAdapter(req.opts).then(function (a) {
+            p.then(function (a) {
               if (!a) return null;
               var d = describe(a, req.tag);
               var key = d.name + '|' + d.tag;
@@ -486,6 +489,9 @@
           .sort(function (a, b) { return b.score - a.score; })
           .map(function (d) { return renderRow(d, best); })
           .join('');
+      }).catch(function (err) {
+        var list = el('gpu-inspector');
+        if (list) list.innerHTML = '<div class="bad">inspector error: ' + err + '</div>';
       });
     }
 
