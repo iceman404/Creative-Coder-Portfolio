@@ -321,7 +321,11 @@
         return;
       }
       navigator.gpu.requestAdapter().then(function (adapter) {
-        if (!adapter) { set('gi-available', 'no GPU adapter found'); return; }
+        if (!adapter) {
+          set('gi-available', 'no GPU adapter found');
+          ['gi-adapter', 'gi-wg', 'gi-buf', 'gi-f16', 'gi-ts'].forEach(function (id) { set(id, 'n/a'); });
+          return;
+        }
         set('gi-available', 'available');
         var info = adapter.info || {};
         set('gi-adapter', [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported');
