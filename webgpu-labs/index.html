@@ -372,11 +372,15 @@
     function describe(a, tag) {
       var feats = featureFlags(a);
       var limits = a.limits || {};
-      var score = (feats.f16 ? 2 : 0) + (feats.ts ? 1 : 0) + (feats.sg ? 1 : 0) + (a.isFallbackAdapter ? -3 : 0);
+      var name = adapterName(a);
+      var software = /swiftshader|llvmpipe/i.test(name);
+      var score = (feats.f16 ? 2 : 0) + (feats.ts ? 1 : 0) + (feats.sg ? 1 : 0) +
+        (a.isFallbackAdapter || software ? -99 : 0);
       return {
         adapter: a,
         tag: tag,
-        name: adapterName(a),
+        name: name,
+        software: software,
         fallback: !!a.isFallbackAdapter,
         features: feats,
         score: score,
@@ -387,7 +391,9 @@
 
     function renderRow(d, best) {
       var cls = d.fallback ? 'bad' : 'ok';
-      var stars = (d === best) ? ' ★ recommended for compute labs' : '';
+      var stars = (d === best)
+        ? (d.software ? ' ★ fastest available (software renderer)' : ' ★ recommended for compute labs')
+        : '';
       var feats = [
         d.features.f16 ? 'shader-f16' : null,
         d.features.ts ? 'timestamp-query' : null,
