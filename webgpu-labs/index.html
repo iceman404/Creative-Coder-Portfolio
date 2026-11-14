@@ -376,8 +376,15 @@
       }
       navigator.gpu.requestAdapter().then(function (adapter) {
         if (!adapter) {
-          set('gi-available', 'no GPU adapter found');
-          ['gi-adapter', 'gi-wg', 'gi-buf', 'gi-f16', 'gi-ts'].forEach(function (id) { set(id, 'n/a'); });
+          set('gi-available', 'no Vulkan adapter visible to ' + detectedEnv());
+          set('gi-adapter', 'flag or driver needed: guide below');
+          ['gi-wg', 'gi-buf', 'gi-f16', 'gi-ts'].forEach(function (id) { set(id, 'n/a'); });
+          var guide = document.getElementById('enable-guide');
+          if (guide) {
+            guide.hidden = false;
+            var famli = guide.querySelector('li[data-family="' + browserFamily() + '"]');
+            if (famli) famli.style.borderLeft = '3px solid var(--accent)';
+          }
           return;
         }
         set('gi-available', 'available');
