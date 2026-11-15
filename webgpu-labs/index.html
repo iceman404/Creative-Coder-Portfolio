@@ -281,6 +281,16 @@
         inspector above re-checks the moment you relaunch.</p>
     </div>
 
+    <div class="list-card" id="gpu-notes">
+      <h2>Field notes: WebGPU bring-up on Linux, verified on this rig</h2>
+      <ul>
+        <li><b>Vulkan stack healthy:</b> RADV Phoenix (iGPU) + RTX 5050 (NVIDIA 595.99.02) + llvmpipe, all Vulkan 1.4 via <code>vulkaninfo</code></li>
+        <li><b>Chromium/Dawn:</b> enumerates only SwiftShader (CPU) on snap and deb, headed and headless, with <code>--enable-unsafe-webgpu --ignore-gpu-blocklist --use-angle=vulkan</code> and the GPU sandbox released</li>
+        <li><b>NVIDIA Vulkan ICD (595.x):</b> hangs Dawn adapter requests; RADV: enumerates but Dawn declines the adapter. Firefox (wgpu, a different implementation) is the next candidate to test</li>
+        <li><b>Until hardware lands:</b> the labs run on SwiftShader, correctness-verified. The Real GPU Bridge is the native path for real silicon numbers</li>
+      </ul>
+    </div>
+
     <div class="card-grid">
       <a class="module-card" href="/webgpu-labs/inference-forge">
         <i class="fas fa-microchip mod-icon" aria-hidden="true"></i>
