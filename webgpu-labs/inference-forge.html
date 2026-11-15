@@ -283,14 +283,14 @@
       <h1>Inference Forge</h1>
       <p class="headline">
         A quantized transformer inference engine <b>hand-written in WGSL compute shaders</b>.
-        Milestone 1 puts the foundation kernel on the anvil: the GEMM ladder &mdash; a naive
-        reference implementation and a workgroup-tiled kernel &mdash; verified against a CPU
+        Milestone 1 puts the foundation kernel on the anvil: the GEMM ladder: a naive
+        reference implementation and a workgroup-tiled kernel, verified against a CPU
         reference and timed on whatever adapter your browser provides.
       </p>
     </header>
 
     <div class="arena-card">
-      <h2>GEMM ladder &mdash; live benchmark</h2>
+      <h2>GEMM ladder: live benchmark</h2>
       <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
 
       <div class="controls">
@@ -332,16 +332,45 @@
     </div>
 
     <div class="arena-card">
+      <h2>Transformer primitives: M2 kernels, live</h2>
+      <div class="device-line">seq 32 &middot; hidden 64 &middot; single head &middot; f32 &middot; verified against float64 CPU references</div>
+
+      <button class="run-btn" id="prim-btn" type="button">Run primitive suite</button>
+
+      <table class="results" style="margin-top:18px;" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Kernel</th>
+            <th>Time</th>
+            <th>Max abs error vs reference</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="primitives-body">
+          <tr id="prim-placeholder"><td colspan="4" style="color:var(--text-dim); font-family:'Inter',sans-serif;">
+            Press <b>Run primitive suite</b> to dispatch RMSNorm, RoPE, and causal attention.
+          </td></tr>
+        </tbody>
+      </table>
+
+      <p class="ledger-note">
+        The <b>KV-cache equivalence</b> row is the invariant every inference engine must
+        guarantee: decoding one query token against the cached keys produces the same
+        result as full recomputation. On this page the proof runs live on your adapter.
+      </p>
+    </div>
+
+    <div class="arena-card">
       <h2>Where this goes</h2>
       <div style="line-height:1.9; color:var(--text-dim); font-size:0.95rem;">
         <span class="phase-tag">M1 &middot; live</span> GEMM ladder (naive + workgroup-tiled), correctness ledger<br>
-        <span class="phase-tag">M2</span> causal attention with a persistent KV cache, RoPE, RMSNorm as fused WGSL passes<br>
+        <span class="phase-tag">M2 &middot; kernels live</span> causal attention with a persistent KV cache, RoPE, RMSNorm as fused WGSL passes<br>
         <span class="phase-tag sealed">M3 &middot; sealed</span> packed 4-bit weight kernels: the optimized implementations ship inside the vault<br>
         <span class="phase-tag">M4</span> tokenizer + streaming generation with the per-kernel latency dashboard
       </div>
       <p class="ledger-note" style="margin-top:16px;">
         The engine's arithmetic path is the same one
-        <b>llama.cpp and MLC run on your native drivers</b> &mdash; authored here in WGSL so it
+        <b>llama.cpp and MLC run on your native drivers</b>, authored here in WGSL so it
         executes in a browser tab on any GPU vendor. The performance target and the honest
         gap analysis are documented in the
         <a href="https://github.com/iceman404/Creative-Coder-Portfolio/blob/main/docs/webgpu-labs-blueprint.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">blueprint</a>.
@@ -362,11 +391,11 @@
     <div class="list-card">
       <h2>Roadmap</h2>
       <ul>
-        <li><b>Milestone 1:</b> fp16 forward pass of a GPT-2 class model, correctness ledger vs fp32 &mdash; this page</li>
+        <li><b>Milestone 1:</b> fp16 forward pass of a GPT-2 class model, correctness ledger vs fp32, live on this page</li>
         <li><b>Milestone 2:</b> causal attention with a persistent KV cache</li>
         <li><b>Milestone 3:</b> 4-bit quantized kernels and packed weight loading (sealed tier)</li>
         <li><b>Milestone 4:</b> streaming UI with per-kernel instrumentation</li>
-        <li><b>The honest benchmark:</b> memory-bound decode within striking distance of llama.cpp, on every GPU vendor, from a single URL &mdash; numbers published here, unedited</li>
+        <li><b>The honest benchmark:</b> memory-bound decode within striking distance of llama.cpp, on every GPU vendor, from a single URL, with the numbers published here unedited</li>
       </ul>
     </div>
 
@@ -446,6 +475,109 @@
       '  }',
       '',
       '  if (row < dim && col < dim) { out[row * dim + col] = sum; }',
+      '}'
+    ].join('\n');
+
+    /* ================= M2: transformer primitive kernels ================= */
+
+    var PRIM_WGSL = [
+      'struct NParams {',
+      '  rows : u32,',
+      '  dim : u32,',
+      '  eps : f32,',
+      '  _pad : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> np : NParams;',
+      '@group(0) @binding(1) var<storage, read> x : array<f32>;',
+      '@group(0) @binding(2) var<storage, read_write> y : array<f32>;',
+      '@group(0) @binding(3) var<storage, read> w : array<f32>;',
+      '',
+      '@compute @workgroup_size(64)',
+      'fn rmsnorm(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let row = gid.x;',
+      '  if (row >= np.rows) { return; }',
+      '  var sum = 0.0;',
+      '  for (var d = 0u; d < np.dim; d = d + 1u) {',
+      '    let v = x[row * np.dim + d];',
+      '    sum = sum + v * v;',
+      '  }',
+      '  let inv = 1.0 / sqrt(sum / f32(np.dim) + np.eps);',
+      '  for (var d = 0u; d < np.dim; d = d + 1u) {',
+      '    y[row * np.dim + d] = x[row * np.dim + d] * inv * w[d];',
+      '  }',
+      '}',
+      '',
+      'struct RParams {',
+      '  tokens : u32,',
+      '  dim : u32,',
+      '  _pad0 : u32,',
+      '  _pad1 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> rp : RParams;',
+      '@group(0) @binding(1) var<storage, read> x : array<f32>;',
+      '@group(0) @binding(2) var<storage, read_write> y : array<f32>;',
+      '',
+      '@compute @workgroup_size(64)',
+      'fn rope(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let tok = gid.x;',
+      '  if (tok >= rp.tokens) { return; }',
+      '  let half = rp.dim / 2u;',
+      '  for (var d = 0u; d < half; d = d + 1u) {',
+      '    let freq = pow(10000.0, -2.0 * f32(d) / f32(rp.dim));',
+      '    let angle = f32(tok) * freq;',
+      '    let s = sin(angle);',
+      '    let c = cos(angle);',
+      '    let i = tok * rp.dim + d;',
+      '    let j = tok * rp.dim + d + half;',
+      '    let x1 = x[i];',
+      '    let x2 = x[j];',
+      '    y[i] = x1 * c - x2 * s;',
+      '    y[j] = x2 * c + x1 * s;',
+      '  }',
+      '}'
+    ].join('\n');
+
+    var ATTN_WGSL = [
+      'struct AParams {',
+      '  seq : u32,',
+      '  hd : u32,',
+      '  scale : f32,',
+      '  qoff : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> ap : AParams;',
+      '@group(0) @binding(1) var<storage, read> q : array<f32>;',
+      '@group(0) @binding(2) var<storage, read> k : array<f32>;',
+      '@group(0) @binding(3) var<storage, read> v : array<f32>;',
+      '@group(0) @binding(4) var<storage, read_write> scores : array<f32>;',
+      '@group(0) @binding(5) var<storage, read_write> out : array<f32>;',
+      '',
+      '@compute @workgroup_size(1)',
+      'fn attn(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let sq = gid.x;',
+      '  if (sq >= ap.seq) { return; }',
+      '  var maxv = -3.0e38;',
+      '  for (var sk = 0u; sk <= sq + ap.qoff; sk = sk + 1u) {',
+      '    var dot = 0.0;',
+      '    for (var d = 0u; d < ap.hd; d = d + 1u) {',
+      '      dot = dot + q[(sq + ap.qoff) * ap.hd + d] * k[sk * ap.hd + d];',
+      '    }',
+      '    let s = dot * ap.scale;',
+      '    scores[sq * ap.seq + sk] = s;',
+      '    if (s > maxv) { maxv = s; }',
+      '  }',
+      '  var denom = 0.0;',
+      '  for (var sk = 0u; sk <= sq + ap.qoff; sk = sk + 1u) {',
+      '    let e = exp(scores[sq * ap.seq + sk] - maxv);',
+      '    scores[sq * ap.seq + sk] = e;',
+      '    denom = denom + e;',
+      '  }',
+      '  for (var d = 0u; d < ap.hd; d = d + 1u) {',
+      '    var acc = 0.0;',
+      '    for (var sk = 0u; sk <= sq + ap.qoff; sk = sk + 1u) {',
+      '      acc = acc + scores[sq * ap.seq + sk] * v[sk * ap.hd + d];',
+      '    }',
+      '    out[(sq + ap.qoff) * ap.hd + d] = acc / denom;',
+      '  }',
       '}'
     ].join('\n');
 
@@ -699,6 +831,258 @@
       });
     }
 
+    /* ================= M2: primitive suite ================= */
+
+    function primRow(kernel, timeMs, err, verdict, cls) {
+      var body = document.getElementById('primitives-body');
+      var ph = document.getElementById('prim-placeholder');
+      if (ph) ph.remove();
+      var row = document.createElement('tr');
+      row.innerHTML =
+        '<td class="tier">' + kernel + '</td>' +
+        '<td class="num">' + timeMs.toFixed(3) + ' ms</td>' +
+        '<td class="num">' + (err === null ? 'n/a' : err.toExponential(2)) + '</td>' +
+        '<td class="' + (cls || '') + '">' + verdict + '</td>';
+      body.appendChild(row);
+    }
+
+    function makeBuffer(byteSize, usage) {
+      return device.createBuffer({ size: byteSize, usage: usage });
+    }
+
+    function uploadF32(data) {
+      var b = makeBuffer(data.length * 4, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+      device.queue.writeBuffer(b, 0, data);
+      return b;
+    }
+
+    function readbackF32(buf, byteSize) {
+      var rb = makeBuffer(byteSize, GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ);
+      var enc = device.createCommandEncoder();
+      enc.copyBufferToBuffer(buf, 0, rb, 0, byteSize);
+      device.queue.submit([enc.finish()]);
+      return rb.mapAsync(GPUMapMode.READ).then(function () {
+        var out = new Float32Array(rb.getMappedRange().slice(0));
+        rb.unmap();
+        rb.destroy();
+        return out;
+      });
+    }
+
+    function dispatchNamed(pipeline, bg, groups) {
+      var enc = device.createCommandEncoder();
+      var pass = enc.beginComputePass();
+      pass.setPipeline(pipeline);
+      pass.setBindGroup(0, bg);
+      pass.dispatchWorkgroups(groups);
+      pass.end();
+      device.queue.submit([enc.finish()]);
+      return device.queue.onSubmittedWorkDone();
+    }
+
+    function runPrimitives() {
+      if (running || !device) return;
+      running = true;
+      var btn = document.getElementById('prim-btn');
+      btn.disabled = true;
+      btn.textContent = 'Running suite…';
+
+      var ROWS = 32, DIM = 64, HD = 32, EPS = 1e-6;
+      var SCALE = 1 / Math.sqrt(HD);
+
+      function seed(n, salt) {
+        var arr = new Float32Array(n);
+        var st = 98765 + salt;
+        for (var i = 0; i < n; i++) {
+          st = (st * 1103515245 + 12345) >>> 0;
+          arr[i] = ((st >>> 8) % 2000 - 1000) / 1000;
+        }
+        return arr;
+      }
+
+      var xData = seed(ROWS * DIM, 1);
+      var wData = seed(DIM, 2);
+      var qData = seed(ROWS * HD, 3);
+      var kData = seed(ROWS * HD, 4);
+      var vData = seed(ROWS * HD, 5);
+
+      // CPU float64 references (same conventions as the WGSL)
+      var cpuNorm = new Float64Array(ROWS * DIM);
+      for (var r = 0; r < ROWS; r++) {
+        var ss = 0;
+        for (var d = 0; d < DIM; d++) { var v = xData[r * DIM + d]; ss += v * v; }
+        var inv = 1 / Math.sqrt(ss / DIM + EPS);
+        for (var d = 0; d < DIM; d++) cpuNorm[r * DIM + d] = xData[r * DIM + d] * inv * wData[d];
+      }
+      var HALF = DIM / 2;
+      var cpuRoPE = new Float64Array(ROWS * DIM);
+      for (var t = 0; t < ROWS; t++) {
+        for (var d = 0; d < HALF; d++) {
+          var freq = Math.pow(10000, -2 * d / DIM);
+          var ang = t * freq;
+          var i = t * DIM + d, j = t * DIM + d + HALF;
+          var x1 = xData[i], x2 = xData[j];
+          cpuRoPE[i] = x1 * Math.cos(ang) - x2 * Math.sin(ang);
+          cpuRoPE[j] = x2 * Math.cos(ang) + x1 * Math.sin(ang);
+        }
+      }
+      var cpuAtt = new Float64Array(ROWS * HD);
+      for (var sq = 0; sq < ROWS; sq++) {
+        var mx = -Infinity, den = 0;
+        var sc = new Float64Array(sq + 1);
+        for (var sk = 0; sk <= sq; sk++) {
+          var dot = 0;
+          for (var d = 0; d < HD; d++) dot += qData[sq * HD + d] * kData[sk * HD + d];
+          sc[sk] = dot * SCALE;
+          if (sc[sk] > mx) mx = sc[sk];
+        }
+        for (var sk = 0; sk <= sq; sk++) { var e = Math.exp(sc[sk] - mx); sc[sk] = e; den += e; }
+        for (var d = 0; d < HD; d++) {
+          var acc = 0;
+          for (var sk = 0; sk <= sq; sk++) acc += sc[sk] * vData[sk * HD + d];
+          cpuAtt[sq * HD + d] = acc / den;
+        }
+      }
+
+      var xB = uploadF32(xData);
+      var wB = uploadF32(wData);
+      var yB = makeBuffer(xData.length * 4, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC);
+      var npBuf = makeBuffer(16, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+      device.queue.writeBuffer(npBuf, 0, new Uint32Array([ROWS, DIM, 0, 0]));
+      device.queue.writeBuffer(npBuf, 8, new Float32Array([EPS]));
+
+      var modP = device.createShaderModule({ code: PRIM_WGSL });
+
+      var pipeNorm = device.createComputePipeline({
+        layout: 'auto',
+        compute: { module: modP, entryPoint: 'rmsnorm' }
+      });
+      var bgNorm = device.createBindGroup({
+        layout: pipeNorm.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: npBuf } },
+          { binding: 1, resource: { buffer: xB } },
+          { binding: 2, resource: { buffer: yB } },
+          { binding: 3, resource: { buffer: wB } }
+        ]
+      });
+
+      var rpBuf = makeBuffer(16, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+      device.queue.writeBuffer(rpBuf, 0, new Uint32Array([ROWS, DIM, 0, 0]));
+      var pipeRope = device.createComputePipeline({
+        layout: 'auto',
+        compute: { module: modP, entryPoint: 'rope' }
+      });
+      var bgRope = device.createBindGroup({
+        layout: pipeRope.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: rpBuf } },
+          { binding: 1, resource: { buffer: xB } },
+          { binding: 2, resource: { buffer: yB } }
+        ]
+      });
+
+      var qB = uploadF32(qData);
+      var kB = uploadF32(kData);
+      var vB = uploadF32(vData);
+      var oB = makeBuffer(ROWS * HD * 4, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC);
+      var sB = makeBuffer(ROWS * ROWS * 4, GPUBufferUsage.STORAGE);
+      var apBuf = makeBuffer(16, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+
+      var modA = device.createShaderModule({ code: ATTN_WGSL });
+      var pipeAtt = device.createComputePipeline({
+        layout: 'auto',
+        compute: { module: modA, entryPoint: 'attn' }
+      });
+
+      function setAParams(seq, qoff) {
+        device.queue.writeBuffer(apBuf, 0, new Uint32Array([seq, HD]));
+        device.queue.writeBuffer(apBuf, 8, new Float32Array([SCALE]));
+        device.queue.writeBuffer(apBuf, 12, new Uint32Array([qoff]));
+      }
+      function attBind() {
+        return device.createBindGroup({
+          layout: pipeAtt.getBindGroupLayout(0),
+          entries: [
+            { binding: 0, resource: { buffer: apBuf } },
+            { binding: 1, resource: { buffer: qB } },
+            { binding: 2, resource: { buffer: kB } },
+            { binding: 3, resource: { buffer: vB } },
+            { binding: 4, resource: { buffer: sB } },
+            { binding: 5, resource: { buffer: oB } }
+          ]
+        });
+      }
+
+      function timed(dispatchFn) {
+        var t0 = performance.now();
+        return dispatchFn().then(function () {
+          return performance.now() - t0;
+        });
+      }
+
+      function f32ToJs(arr) { var o = new Float64Array(arr.length); for (var i = 0; i < arr.length; i++) o[i] = arr[i]; return o; }
+
+      var chain = Promise.resolve();
+
+      // RMSNorm
+      chain = chain.then(function () {
+        return timed(function () { return dispatchNamed(pipeNorm, bgNorm, ROWS); }).then(function (ms) {
+          return readbackF32(yB, xData.length * 4).then(function (out) {
+            var err = maxAbsDiff(f32ToJs(out), cpuNorm);
+            primRow('RMSNorm (row-wise, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
+          });
+        });
+      });
+
+      // RoPE
+      chain = chain.then(function () {
+        return timed(function () { return dispatchNamed(pipeRope, bgRope, ROWS); }).then(function (ms) {
+          return readbackF32(yB, xData.length * 4).then(function (out) {
+            var err = maxAbsDiff(f32ToJs(out), cpuRoPE);
+            primRow('RoPE (rotate-half, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
+          });
+        });
+      });
+
+      // Attention: full 32 rows
+      chain = chain.then(function () {
+        setAParams(ROWS, 0);
+        return timed(function () { return dispatchNamed(pipeAtt, attBind(), ROWS); }).then(function (ms) {
+          return readbackF32(oB, ROWS * HD * 4).then(function (out) {
+            var err = maxAbsDiff(f32ToJs(out), cpuAtt);
+            primRow('Causal attention (full ' + ROWS + ' rows)', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
+          });
+        });
+      });
+
+      // KV-cache equivalence: decode row 31 from 31 cached keys + own row
+      chain = chain.then(function () {
+        setAParams(1, ROWS - 1);
+        return timed(function () { return dispatchNamed(pipeAtt, attBind(), 1); }).then(function (ms) {
+          return readbackF32(oB, ROWS * HD * 4).then(function (out) {
+            var decodeRow = out.subarray((ROWS - 1) * HD, ROWS * HD);
+            var full31 = new Float64Array(HD);
+            for (var d = 0; d < HD; d++) full31[d] = cpuAtt[(ROWS - 1) * HD + d];
+            var err = maxAbsDiff(f32ToJs(decodeRow), full31);
+            primRow('KV-cache decode (1 query row vs cache)', ms, err, err === 0 ? 'PASS: identical to full recomputation' : (err < 1e-5 ? 'PASS: identical to full recomputation' : 'FAIL'), err < 1e-5 ? 'pass' : 'fail');
+          });
+        });
+      });
+
+      chain = chain.then(function () {
+        [xB, wB, yB, qB, kB, vB, oB, sB, npBuf, rpBuf, apBuf].forEach(function (b) { try { b.destroy(); } catch (e) {} });
+        running = false;
+        btn.disabled = false;
+        btn.textContent = 'Run primitive suite';
+      }).catch(function (err) {
+        primRow('suite error', 0, null, String(err.message || err), 'fail');
+        running = false;
+        btn.disabled = false;
+        btn.textContent = 'Run primitive suite';
+      });
+    }
+
     /* ================= entry ================= */
 
     function start() {
@@ -706,6 +1090,9 @@
       document.getElementById('run-btn').addEventListener('click', function () {
         var dim = parseInt(document.getElementById('dim-select').value, 10);
         runLadder(dim);
+      });
+      document.getElementById('prim-btn').addEventListener('click', function () {
+        runPrimitives();
       });
 
       // auto-run the fast ladder once on load, then hold the load event
