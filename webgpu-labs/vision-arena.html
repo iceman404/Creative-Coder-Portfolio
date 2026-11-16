@@ -316,15 +316,15 @@
       <div class="view-row">
         <div class="view-box">
           <div class="view-label">Source</div>
-          <canvas id="view-src" width="320" height="180"></canvas>
+          <canvas id="view-src" width="640" height="360"></canvas>
         </div>
         <div class="view-box">
           <div class="view-label">Naive kernel (global reads)</div>
-          <canvas id="view-naive" width="320" height="180"></canvas>
+          <canvas id="view-naive" width="640" height="360"></canvas>
         </div>
         <div class="view-box">
           <div class="view-label">Tiled kernel (workgroup memory)</div>
-          <canvas id="view-tiled" width="320" height="180"></canvas>
+          <canvas id="view-tiled" width="640" height="360"></canvas>
         </div>
       </div>
 
@@ -762,14 +762,10 @@
         navigator.mediaDevices.getUserMedia({ video: { width: WIDTH, height: HEIGHT } }).then(function (stream) {
           video.srcObject = stream;
           video.play();
-          streaming = true;
         }).catch(function (err) {
           document.getElementById('device-line').innerHTML += '<br><span class="sw-note">camera unavailable (' + err.name + '): falling back to the test scene</span>';
           sourceMode = 'pattern';
-          streaming = true;
         });
-      } else {
-        streaming = true;
       }
       document.getElementById('start-btn').style.display = 'none';
       document.getElementById('stop-btn').style.display = '';
@@ -847,6 +843,7 @@
       if (!device) { rafId = window.requestAnimationFrame(loop); return; }
 
       var t0 = performance.now();
+      viewSrcCtx.drawImage(currentSourceCanvas(), 0, 0, WIDTH, HEIGHT);
       dispatchFrame();
       device.queue.onSubmittedWorkDone().then(function () {
         var frameMs = performance.now() - t0;
@@ -938,6 +935,7 @@
       document.getElementById('start-btn').style.display = 'none';
       document.getElementById('stop-btn').style.display = '';
       startSource();
+      streaming = true; // the camera path resolves async; the loop must not die waiting
       fpsLast = performance.now();
       frameCount = 0;
       window.requestAnimationFrame(loop);
