@@ -299,6 +299,9 @@
         <select id="kernel-select">
           <option value="gauss" selected>Gaussian 5&times;5 (naive vs tiled)</option>
           <option value="sobel">Sobel edges (naive vs tiled)</option>
+          <option value="canny">Canny edges (blur + NMS + hysteresis)</option>
+          <option value="harris">Harris corners (structure tensor)</option>
+          <option value="flow">Optical flow (Lucas-Kanade 7&times;7)</option>
           <option value="lum">Luminance (reference pass)</option>
         </select>
         <button class="run-btn" id="start-btn" type="button">Start</button>
@@ -538,6 +541,402 @@
       '}'
     ].join('\n');
 
+    /* gradient pair: sobel gx/gy into a float texture (shared by canny and harris).
+       Needs its own decl: gradients are signed, so the storage format is rgba16float. */
+
+    var GRAD_DECL = [
+      'struct SizeParams {',
+      '  width : u32,',
+      '  height : u32,',
+      '  _pad0 : u32,',
+      '  _pad1 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> szp : SizeParams;',
+      '@group(0) @binding(1) var src : texture_2d<f32>;',
+      '@group(0) @binding(2) var dst : texture_storage_2d<rgba16float, write>;'
+    ].join('\n');
+
+    var GRAD_NAIVE_WGSL = GRAD_DECL + '\n' + [
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  var g : array<f32, 9>;',
+      '  var gi = 0u;',
+      '  for (var dy = -1; dy <= 1; dy = dy + 1) {',
+      '    for (var dx = -1; dx <= 1; dx = dx + 1) {',
+      '      let x = clamp(i32(gid.x) + dx, 0, i32(szp.width) - 1);',
+      '      let y = clamp(i32(gid.y) + dy, 0, i32(szp.height) - 1);',
+      '      g[gi] = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '      gi = gi + 1u;',
+      '    }',
+      '  }',
+      '  let gx = (-g[0] - 2.0 * g[3] - g[6] + g[2] + 2.0 * g[5] + g[8]) / 4.0;',
+      '  let gy = (-g[0] - 2.0 * g[1] - g[2] + g[6] + 2.0 * g[7] + g[8]) / 4.0;',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(gx, gy, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    var GRAD_TILED_WGSL = GRAD_DECL + '\n' + [
+      'var<workgroup> tile : array<f32, 324>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let originX = i32(wid.x * 16) - 1;',
+      '  let originY = i32(wid.y * 16) - 1;',
+      '  let li = lid.y * 16u + lid.x;',
+      '  for (var n = 0u; n < 2u; n = n + 1u) {',
+      '    let idx = li + n * 256u;',
+      '    if (idx < 324u) {',
+      '      let x = clamp(originX + i32(idx % 18u), 0, i32(szp.width) - 1);',
+      '      let y = clamp(originY + i32(idx / 18u), 0, i32(szp.height) - 1);',
+      '      tile[idx] = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '    }',
+      '  }',
+      '  workgroupBarrier();',
+      '',
+      '  let lx = i32(lid.x) + 1;',
+      '  let ly = i32(lid.y) + 1;',
+      '  let gx = (-tile[u32((ly - 1) * 18 + lx - 1)] - 2.0 * tile[u32(ly * 18 + lx - 1)] - tile[u32((ly + 1) * 18 + lx - 1)]',
+      '            + tile[u32((ly - 1) * 18 + lx + 1)] + 2.0 * tile[u32(ly * 18 + lx + 1)] + tile[u32((ly + 1) * 18 + lx + 1)]) / 4.0;',
+      '  let gy = (-tile[u32((ly - 1) * 18 + lx - 1)] - 2.0 * tile[u32((ly - 1) * 18 + lx)] - tile[u32((ly - 1) * 18 + lx + 1)]',
+      '            + tile[u32((ly + 1) * 18 + lx - 1)] + 2.0 * tile[u32((ly + 1) * 18 + lx)] + tile[u32((ly + 1) * 18 + lx + 1)]) / 4.0;',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(gx, gy, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    /* canny: non-maximum suppression + double threshold -> r8 edge map (1.0 strong, 0.5 weak) */
+
+    var NMS_NAIVE_WGSL = SIZE_DECL + '\n' + [
+      'const HIGH_T = 0.1;',
+      'const LOW_T = 0.04;',
+      '',
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  let g0 = textureLoad(src, vec2<u32>(gid.xy), 0);',
+      '  let mag = sqrt(g0.r * g0.r + g0.g * g0.g);',
+      '  var out = 0.0;',
+      '  if (mag > LOW_T) {',
+      '    var a = atan2(g0.g, g0.r);',
+      '    if (a < 0.0) { a = a + 6.28318530; }',
+      '    var s = floor((a + 0.3926991) / 0.78539816);',
+      '    s = s - floor(s / 4.0) * 4.0;',
+      '    var ox = 0.0; var oy = 0.0;',
+      '    if (s < 0.5) { ox = 1.0; }',
+      '    else if (s < 1.5) { ox = 1.0; oy = 1.0; }',
+      '    else if (s < 2.5) { oy = 1.0; }',
+      '    else { ox = -1.0; oy = 1.0; }',
+      '    let x1 = clamp(i32(gid.x) + i32(ox), 0, i32(szp.width) - 1);',
+      '    let y1 = clamp(i32(gid.y) + i32(oy), 0, i32(szp.height) - 1);',
+      '    let x2 = clamp(i32(gid.x) - i32(ox), 0, i32(szp.width) - 1);',
+      '    let y2 = clamp(i32(gid.y) - i32(oy), 0, i32(szp.height) - 1);',
+      '    let g1 = textureLoad(src, vec2<u32>(u32(x1), u32(y1)), 0);',
+      '    let g2 = textureLoad(src, vec2<u32>(u32(x2), u32(y2)), 0);',
+      '    let m1 = sqrt(g1.r * g1.r + g1.g * g1.g);',
+      '    let m2 = sqrt(g2.r * g2.r + g2.g * g2.g);',
+      '    if (mag >= m1 && mag > m2) {',
+      '      out = select(0.5, 1.0, mag > HIGH_T);',
+      '    }',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(out, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    var NMS_TILED_WGSL = SIZE_DECL + '\n' + [
+      'const HIGH_T = 0.1;',
+      'const LOW_T = 0.04;',
+      'var<workgroup> tgx : array<f32, 324>;',
+      'var<workgroup> tgy : array<f32, 324>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let originX = i32(wid.x * 16) - 1;',
+      '  let originY = i32(wid.y * 16) - 1;',
+      '  let li = lid.y * 16u + lid.x;',
+      '  for (var n = 0u; n < 2u; n = n + 1u) {',
+      '    let idx = li + n * 256u;',
+      '    if (idx < 324u) {',
+      '      let x = clamp(originX + i32(idx % 18u), 0, i32(szp.width) - 1);',
+      '      let y = clamp(originY + i32(idx / 18u), 0, i32(szp.height) - 1);',
+      '      let g = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0);',
+      '      tgx[idx] = g.r; tgy[idx] = g.g;',
+      '    }',
+      '  }',
+      '  workgroupBarrier();',
+      '',
+      '  let lx = i32(lid.x) + 1;',
+      '  let ly = i32(lid.y) + 1;',
+      '  let gx = tgx[u32(ly * 18 + lx)];',
+      '  let gy = tgy[u32(ly * 18 + lx)];',
+      '  let mag = sqrt(gx * gx + gy * gy);',
+      '  var out = 0.0;',
+      '  if (mag > LOW_T) {',
+      '    var a = atan2(gy, gx);',
+      '    if (a < 0.0) { a = a + 6.28318530; }',
+      '    var s = floor((a + 0.3926991) / 0.78539816);',
+      '    s = s - floor(s / 4.0) * 4.0;',
+      '    var ox = 0.0; var oy = 0.0;',
+      '    if (s < 0.5) { ox = 1.0; }',
+      '    else if (s < 1.5) { ox = 1.0; oy = 1.0; }',
+      '    else if (s < 2.5) { oy = 1.0; }',
+      '    else { ox = -1.0; oy = 1.0; }',
+      '    let m1v = tgx[u32((ly + i32(oy)) * 18 + lx + i32(ox))];',
+      '    let m1g = tgy[u32((ly + i32(oy)) * 18 + lx + i32(ox))];',
+      '    let m2v = tgx[u32((ly - i32(oy)) * 18 + lx - i32(ox))];',
+      '    let m2g = tgy[u32((ly - i32(oy)) * 18 + lx - i32(ox))];',
+      '    let m1 = sqrt(m1v * m1v + m1g * m1g);',
+      '    let m2 = sqrt(m2v * m2v + m2g * m2g);',
+      '    if (mag >= m1 && mag > m2) {',
+      '      out = select(0.5, 1.0, mag > HIGH_T);',
+      '    }',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(out, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    /* canny: hysteresis promotion (weak 0.5 next to strong 1.0 -> strong), ping-pong */
+
+    var HYST_NAIVE_WGSL = SIZE_DECL + '\n' + [
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  let v = textureLoad(src, vec2<u32>(gid.xy), 0).r;',
+      '  var out = v;',
+      '  if (v > 0.0 && v < 1.0) {',
+      '    for (var dy = -1; dy <= 1; dy = dy + 1) {',
+      '      for (var dx = -1; dx <= 1; dx = dx + 1) {',
+      '        let x = clamp(i32(gid.x) + dx, 0, i32(szp.width) - 1);',
+      '        let y = clamp(i32(gid.y) + dy, 0, i32(szp.height) - 1);',
+      '        if (textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r >= 1.0) { out = 1.0; }',
+      '      }',
+      '    }',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(out, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    var HYST_TILED_WGSL = SIZE_DECL + '\n' + [
+      'var<workgroup> tile : array<f32, 324>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let originX = i32(wid.x * 16) - 1;',
+      '  let originY = i32(wid.y * 16) - 1;',
+      '  let li = lid.y * 16u + lid.x;',
+      '  for (var n = 0u; n < 2u; n = n + 1u) {',
+      '    let idx = li + n * 256u;',
+      '    if (idx < 324u) {',
+      '      let x = clamp(originX + i32(idx % 18u), 0, i32(szp.width) - 1);',
+      '      let y = clamp(originY + i32(idx / 18u), 0, i32(szp.height) - 1);',
+      '      tile[idx] = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '    }',
+      '  }',
+      '  workgroupBarrier();',
+      '',
+      '  let v = tile[u32((i32(lid.y) + 1) * 18 + i32(lid.x) + 1)];',
+      '  var out = v;',
+      '  if (v > 0.0 && v < 1.0) {',
+      '    for (var dy = -1; dy <= 1; dy = dy + 1) {',
+      '      for (var dx = -1; dx <= 1; dx = dx + 1) {',
+      '        if (tile[u32((i32(lid.y) + 1 + dy) * 18 + i32(lid.x) + 1 + dx)] >= 1.0) { out = 1.0; }',
+      '      }',
+      '    }',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(out, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    /* edge colorize: 1:1 pass, shared by both sides */
+
+    var EDGEOUT_WGSL = SIZE_DECL + '\n' + [
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  let v = textureLoad(src, vec2<u32>(gid.xy), 0).r;',
+      '  var c = vec3<f32>(0.04, 0.05, 0.06);',
+      '  if (v >= 1.0) { c = vec3<f32>(1.0, 0.95, 0.85); }',
+      '  else if (v > 0.0) { c = vec3<f32>(0.22, 0.28, 0.3); }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
+    /* harris corners: structure tensor over 5x5, response, colorize */
+
+    var HARRIS_NAIVE_WGSL = SIZE_DECL + '\n' + [
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  var sxx = 0.0; var syy = 0.0; var sxy = 0.0;',
+      '  for (var dy = -2; dy <= 2; dy = dy + 1) {',
+      '    for (var dx = -2; dx <= 2; dx = dx + 1) {',
+      '      let x = clamp(i32(gid.x) + dx, 0, i32(szp.width) - 1);',
+      '      let y = clamp(i32(gid.y) + dy, 0, i32(szp.height) - 1);',
+      '      let g = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0);',
+      '      sxx = sxx + g.r * g.r;',
+      '      syy = syy + g.g * g.g;',
+      '      sxy = sxy + g.r * g.g;',
+      '    }',
+      '  }',
+      '  let det = sxx * syy - sxy * sxy;',
+      '  let trace = sxx + syy;',
+      '  let r = det - 0.04 * trace * trace;',
+      '  let v = max(r, 0.0);',
+      '  var c = vec3<f32>(v * 6.0, v * 6.8, v * 7.6);',
+      '  if (v > 0.02) { c = vec3<f32>(1.0, 0.32, 0.2); }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
+    var HARRIS_TILED_WGSL = SIZE_DECL + '\n' + [
+      'var<workgroup> tgx : array<f32, 400>;',
+      'var<workgroup> tgy : array<f32, 400>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let originX = i32(wid.x * 16) - 2;',
+      '  let originY = i32(wid.y * 16) - 2;',
+      '  let li = lid.y * 16u + lid.x;',
+      '  for (var n = 0u; n < 2u; n = n + 1u) {',
+      '    let idx = li + n * 256u;',
+      '    if (idx < 400u) {',
+      '      let x = clamp(originX + i32(idx % 20u), 0, i32(szp.width) - 1);',
+      '      let y = clamp(originY + i32(idx / 20u), 0, i32(szp.height) - 1);',
+      '      let g = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0);',
+      '      tgx[idx] = g.r; tgy[idx] = g.g;',
+      '    }',
+      '  }',
+      '  workgroupBarrier();',
+      '',
+      '  let lx = i32(lid.x) + 2;',
+      '  let ly = i32(lid.y) + 2;',
+      '  var sxx = 0.0; var syy = 0.0; var sxy = 0.0;',
+      '  for (var dy = -2; dy <= 2; dy = dy + 1) {',
+      '    for (var dx = -2; dx <= 2; dx = dx + 1) {',
+      '      let ti = u32((ly + dy) * 20 + lx + dx);',
+      '      sxx = sxx + tgx[ti] * tgx[ti];',
+      '      syy = syy + tgy[ti] * tgy[ti];',
+      '      sxy = sxy + tgx[ti] * tgy[ti];',
+      '    }',
+      '  }',
+      '  let det = sxx * syy - sxy * sxy;',
+      '  let trace = sxx + syy;',
+      '  let r = det - 0.04 * trace * trace;',
+      '  let v = max(r, 0.0);',
+      '  var c = vec3<f32>(v * 6.0, v * 6.8, v * 7.6);',
+      '  if (v > 0.02) { c = vec3<f32>(1.0, 0.32, 0.2); }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
+    /* lucas-kanade optical flow: 7x7 LK between the previous and current gray frame */
+
+    var FLOW_NAIVE_WGSL = SIZE_DECL + '\n' + [
+      '@group(0) @binding(3) var prev : texture_2d<f32>;',
+      '',
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= szp.width || gid.y >= szp.height) { return; }',
+      '  var a11 = 0.0; var a22 = 0.0; var a12 = 0.0; var b1 = 0.0; var b2 = 0.0;',
+      '  for (var dy = -3; dy <= 3; dy = dy + 1) {',
+      '    for (var dx = -3; dx <= 3; dx = dx + 1) {',
+      '      let x = clamp(i32(gid.x) + dx, 1, i32(szp.width) - 2);',
+      '      let y = clamp(i32(gid.y) + dy, 1, i32(szp.height) - 2);',
+      '      let pL = textureLoad(prev, vec2<u32>(u32(x - 1), u32(y)), 0).r;',
+      '      let pR = textureLoad(prev, vec2<u32>(u32(x + 1), u32(y)), 0).r;',
+      '      let pU = textureLoad(prev, vec2<u32>(u32(x), u32(y - 1)), 0).r;',
+      '      let pD = textureLoad(prev, vec2<u32>(u32(x), u32(y + 1)), 0).r;',
+      '      let ix = (pR - pL) * 0.5;',
+      '      let iy = (pD - pU) * 0.5;',
+      '      let it = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r - textureLoad(prev, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '      a11 = a11 + ix * ix;',
+      '      a22 = a22 + iy * iy;',
+      '      a12 = a12 + ix * iy;',
+      '      b1 = b1 + ix * it;',
+      '      b2 = b2 + iy * it;',
+      '    }',
+      '  }',
+      '  let det = a11 * a22 - a12 * a12;',
+      '  var u = 0.0; var v = 0.0;',
+      '  if (det > 1e-5 || det < -(1e-5)) {',
+      '    u = (-a22 * b1 + a12 * b2) / det;',
+      '    v = (-a11 * b2 + a12 * b1) / det;',
+      '  }',
+      '  let mag = sqrt(u * u + v * v);',
+      '  var c = vec3<f32>(0.02, 0.02, 0.03);',
+      '  if (mag > 0.01) {',
+      '    var h = atan2(v, u) * 0.15915494 + 0.5;',
+      '    let c6 = vec3<f32>(abs(h * 6.0 - 3.0) - 1.0, 2.0 - abs(h * 6.0 - 2.0), 2.0 - abs(h * 6.0 - 4.0));',
+      '    c = clamp(c6, vec3<f32>(0.0), vec3<f32>(1.0)) * clamp(mag * 4.0, 0.0, 1.0);',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
+    var FLOW_TILED_WGSL = SIZE_DECL + '\n' + [
+      '@group(0) @binding(3) var prev : texture_2d<f32>;',
+      'var<workgroup> tprev : array<f32, 576>;',
+      'var<workgroup> tcurr : array<f32, 576>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let originX = i32(wid.x * 16) - 4;',
+      '  let originY = i32(wid.y * 16) - 4;',
+      '  let li = lid.y * 16u + lid.x;',
+      '  for (var n = 0u; n < 3u; n = n + 1u) {',
+      '    let idx = li + n * 256u;',
+      '    if (idx < 576u) {',
+      '      let x = clamp(originX + i32(idx % 24u), 0, i32(szp.width) - 1);',
+      '      let y = clamp(originY + i32(idx / 24u), 0, i32(szp.height) - 1);',
+      '      tprev[idx] = textureLoad(prev, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '      tcurr[idx] = textureLoad(src, vec2<u32>(u32(x), u32(y)), 0).r;',
+      '    }',
+      '  }',
+      '  workgroupBarrier();',
+      '',
+      '  var a11 = 0.0; var a22 = 0.0; var a12 = 0.0; var b1 = 0.0; var b2 = 0.0;',
+      '  for (var dy = -3; dy <= 3; dy = dy + 1) {',
+      '    for (var dx = -3; dx <= 3; dx = dx + 1) {',
+      '      let x = clamp(i32(gid.x) + dx, 1, i32(szp.width) - 2);',
+      '      let y = clamp(i32(gid.y) + dy, 1, i32(szp.height) - 2);',
+      '      let ci = x - originX;',
+      '      let ri = y - originY;',
+      '      let ix = (tprev[u32(ri * 24 + ci + 1)] - tprev[u32(ri * 24 + ci - 1)]) * 0.5;',
+      '      let iy = (tprev[u32((ri + 1) * 24 + ci)] - tprev[u32((ri - 1) * 24 + ci)]) * 0.5;',
+      '      let it = tcurr[u32(ri * 24 + ci)] - tprev[u32(ri * 24 + ci)];',
+      '      a11 = a11 + ix * ix;',
+      '      a22 = a22 + iy * iy;',
+      '      a12 = a12 + ix * iy;',
+      '      b1 = b1 + ix * it;',
+      '      b2 = b2 + iy * it;',
+      '    }',
+      '  }',
+      '  let det = a11 * a22 - a12 * a12;',
+      '  var u = 0.0; var v = 0.0;',
+      '  if (det > 1e-5 || det < -(1e-5)) {',
+      '    u = (-a22 * b1 + a12 * b2) / det;',
+      '    v = (-a11 * b2 + a12 * b1) / det;',
+      '  }',
+      '  let mag = sqrt(u * u + v * v);',
+      '  var c = vec3<f32>(0.02, 0.02, 0.03);',
+      '  if (mag > 0.01) {',
+      '    var h = atan2(v, u) * 0.15915494 + 0.5;',
+      '    let c6 = vec3<f32>(abs(h * 6.0 - 3.0) - 1.0, 2.0 - abs(h * 6.0 - 2.0), 2.0 - abs(h * 6.0 - 4.0));',
+      '    c = clamp(c6, vec3<f32>(0.0), vec3<f32>(1.0)) * clamp(mag * 4.0, 0.0, 1.0);',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
     /* ================= state ================= */
 
     var device = null;
@@ -567,7 +966,8 @@
     var tsResolve = null;
     var tsRead = null;
     var useTs = false;
-    var tsMapBusy = false;
+    var flowPrevReady = false;
+    var lastNPasses = 0;
     var viewSrcCtx = null;
     var viewNaiveCtx = null;
     var viewTiledCtx = null;
@@ -608,7 +1008,7 @@
           requiredFeatures: useTs ? ['timestamp-query'] : []
         }).then(function (dev) {
           device = dev;
-          device.addEventListener('uncapturederror', function (e) { console.error('GPUERR:', e.message); });
+          device.addEventListener('uncapturederror', function (e) { if (e.message) console.error('GPUERR:', e.message); });
           device.lost.then(function (info) { console.error('LOST:', info.reason, info.message); });
 
           szBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
@@ -620,7 +1020,7 @@
           });
           grayTex = device.createTexture({
             size: [WIDTH, HEIGHT], format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC
           });
           outNaiveTex = device.createTexture({
             size: [WIDTH, HEIGHT], format: 'rgba8unorm',
@@ -632,7 +1032,7 @@
           });
 
           pipeLum = makePipeline(LUM_WGSL);
-          bgLum = makeBindGroup(pipeLum, srcTex, grayTex, null);
+          bgLum = makeBindGroup(pipeLum, srcTex, grayTex);
 
           pipes.gaussN = makePipeline(GAUSS_NAIVE_WGSL);
           pipes.gaussT = makePipeline(GAUSS_TILED_WGSL);
@@ -643,24 +1043,80 @@
           bgs.sobelN = makeBindGroup(pipes.sobelN, grayTex, outNaiveTex);
           bgs.sobelT = makeBindGroup(pipes.sobelT, grayTex, outTiledTex);
 
+          // intermediate textures for the multi-pass chains
+          function storageTex(format) {
+            return device.createTexture({
+              size: [WIDTH, HEIGHT], format: format,
+              usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING
+            });
+          }
+          var blurN = storageTex('rgba8unorm');
+          var blurT = storageTex('rgba8unorm');
+          var gradN = storageTex('rgba16float');
+          var gradT = storageTex('rgba16float');
+          var edgeNa = storageTex('rgba8unorm');
+          var edgeNb = storageTex('rgba8unorm');
+          var edgeTa = storageTex('rgba8unorm');
+          var edgeTb = storageTex('rgba8unorm');
+          var prevGrayTex = device.createTexture({
+            size: [WIDTH, HEIGHT], format: 'rgba8unorm',
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC
+          });
+
+          pipes.gradN = makePipeline(GRAD_NAIVE_WGSL);
+          pipes.gradT = makePipeline(GRAD_TILED_WGSL);
+          pipes.nmsN = makePipeline(NMS_NAIVE_WGSL);
+          pipes.nmsT = makePipeline(NMS_TILED_WGSL);
+          pipes.hystN = makePipeline(HYST_NAIVE_WGSL);
+          pipes.hystT = makePipeline(HYST_TILED_WGSL);
+          pipes.edgeOut = makePipeline(EDGEOUT_WGSL);
+          pipes.harrisN = makePipeline(HARRIS_NAIVE_WGSL);
+          pipes.harrisT = makePipeline(HARRIS_TILED_WGSL);
+          pipes.flowN = makePipeline(FLOW_NAIVE_WGSL);
+          pipes.flowT = makePipeline(FLOW_TILED_WGSL);
+
+          // canny chains: blur -> gradient -> NMS+threshold -> hysteresis ping-pong -> colorize
+          bgs.cbN = makeBindGroup(pipes.gaussN, grayTex, blurN);
+          bgs.cbT = makeBindGroup(pipes.gaussT, grayTex, blurT);
+          bgs.cgN = makeBindGroup(pipes.gradN, blurN, gradN);
+          bgs.cgT = makeBindGroup(pipes.gradT, blurT, gradT);
+          bgs.cnN = makeBindGroup(pipes.nmsN, gradN, edgeNa);
+          bgs.cnT = makeBindGroup(pipes.nmsT, gradT, edgeTa);
+          bgs.chNA = makeBindGroup(pipes.hystN, edgeNa, edgeNb);
+          bgs.chNB = makeBindGroup(pipes.hystN, edgeNb, edgeNa);
+          bgs.chTA = makeBindGroup(pipes.hystT, edgeTa, edgeTb);
+          bgs.chTB = makeBindGroup(pipes.hystT, edgeTb, edgeTa);
+          bgs.coN = makeBindGroup(pipes.edgeOut, edgeNa, outNaiveTex);
+          bgs.coT = makeBindGroup(pipes.edgeOut, edgeTa, outTiledTex);
+
+          // harris: gradient from gray, then structure tensor
+          bgs.hgN = makeBindGroup(pipes.gradN, grayTex, gradN);
+          bgs.hgT = makeBindGroup(pipes.gradT, grayTex, gradT);
+          bgs.hrN = makeBindGroup(pipes.harrisN, gradN, outNaiveTex);
+          bgs.hrT = makeBindGroup(pipes.harrisT, gradT, outTiledTex);
+
+          // flow: current + previous gray
+          bgs.flN = makeBindGroup2(pipes.flowN, grayTex, prevGrayTex, outNaiveTex);
+          bgs.flT = makeBindGroup2(pipes.flowT, grayTex, prevGrayTex, outTiledTex);
+
           readNaive = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
           readTiled = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
           if (useTs) {
             // The enum was renamed across spec revisions: 'timestamp-query' before,
             // 'timestamp' on current builds. Try both, keep whichever the browser takes.
             try {
-              querySet = device.createQuerySet({ type: 'timestamp', count: 6 });
+              querySet = device.createQuerySet({ type: 'timestamp', count: 34 });
             } catch (e1) {
-              querySet = device.createQuerySet({ type: 'timestamp-query', count: 6 });
+              querySet = device.createQuerySet({ type: 'timestamp-query', count: 34 });
             }
-            tsResolve = device.createBuffer({ size: 6 * 8, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC });
-            tsRead = device.createBuffer({ size: 6 * 8, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+            // slots: lum (0,1); naive chain pass i (2+2i, 3+2i); tiled chain pass i (18+2i, 19+2i)
+            tsResolve = device.createBuffer({ size: 512, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC });
+            tsRead = device.createBuffer({ size: 34 * 8, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
           }
 
           var note = adapterSoftware ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
           line.innerHTML = 'Adapter: <b>' + adapterLabel + '</b>' + note;
           document.getElementById('start-btn').disabled = false;
-          selfTest();
           if (sourceMode === 'pattern') begin(); // the test scene needs no permission: race immediately
         });
       }).catch(function (err) {
@@ -682,31 +1138,19 @@
         ]
       });
     }
+    function makeBindGroup2(pipe, srcView, secondView, outTex) {
+      return device.createBindGroup({
+        layout: pipe.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: szBuf } },
+          { binding: 1, resource: srcView },
+          { binding: 2, resource: outTex.createView() },
+          { binding: 3, resource: secondView }
+        ]
+      });
+    }
 
     /* ================= self test ================= */
-
-    function selfTest() {
-      pushFrame();
-      dispatchFrame();
-      device.queue.onSubmittedWorkDone().then(function () {
-        var enc = device.createCommandEncoder();
-        enc.copyTextureToBuffer({ texture: outNaiveTex }, { buffer: readNaive, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
-        enc.copyTextureToBuffer({ texture: outTiledTex }, { buffer: readTiled, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
-        device.queue.submit([enc.finish()]);
-        Promise.all([readNaive.mapAsync(GPUMapMode.READ), readTiled.mapAsync(GPUMapMode.READ)]).then(function () {
-          var n = new Uint8Array(readNaive.getMappedRange());
-          var t = new Uint8Array(readTiled.getMappedRange());
-          var diff = 0;
-          for (var i = 0; i < n.length; i++) {
-            var d = Math.abs(n[i] - t[i]);
-            if (d > diff) diff = d;
-          }
-          readNaive.unmap(); readTiled.unmap();
-          document.getElementById('st-diff').textContent = diff + ' LSB';
-          document.getElementById('st-diff').className = 'v' + (diff <= 2 ? ' pass' : ' warn');
-        }).catch(function () { /* readback retried on the next frame */ });
-      }).catch(function () { /* retry once on the next frame */ });
-    }
 
     /* ================= sources ================= */
 
@@ -801,39 +1245,123 @@
 
     function dispatchFrame() {
       pushFrame();
-      var enc = device.createCommandEncoder();
-      var tw = function (a, b) {
-        return useTs ? { timestampWrites: { querySet: querySet, beginningOfPassWriteIndex: a, endOfPassWriteIndex: b } } : undefined;
-      };
+      var W8 = Math.ceil(WIDTH / 8), H8 = Math.ceil(HEIGHT / 8);
+      var W16 = Math.ceil(WIDTH / 16), H16 = Math.ceil(HEIGHT / 16);
 
-      var pass = enc.beginComputePass(tw(0, 1));
-      pass.setPipeline(pipeLum);
-      pass.setBindGroup(0, bgLum);
-      pass.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
-      pass.end();
+      // Stage-grouped dispatch: each stage is one submit holding the naive and
+      // tiled pass of that step. Multi-pass chains (canny's hysteresis ping-pong)
+      // must not share a submit with the pass that feeds them: keeping the
+      // stage boundaries as submit boundaries keeps the two chains bit-identical
+      // on every backend.
+      var stages = [];
+      var np = 0, tp = 0;
+      var stageN = [], stageT = [];
 
-      if (kernelMode !== 'lum') {
-        var nPipe = (kernelMode === 'sobel') ? pipes.sobelN : pipes.gaussN;
-        var tPipe = (kernelMode === 'sobel') ? pipes.sobelT : pipes.gaussT;
-
-        var np = enc.beginComputePass(tw(2, 3));
-        np.setPipeline(nPipe);
-        np.setBindGroup(0, bgs[kernelMode === 'sobel' ? 'sobelN' : 'gaussN']);
-        np.dispatchWorkgroups(Math.ceil(WIDTH / 8), Math.ceil(HEIGHT / 8));
-        np.end();
-
-        var tp = enc.beginComputePass(tw(4, 5));
-        tp.setPipeline(tPipe);
-        tp.setBindGroup(0, bgs[kernelMode === 'sobel' ? 'sobelT' : 'gaussT']);
-        tp.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
-        tp.end();
+      function passDesc(pipe, bg, gx, gy, tsBase) {
+        return [pipe, bg, gx, gy, tsBase];
       }
 
-      if (useTs) {
-        enc.resolveQuerySet(querySet, 0, 6, tsResolve, 0);
-        enc.copyBufferToBuffer(tsResolve, 0, tsRead, 0, 6 * 8);
+      // stage 0: luminance reference
+      stageN.push(passDesc(pipeLum, bgLum, W16, H16, 0));
+
+      if (kernelMode === 'gauss' || kernelMode === 'sobel') {
+        var kn = (kernelMode === 'sobel') ? 'sobelN' : 'gaussN';
+        var kt = (kernelMode === 'sobel') ? 'sobelT' : 'gaussT';
+        stageN.push(passDesc(pipes[kn], bgs[kn], W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes[kt], bgs[kt], W16, H16, 18 + 2 * tp++));
+
+      } else if (kernelMode === 'canny') {
+        // blur -> gradient -> NMS+threshold -> hysteresis x4 -> colorize
+        stageN.push(passDesc(pipes.gaussN, bgs.cbN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.gaussT, bgs.cbT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT]);
+        stageN = []; stageT = [];
+
+        stageN.push(passDesc(pipes.gradN, bgs.cgN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.gradT, bgs.cgT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT]);
+        stageN = []; stageT = [];
+
+        stageN.push(passDesc(pipes.nmsN, bgs.cnN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.nmsT, bgs.cnT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT]);
+        stageN = []; stageT = [];
+
+        for (var i = 0; i < 4; i++) {
+          stageN.push(passDesc(pipes.hystN, (i % 2 === 0) ? bgs.chNA : bgs.chNB, W8, H8, 2 + 2 * np++));
+          stageT.push(passDesc(pipes.hystT, (i % 2 === 0) ? bgs.chTA : bgs.chTB, W16, H16, 18 + 2 * tp++));
+          stages.push([stageN, stageT]);
+          stageN = []; stageT = [];
+        }
+
+        stageN.push(passDesc(pipes.edgeOut, bgs.coN, W16, H16, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.edgeOut, bgs.coT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT]);
+        stageN = []; stageT = [];
+
+      } else if (kernelMode === 'harris') {
+        stageN.push(passDesc(pipes.gradN, bgs.hgN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.gradT, bgs.hgT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT]);
+        stageN = []; stageT = [];
+
+        stageN.push(passDesc(pipes.harrisN, bgs.hrN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.harrisT, bgs.hrT, W16, H16, 18 + 2 * tp++));
+
+      } else if (kernelMode === 'flow') {
+        var pre = !flowPrevReady;
+        stageN.push(passDesc(pipes.flowN, bgs.flN, W8, H8, 2 + 2 * np++));
+        stageT.push(passDesc(pipes.flowT, bgs.flT, W16, H16, 18 + 2 * tp++));
+        stages.push([stageN, stageT, pre]); // pre: seed prevGray with the current frame first
+        stageN = []; stageT = [];
+        flowPrevReady = true;
       }
-      device.queue.submit([enc.finish()]);
+
+      stages.push([stageN, stageT]);
+
+      var nStages = stages.length;
+      var seq = Promise.resolve();
+      for (var s = 0; s < nStages; s++) {
+        (function (idx) {
+          seq = seq.then(function () {
+            var enc = device.createCommandEncoder();
+            var group = stages[idx];
+            if (group[2] === true) {
+              enc.copyTextureToTexture({ texture: grayTex }, { texture: prevGrayTex }, [WIDTH, HEIGHT]);
+            }
+            for (var side = 0; side < 2; side++) {
+              var list = group[side];
+              for (var k = 0; k < list.length; k++) {
+                var pd = list[k];
+                var pass = enc.beginComputePass(useTs ? {
+                  timestampWrites: { querySet: querySet, beginningOfPassWriteIndex: pd[4], endOfPassWriteIndex: pd[4] + 1 }
+                } : undefined);
+                pass.setPipeline(pd[0]);
+                pass.setBindGroup(0, pd[1]);
+                pass.dispatchWorkgroups(pd[2], pd[3]);
+                pass.end();
+              }
+            }
+            if (idx === nStages - 1 && useTs) {
+              // Resolve only the slots written this frame; resolving never-written
+              // slots raises an internal error on every submit.
+              // resolveQuerySet destination offsets must be 256-aligned.
+              enc.resolveQuerySet(querySet, 0, 2 + 2 * np, tsResolve, 0);
+              if (tp > 0) enc.resolveQuerySet(querySet, 18, 2 * tp, tsResolve, 256);
+              enc.copyBufferToBuffer(tsResolve, 0, tsRead, 0, (2 + 2 * np) * 8);
+              if (tp > 0) enc.copyBufferToBuffer(tsResolve, 256, tsRead, 18 * 8, 2 * tp * 8);
+            }
+            device.queue.submit([enc.finish()]);
+            // The queue wait between stages is what keeps the naive and tiled
+            // chains bit-identical on every backend: storage-texture reads of
+            // work queued in the same flush are not reliably ordered under
+            // SwiftShader, and a correctness ledger must never depend on that.
+            return device.queue.onSubmittedWorkDone();
+          });
+        })(s);
+      }
+      lastNPasses = Math.max(np, tp);
+      return seq;
     }
 
     /* ================= the loop ================= */
@@ -844,41 +1372,50 @@
 
       var t0 = performance.now();
       viewSrcCtx.drawImage(currentSourceCanvas(), 0, 0, WIDTH, HEIGHT);
-      dispatchFrame();
-      device.queue.onSubmittedWorkDone().then(function () {
+      dispatchFrame().then(function () {
         var frameMs = performance.now() - t0;
         frameCount++;
         var fps = 1000 * frameCount / (performance.now() - fpsLast);
 
         document.getElementById('st-fps').textContent = fps.toFixed(1);
 
-        if (useTs && kernelMode !== 'lum' && !tsMapBusy) {
-          tsMapBusy = true;
-          tsRead.mapAsync(GPUMapMode.READ).then(function () {
+        // Every map completes and unmaps inside this serialized chain, so no
+        // buffer is ever pending map across a submit.
+        var chain;
+        if (useTs && kernelMode !== 'lum') {
+          chain = tsRead.mapAsync(GPUMapMode.READ).then(function () {
             var ts = new BigInt64Array(tsRead.getMappedRange());
-            lastMsNaive = Number(ts[3] - ts[2]) / 1e6;
-            lastMsTiled = Number(ts[5] - ts[4]) / 1e6;
+            var nMs = 0, tMs = 0;
+            for (var i = 0; i < lastNPasses; i++) {
+              nMs += Number(ts[3 + 2 * i] - ts[2 + 2 * i]) / 1e6;
+              tMs += Number(ts[19 + 2 * i] - ts[18 + 2 * i]) / 1e6;
+            }
+            lastMsNaive = nMs;
+            lastMsTiled = tMs;
             tsRead.unmap();
-            tsMapBusy = false;
             document.getElementById('st-naive').textContent = lastMsNaive.toFixed(2);
             document.getElementById('st-tiled').textContent = lastMsTiled.toFixed(2);
             document.getElementById('st-speedup').textContent =
               (lastMsNaive / Math.max(lastMsTiled, 0.01)).toFixed(2) + 'x';
-          }).catch(function () { tsMapBusy = false; });
+          });
         } else if (!useTs) {
           // No timestamp support: report wall time honestly, per pass unavailable.
           document.getElementById('k-naive').textContent = 'wall ms/frame';
           document.getElementById('st-naive').textContent = frameMs.toFixed(2);
           document.getElementById('st-tiled').textContent = 'n/a';
           document.getElementById('st-speedup').textContent = 'n/a';
+          chain = Promise.resolve();
+        } else {
+          chain = Promise.resolve();
         }
 
-        var enc = device.createCommandEncoder();
-        enc.copyTextureToBuffer({ texture: outNaiveTex }, { buffer: readNaive, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
-        enc.copyTextureToBuffer({ texture: outTiledTex }, { buffer: readTiled, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
-        device.queue.submit([enc.finish()]);
-
-        Promise.all([readNaive.mapAsync(GPUMapMode.READ), readTiled.mapAsync(GPUMapMode.READ)]).then(function () {
+        return chain.then(function () {
+          var enc = device.createCommandEncoder();
+          enc.copyTextureToBuffer({ texture: outNaiveTex }, { buffer: readNaive, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
+          enc.copyTextureToBuffer({ texture: outTiledTex }, { buffer: readTiled, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
+          device.queue.submit([enc.finish()]);
+          return Promise.all([readNaive.mapAsync(GPUMapMode.READ), readTiled.mapAsync(GPUMapMode.READ)]);
+        }).then(function () {
           var n = new Uint8Array(readNaive.getMappedRange());
           var t = new Uint8Array(readTiled.getMappedRange());
 
@@ -894,10 +1431,9 @@
           document.getElementById('st-diff').className = 'v' + (diff <= 2 ? ' pass' : ' warn');
 
           readNaive.unmap(); readTiled.unmap();
-          if (streaming) rafId = window.requestAnimationFrame(loop);
-        }).catch(function () {
-          if (streaming) rafId = window.requestAnimationFrame(loop);
         });
+      }).then(function () {
+        if (streaming) rafId = window.requestAnimationFrame(loop);
       }).catch(function () {
         if (streaming) rafId = window.requestAnimationFrame(loop);
       });
@@ -927,6 +1463,10 @@
       });
       document.getElementById('kernel-select').addEventListener('change', function (e) {
         kernelMode = e.target.value;
+        flowPrevReady = false; // re-seed the previous-frame texture on the first flow frame
+        var lbl = (kernelMode === 'canny') ? 'chain GPU ms' : 'GPU ms';
+        document.getElementById('k-naive').textContent = 'naive ' + lbl;
+        document.getElementById('k-tiled').textContent = 'tiled ' + lbl;
       });
     }
 
