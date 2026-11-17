@@ -248,12 +248,61 @@
     </nav>
 
         <header>
-      <span class="status-chip">research</span>
+      <span class="status-chip">research &middot; capability detection live</span>
       <h1>AR/VR Lab</h1>
-      <p class="headline">WebXR research with GPU-computed vision passes. <b>Meta Quest passthrough</b> experiments first: the vision stack computes, the immersive layer renders. A clear-eyed note on smart glasses follows.</p>
+      <p class="headline">Research toward WebXR compute: the vision stack of the other labs
+      running <b>on device</b> inside an immersive session. This page states plainly what is
+      possible today, what is experimental, and what consumer hardware forbids.</p>
     </header>
-    <div class="list-card"><h2>What this lab covers</h2><ul><li>WebXR immersive-ar sessions in the Meta Quest browser, with the vision stack computing on device</li><li>Hand-tracking fusion with the WebGPU vision pipeline from the bio demo</li><li>An honest account of smart glasses: consumer AR glasses expose no browser capture API, and no lab here will pretend otherwise</li></ul></div>
-    <div class="list-card"><h2>Roadmap</h2><ul><li>Milestone 1: WebXR session and passthrough research</li><li>Milestone 2: passthrough computer-vision overlay</li><li>Milestone 3: hand-tracking fusion with the WebGPU pipeline</li></ul></div>
+
+    <div class="arena-card">
+      <h2>Live capability check</h2>
+      <ul id="xr-inspector" style="line-height:2;">
+        <li>WebXR API: <span id="xr-api">checking&hellip;</span></li>
+        <li>immersive-ar session: <span id="xr-ar">checking&hellip;</span></li>
+        <li>immersive-vr session: <span id="xr-vr">checking&hellip;</span></li>
+        <li>WebGPU (for the compute stack): <span id="xr-gpu">checking&hellip;</span></li>
+      </ul>
+      <p class="ledger-note">
+        This check runs the real <b>navigator.xr.isSessionSupported</b> probes. A headset
+        browser (Meta Quest Browser, Wolvic) reports immersive-ar here; desktop browsers
+        report it honestly as unsupported.
+      </p>
+    </div>
+
+    <div class="list-card">
+      <h2>Research phases</h2>
+      <ul>
+        <li><b>Phase 1:</b> an <b>immersive-ar</b> session in the Meta Quest Browser. The
+        WebGPU compute stack of the other labs (flow, splatting, the inference kernels) runs
+        on the headset's GPU; the immersive layer renders with the session's WebGL surface.
+        The plan: port the Vision Arena sources to a shared module, run the compute passes
+        offscreen, and feed the results to the XR framebuffer.</li>
+        <li><b>Phase 2:</b> <b>passthrough computer vision</b>. The camera frames come from the
+        XR session, not from getUserMedia; the WebGPU-WebXR binding is still experimental, so
+        the honest architecture is a hybrid: WebGPU compute for the vision passes, WebGL for
+        the XR rendering path, with the frame handoff documented per headset.</li>
+        <li><b>Phase 3:</b> <b>hand-tracking fusion</b> with the bio demo's pipeline: the
+        session's joint poses drive the same algorithms the flat page runs, at the headset's
+        frame budget instead of the desktop's.</li>
+      </ul>
+    </div>
+
+    <div class="list-card">
+      <h2>What consumer hardware forbids (stated plainly)</h2>
+      <ul>
+        <li><b>Consumer AR glasses expose no browser capture API.</b> The passthrough cameras
+        of a Quest or an XREAL device are not reachable from a web page; any demo claiming
+        otherwise is faking it. This lab documents that limitation instead of performing it.</li>
+        <li><b>Immersive sessions need a user gesture and a secure context</b> &mdash; the
+        capability check above is the honest part that runs everywhere; the session itself
+        starts only on supported headset hardware.</li>
+        <li><b>The WebGPU-WebXR binding is experimental.</b> The hybrid compute-and-render
+        architecture above is the current state of the art, and this page will say so until
+        the platforms change.</li>
+      </ul>
+    </div>
+
     <div class="prose" style="text-align:center;">
       Questions or collaboration: <a href="/contacts" style="color:var(--accent);">contact</a>.
       Progress notes land on the <a href="/" style="color:var(--accent);">main page</a> as milestones ship.
@@ -267,35 +316,48 @@
   <script>
   (function () {
     'use strict';
+
     function set(id, value) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = value;
+      var e = document.getElementById(id);
+      if (e) e.textContent = value;
     }
+
     function start() {
-      if (!navigator.gpu) {
-        set('gi-available', 'not available in this browser');
-        set('gi-adapter', 'demos fall back to WebGL');
-        set('gi-wg', 'n/a');
-        set('gi-buf', 'n/a');
-        set('gi-f16', 'n/a');
-        set('gi-ts', 'n/a');
-        return;
+      if (!('xr' in navigator)) {
+        set('xr-api', 'not present in this browser');
+        set('xr-ar', 'n/a');
+        set('xr-vr', 'n/a');
+      } else {
+        set('xr-api', 'present');
+        if (navigator.xr.isSessionSupported) {
+          navigator.xr.isSessionSupported('immersive-ar').then(function (ok) {
+            set('xr-ar', ok ? 'supported on this device' : 'not supported here');
+          }).catch(function (err) {
+            set('xr-ar', 'probe failed: ' + err);
+          });
+          navigator.xr.isSessionSupported('immersive-vr').then(function (ok) {
+            set('xr-vr', ok ? 'supported on this device' : 'not supported here');
+          }).catch(function (err) {
+            set('xr-vr', 'probe failed: ' + err);
+          });
+        } else {
+          set('xr-ar', 'isSessionSupported unavailable');
+          set('xr-vr', 'isSessionSupported unavailable');
+        }
       }
-      navigator.gpu.requestAdapter().then(function (adapter) {
-        if (!adapter) { set('gi-available', 'no GPU adapter found'); return; }
-        set('gi-available', 'available');
-        var info = adapter.info || {};
-        set('gi-adapter', [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported');
-        var limits = adapter.limits || {};
-        set('gi-wg', limits.maxComputeWorkgroupSizeX ? limits.maxComputeWorkgroupSizeX + ' threads' : 'reported');
-        set('gi-buf', limits.maxStorageBufferBindingSize ? Math.round(limits.maxStorageBufferBindingSize / (1024 * 1024)) + ' MB' : 'reported');
-        var f = adapter.features ? Array.from(adapter.features) : [];
-        set('gi-f16', f.indexOf('shader-f16') !== -1 ? 'supported' : 'not exposed');
-        set('gi-ts', f.indexOf('timestamp-query') !== -1 ? 'supported' : 'not exposed');
-      }).catch(function () {
-        set('gi-available', 'adapter request failed');
-      });
+      if (!navigator.gpu) {
+        set('xr-gpu', 'not available in this browser');
+      } else {
+        navigator.gpu.requestAdapter().then(function (a) {
+          if (!a) { set('xr-gpu', 'no adapter'); return; }
+          var info = a.info || {};
+          set('xr-gpu', 'available (' + [info.vendor, info.architecture].filter(Boolean).join(' / ') || 'reported' + ')');
+        }).catch(function () {
+          set('xr-gpu', 'adapter request failed');
+        });
+      }
     }
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', start);
     } else {
