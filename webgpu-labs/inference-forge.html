@@ -361,11 +361,48 @@
     </div>
 
     <div class="arena-card">
+      <h2>Quantized GEMM: M3 kernels, live</h2>
+      <div class="device-line">4-bit packed weights &middot; group size 32 &middot; symmetric quant &middot; dequantize-on-load &middot; same matrix as the ladder above</div>
+
+      <button class="run-btn" id="q-btn" type="button">Run quantized ladder</button>
+
+      <table class="results" style="margin-top:18px;" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Time / run</th>
+            <th>Throughput</th>
+            <th>Weight stream</th>
+            <th>Max abs error</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="quant-body">
+          <tr id="quant-placeholder"><td colspan="6" style="color:var(--text-dim); font-family:'Inter',sans-serif;">
+            Press <b>Run quantized ladder</b> to dispatch the fp32 reference and both 4-bit kernels.
+          </td></tr>
+        </tbody>
+      </table>
+
+      <p class="ledger-note">
+        <b>The quantization trade:</b> weights are packed two 4-bit values per byte
+        (symmetric, per-32-element scales), so a run streams <b>0.625 &times; N&sup2; bytes</b>
+        of weights instead of 4 &times; N&sup2; &mdash; 6.4&times; less memory traffic for the
+        same arithmetic. <b>Max abs error</b> here is measured against the dequantized-weight
+        reference: it is the honest price of quantization, and the status column checks it
+        stays inside the per-block scale bound rather than pretending it is zero. The two
+        4-bit tiers must also agree with each other bit-for-bit before any timing is trusted.
+        Decode is memory-bound: this 6.4&times; is why quantized engines beat fp16 at the
+        same arithmetic.
+      </p>
+    </div>
+
+    <div class="arena-card">
       <h2>Where this goes</h2>
       <div style="line-height:1.9; color:var(--text-dim); font-size:0.95rem;">
         <span class="phase-tag">M1 &middot; live</span> GEMM ladder (naive + workgroup-tiled), correctness ledger<br>
         <span class="phase-tag">M2 &middot; kernels live</span> causal attention with a persistent KV cache, RoPE, RMSNorm as fused WGSL passes<br>
-        <span class="phase-tag sealed">M3 &middot; sealed</span> packed 4-bit weight kernels: the optimized implementations ship inside the vault<br>
+        <span class="phase-tag">M3 &middot; kernels live</span> packed 4-bit weight GEMM: dequantize-on-load, naive and tiled tiers, the 6.4&times; traffic delta measured live<br>
         <span class="phase-tag">M4</span> tokenizer + streaming generation with the per-kernel latency dashboard
       </div>
       <p class="ledger-note" style="margin-top:16px;">
@@ -380,7 +417,7 @@
     <div class="list-card">
       <h2>What the full engine will demonstrate</h2>
       <ul>
-        <li><b>Packed 4-bit weight GEMM</b> with dequantize-on-load, benchmarked against fp16</li>
+        <li><b>Packed 4-bit weight GEMM</b> with dequantize-on-load, benchmarked against the fp32 tier &mdash; <i>live above</i></li>
         <li><b>RoPE and RMSNorm</b> as fused WGSL passes</li>
         <li><b>Causal attention</b> with a persistent KV cache, visualized as it fills</li>
         <li><b>Top-p sampling</b> with a live token stream</li>
@@ -393,7 +430,7 @@
       <ul>
         <li><b>Milestone 1:</b> fp16 forward pass of a GPT-2 class model, correctness ledger vs fp32, live on this page</li>
         <li><b>Milestone 2:</b> causal attention with a persistent KV cache</li>
-        <li><b>Milestone 3:</b> 4-bit quantized kernels and packed weight loading (sealed tier)</li>
+        <li><b>Milestone 3:</b> 4-bit quantized kernels and packed weight loading &mdash; <i>live above</i></li>
         <li><b>Milestone 4:</b> streaming UI with per-kernel instrumentation</li>
         <li><b>The honest benchmark:</b> memory-bound decode within striking distance of llama.cpp, on every GPU vendor, from a single URL, with the numbers published here unedited</li>
       </ul>
@@ -470,6 +507,89 @@
       '',
       '    for (var k = 0u; k < 16u; k = k + 1u) {',
       '      sum = sum + tileA[lid.y * 16u + k] * tileB[k * 16u + lid.x];',
+      '    }',
+      '    workgroupBarrier();',
+      '  }',
+      '',
+      '  if (row < dim && col < dim) { out[row * dim + col] = sum; }',
+      '}'
+    ].join('\n');
+
+    /* ================= M3: quantized weight kernels ================= */
+
+    var QCOMMON = [
+      'struct QParams {',
+      '  dim : u32,',
+      '  _pad0 : u32,',
+      '  _pad1 : u32,',
+      '  _pad2 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> qp : QParams;',
+      '@group(0) @binding(1) var<storage, read> a : array<f32>;',
+      '@group(0) @binding(2) var<storage, read> bq : array<u32>;',
+      '@group(0) @binding(3) var<storage, read> sc : array<f32>;',
+      '@group(0) @binding(4) var<storage, read_write> out : array<f32>;',
+      '',
+      // one nibble of a packed weight word, signed 4-bit, times its block scale
+      'fn deq(w : u32, nib : u32, s : f32) -> f32 {',
+      '  let v = i32((w >> (nib * 4u)) & 0xFu);',
+      '  let sv = select(v, v - 16, v >= 8);',
+      '  return f32(sv) * s;',
+      '}'
+    ].join('\n');
+
+    var Q4_NAIVE_WGSL = QCOMMON + '\n' + [
+      '@compute @workgroup_size(8, 8)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let dim = qp.dim;',
+      '  let row = gid.y;',
+      '  let col = gid.x;',
+      '  if (row >= dim || col >= dim) { return; }',
+      '  var sum = 0.0;',
+      '  for (var k = 0u; k < dim; k = k + 1u) {',
+      '    let w = bq[(k / 8u) * dim + col];',
+      '    let s = sc[(k / 32u) * dim + col];',
+      '    sum = sum + a[row * dim + k] * deq(w, k % 8u, s);',
+      '  }',
+      '  out[row * dim + col] = sum;',
+      '}'
+    ].join('\n');
+
+    var Q4_TILED_WGSL = QCOMMON + '\n' + [
+      // staged per tile: fp32 activations, packed weights (2 words per column),
+      // one scale per column (a 16-row tile never crosses a 32-row scale block)
+      'var<workgroup> tileA : array<f32, 256>;',
+      'var<workgroup> tileW : array<u32, 32>;',
+      'var<workgroup> tileS : array<f32, 16>;',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>,',
+      '        @builtin(local_invocation_id) lid : vec3<u32>,',
+      '        @builtin(workgroup_id) wid : vec3<u32>) {',
+      '  let dim = qp.dim;',
+      '  let row = wid.y * 16u + lid.y;',
+      '  let col = wid.x * 16u + lid.x;',
+      '  var sum = 0.0;',
+      '  let tileCount = (dim + 15u) / 16u;',
+      '',
+      '  for (var t = 0u; t < tileCount; t = t + 1u) {',
+      '    let aCol = t * 16u + lid.x;',
+      '    let bRow = t * 16u + lid.y;',
+      '    if (row < dim && aCol < dim) { tileA[lid.y * 16u + lid.x] = a[row * dim + aCol]; }',
+      '    else { tileA[lid.y * 16u + lid.x] = 0.0; }',
+      '    if (col < dim && bRow < dim) {',
+      '      tileW[(lid.y / 8u) * 16u + lid.x] = bq[(bRow / 8u) * dim + col];',
+      '      tileS[lid.x] = sc[(bRow / 32u) * dim + col];',
+      '    } else {',
+      '      tileW[(lid.y / 8u) * 16u + lid.x] = 0u;',
+      '      tileS[lid.x] = 0.0;',
+      '    }',
+      '    workgroupBarrier();',
+      '',
+      '    let s = tileS[lid.x];',
+      '    for (var k = 0u; k < 16u; k = k + 1u) {',
+      '      let w = tileW[(k / 8u) * 16u + lid.x];',
+      '      sum = sum + tileA[lid.y * 16u + k] * deq(w, k % 8u, s);',
       '    }',
       '    workgroupBarrier();',
       '  }',
@@ -627,6 +747,8 @@
 
         return adapter.requestDevice().then(function (dev) {
           device = dev;
+          device.addEventListener('uncapturederror', function (e) { console.error('GPUERR:', e.message); });
+          device.lost.then(function (info) { console.error('DEVICELOST:', info.reason, info.message); });
           pipeNaive = null;
           pipeTiled = null;
           pipeDims = 0;
@@ -639,6 +761,7 @@
             (adapterSoftware ? ' <span class="sw-note">(software renderer)</span>' : '') +
             (note ? '<br>' + note : '');
           document.getElementById('run-btn').disabled = false;
+          document.getElementById('q-btn').disabled = false;
         });
       }).catch(function (err) {
         line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
@@ -708,36 +831,33 @@
         pass.end();
       }
 
-      // warmup: one untimed dispatch so shader compilation is out of the timing
+      // warmup: one untimed dispatch so shader compilation is out of the timing.
+      // Synchronization uses the readback's mapAsync (which waits for all prior
+      // queue work): onSubmittedWorkDone stalls indefinitely on some Chromium
+      // builds, so it never gates the timing path.
       var warmEnc = device.createCommandEncoder();
       dispatchOnce(warmEnc);
       device.queue.submit([warmEnc.finish()]);
 
-      return device.queue.onSubmittedWorkDone().then(function () {
-        var t0 = performance.now();
-        for (var i = 0; i < iterations; i++) {
-          var enc = device.createCommandEncoder();
-          dispatchOnce(enc);
-          device.queue.submit([enc.finish()]);
-        }
-        return device.queue.onSubmittedWorkDone().then(function () {
-          var perRunMs = (performance.now() - t0) / iterations;
-          var gflops = (2 * dim * dim * dim) / (perRunMs / 1000) / 1e9;
+      var readBuf = device.createBuffer({ size: bytes, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      var t0 = performance.now();
+      for (var i = 0; i < iterations; i++) {
+        var enc = device.createCommandEncoder();
+        dispatchOnce(enc);
+        device.queue.submit([enc.finish()]);
+      }
+      var copyEnc = device.createCommandEncoder();
+      copyEnc.copyBufferToBuffer(oBuf, 0, readBuf, 0, bytes);
+      device.queue.submit([copyEnc.finish()]);
 
-          // read back for correctness / cross-check
-          var readBuf = device.createBuffer({ size: bytes, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
-          var copyEnc = device.createCommandEncoder();
-          copyEnc.copyBufferToBuffer(oBuf, 0, readBuf, 0, bytes);
-          device.queue.submit([copyEnc.finish()]);
-
-          return readBuf.mapAsync(GPUMapMode.READ).then(function () {
-            var out = new Float32Array(readBuf.getMappedRange().slice(0));
-            readBuf.unmap();
-            readBuf.destroy();
-            aBuf.destroy(); bBuf.destroy(); oBuf.destroy(); pBuf.destroy();
-            return { out: out, perRunMs: perRunMs, gflops: gflops };
-          });
-        });
+      return readBuf.mapAsync(GPUMapMode.READ).then(function () {
+        var perRunMs = (performance.now() - t0) / iterations;
+        var gflops = (2 * dim * dim * dim) / (perRunMs / 1000) / 1e9;
+        var out = new Float32Array(readBuf.getMappedRange().slice(0));
+        readBuf.unmap();
+        readBuf.destroy();
+        aBuf.destroy(); bBuf.destroy(); oBuf.destroy(); pBuf.destroy();
+        return { out: out, perRunMs: perRunMs, gflops: gflops };
       });
     }
 
@@ -831,6 +951,232 @@
       });
     }
 
+    /* ================= M3: quantized ladder ================= */
+
+    var GROUP = 32; // weights quantized per 32 consecutive k-elements
+
+    // pack dataB (dim x dim, k-major) into 4-bit words + per-block scales
+    function quantizeB(dim, dataB) {
+      var packed = new Uint32Array((dim / 8) * dim);
+      var scales = new Float32Array((dim / GROUP) * dim);
+      var maxScale = 0;
+      for (var col = 0; col < dim; col++) {
+        for (var kb = 0; kb < dim / GROUP; kb++) {
+          var m = 0;
+          for (var k = kb * GROUP; k < (kb + 1) * GROUP; k++) {
+            var v = Math.abs(dataB[k * dim + col]);
+            if (v > m) m = v;
+          }
+          var scale = (m === 0) ? 1 : m / 7;
+          if (scale > maxScale) maxScale = scale;
+          scales[kb * dim + col] = scale;
+          for (var k2 = kb * GROUP; k2 < (kb + 1) * GROUP; k2++) {
+            var q = Math.round(dataB[k2 * dim + col] / scale);
+            if (q > 7) q = 7; else if (q < -8) q = -8;
+            var word = (k2 / 8 | 0) * dim + col;
+            var shift = (k2 % 8) * 4;
+            var uv = (q < 0) ? (q + 16) : q; // two's complement nibble
+            packed[word] = (packed[word] | (uv << shift)) >>> 0;
+          }
+        }
+      }
+      return { packed: packed, scales: scales, maxScale: maxScale };
+    }
+
+    // dequantize back to f32 (fround to mirror the GPU's f32 math) for the reference
+    function dequantizeB(dim, q) {
+      var out = new Float32Array(dim * dim);
+      for (var col = 0; col < dim; col++) {
+        for (var kb = 0; kb < dim / GROUP; kb++) {
+          var scale = q.scales[kb * dim + col];
+          for (var k = kb * GROUP; k < (kb + 1) * GROUP; k++) {
+            var word = q.packed[(k / 8 | 0) * dim + col];
+            var v = (word >>> ((k % 8) * 4)) & 0xF;
+            if (v >= 8) v -= 16;
+            out[k * dim + col] = Math.fround(v * scale);
+          }
+        }
+      }
+      return out;
+    }
+
+    function runQ4Tier(dim, tiled, iterations, dataA, q) {
+      var bytesA = dim * dim * 4;
+      var bytesOut = dim * dim * 4;
+      var aBuf = device.createBuffer({ size: bytesA, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+      var wBuf = device.createBuffer({ size: q.packed.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+      var sBuf = device.createBuffer({ size: q.scales.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+      var oBuf = device.createBuffer({ size: bytesOut, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+      device.queue.writeBuffer(aBuf, 0, dataA);
+      device.queue.writeBuffer(wBuf, 0, q.packed);
+      device.queue.writeBuffer(sBuf, 0, q.scales);
+
+      var module = device.createShaderModule({ code: tiled ? Q4_TILED_WGSL : Q4_NAIVE_WGSL });
+      var pipeline = device.createComputePipeline({ layout: 'auto', compute: { module: module, entryPoint: 'main' } });
+      var pBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+      device.queue.writeBuffer(pBuf, 0, new Uint32Array([dim, 0, 0, 0]));
+
+      var bg = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: pBuf } },
+          { binding: 1, resource: { buffer: aBuf } },
+          { binding: 2, resource: { buffer: wBuf } },
+          { binding: 3, resource: { buffer: sBuf } },
+          { binding: 4, resource: { buffer: oBuf } }
+        ]
+      });
+
+      var wg = tiled ? 16 : 8;
+      var gx = Math.ceil(dim / wg), gy = Math.ceil(dim / wg);
+
+      function dispatchOnce(encoder) {
+        var pass = encoder.beginComputePass();
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bg);
+        pass.dispatchWorkgroups(gx, gy);
+        pass.end();
+      }
+
+      var warmEnc = device.createCommandEncoder();
+      dispatchOnce(warmEnc);
+      device.queue.submit([warmEnc.finish()]);
+
+      var readBuf = device.createBuffer({ size: bytesOut, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      var t0 = performance.now();
+      for (var i = 0; i < iterations; i++) {
+        var enc = device.createCommandEncoder();
+        dispatchOnce(enc);
+        device.queue.submit([enc.finish()]);
+      }
+      var copyEnc = device.createCommandEncoder();
+      copyEnc.copyBufferToBuffer(oBuf, 0, readBuf, 0, bytesOut);
+      device.queue.submit([copyEnc.finish()]);
+
+      return readBuf.mapAsync(GPUMapMode.READ).then(function () {
+        var perRunMs = (performance.now() - t0) / iterations;
+        var gflops = (2 * dim * dim * dim) / (perRunMs / 1000) / 1e9;
+        var out = new Float32Array(readBuf.getMappedRange().slice(0));
+        readBuf.unmap();
+        readBuf.destroy();
+        aBuf.destroy(); wBuf.destroy(); sBuf.destroy(); oBuf.destroy(); pBuf.destroy();
+        return { out: out, perRunMs: perRunMs, gflops: gflops };
+      });
+    }
+
+    function qRow(tier, timeMs, gflops, streamBytes, err, errLabel, cls) {
+      var body = document.getElementById('quant-body');
+      var ph = document.getElementById('quant-placeholder');
+      if (ph) ph.remove();
+      var row = document.createElement('tr');
+      var gbps = (streamBytes / (timeMs / 1000)) / 1e9;
+      row.innerHTML =
+        '<td class="tier">' + tier + '</td>' +
+        '<td class="num">' + timeMs.toFixed(2) + ' ms</td>' +
+        '<td class="num">' + gflops.toFixed(2) + ' GFLOP/s</td>' +
+        '<td class="num">' + gbps.toFixed(1) + ' GB/s w</td>' +
+        '<td class="num">' + (err === null ? 'n/a' : err.toExponential(2)) + '</td>' +
+        '<td class="' + (cls || '') + '">' + (errLabel || '') + '</td>';
+      body.appendChild(row);
+    }
+
+    function runQuantLadder(dim) {
+      if (running || !device) return;
+      running = true;
+      var btn = document.getElementById('q-btn');
+      btn.disabled = true;
+      btn.textContent = 'Running ' + dim + '\u00b7' + dim + ' quantized ladder\u2026';
+      var body = document.getElementById('quant-body');
+      var ph = document.getElementById('quant-placeholder');
+      if (ph) ph.remove();
+      body.innerHTML = '';
+
+      var iterations = dim <= 512 ? 8 : (dim <= 1024 ? 4 : 2);
+      var dataA = seedArray(dim, 1);
+      var dataB = seedArray(dim, 2);
+      var fp32Bytes = dim * dim * 4;
+      var q4Bytes = dim * dim / 2 + dim * dim / 8; // packed words + block scales
+
+      var q = quantizeB(dim, dataB);
+      var deqB = (dim <= 512) ? dequantizeB(dim, q) : null;
+      var quantBound = 0;
+      {
+        var maxAbsA = 0;
+        for (var i = 0; i < dataA.length; i++) { var v = Math.abs(dataA[i]); if (v > maxAbsA) maxAbsA = v; }
+        quantBound = dim * q.maxScale * maxAbsA;
+      }
+
+      var fp32Out = null;
+      var chain = Promise.resolve();
+
+      // fp32 tiled reference tier (the M1 champion) for the delta comparison
+      chain = chain.then(function () {
+        return runTier(dim, true, iterations, dataA, dataB).then(function (r) {
+          fp32Out = r.out;
+          qRow('fp32 tiled (M1)', r.perRunMs, r.gflops, fp32Bytes, null, 'fp32 reference tier', '');
+          return r;
+        });
+      });
+
+      // Q4 naive
+      chain = chain.then(function (rT) {
+        return runQ4Tier(dim, false, iterations, dataA, q).then(function (r) {
+          fp32Out = rT ? rT.out : fp32Out;
+          return { r: r, rT: rT };
+        });
+      });
+
+      // Q4 tiled
+      chain = chain.then(function (prev) {
+        return runQ4Tier(dim, true, iterations, dataA, q).then(function (r) {
+          return { rN: prev.r, rT: prev.rT, rQ: r };
+        });
+      });
+
+      // ledger: CPU f64 reference for small sizes, cross-checks for all
+      chain = chain.then(function (res) {
+        var bitCheck = maxAbsDiff(res.rN.out, res.rQ.out);
+        if (bitCheck !== 0) {
+          qRow('cross-check', 0, 0, 0, bitCheck, 'FAIL: 4-bit tiers disagree', 'fail');
+        }
+
+        if (dim <= 512) {
+          var refQ = new Promise(function (resolve) {
+            setTimeout(function () { resolve(cpuReference(dim, dataA, deqB)); }, 30);
+          });
+          return refQ.then(function (ref) {
+            var errN = maxAbsDiff(res.rN.out, ref);
+            var errT = maxAbsDiff(res.rQ.out, ref);
+            var okN = errN <= quantBound, okT = errT <= quantBound;
+            qRow('Q4 naive (dequant per element)', res.rN.perRunMs, res.rN.gflops, q4Bytes,
+              errN, okN ? 'PASS vs dequant f64' : 'FAIL: exceeds scale bound', okN ? 'pass' : 'fail');
+            qRow('Q4 tiled (dequant per tile)', res.rQ.perRunMs, res.rQ.gflops, q4Bytes,
+              errT, okT && bitCheck === 0 ? 'PASS: bit-identical tiers, within scale bound' : 'FAIL', okT && bitCheck === 0 ? 'pass' : 'fail');
+          });
+        }
+        // large sizes: fp64 CPU reference is too slow; measure the quantization
+        // delta against the fp32 tier computed on the GPU
+        var errN = maxAbsDiff(res.rN.out, res.rT.out);
+        var errQ = maxAbsDiff(res.rQ.out, res.rT.out);
+        qRow('Q4 naive (dequant per element)', res.rN.perRunMs, res.rN.gflops, q4Bytes,
+          errN, errN <= quantBound ? 'PASS: within quantization bound vs fp32' : 'FAIL', errN <= quantBound ? 'pass' : 'fail');
+        qRow('Q4 tiled (dequant per tile)', res.rQ.perRunMs, res.rQ.gflops, q4Bytes,
+          errQ, errQ <= quantBound && bitCheck === 0 ? 'PASS: bit-identical tiers, within bound vs fp32' : 'FAIL', errQ <= quantBound && bitCheck === 0 ? 'pass' : 'fail');
+        return null;
+      });
+
+      chain.then(function () {
+        running = false;
+        btn.disabled = false;
+        btn.textContent = 'Run quantized ladder';
+      }).catch(function (err) {
+        qRow('ladder error', 0, 0, 0, null, String(err.message || err), 'fail');
+        running = false;
+        btn.disabled = false;
+        btn.textContent = 'Run quantized ladder';
+      });
+    }
+
     /* ================= M2: primitive suite ================= */
 
     function primRow(kernel, timeMs, err, verdict, cls) {
@@ -877,7 +1223,9 @@
       pass.dispatchWorkgroups(groups);
       pass.end();
       device.queue.submit([enc.finish()]);
-      return device.queue.onSubmittedWorkDone();
+      // The caller's readbackF32 mapAsync synchronizes on all queued work;
+      // onSubmittedWorkDone stalls indefinitely on some Chromium builds.
+      return Promise.resolve();
     }
 
     function runPrimitives() {
@@ -1014,59 +1362,60 @@
         });
       }
 
-      function timed(dispatchFn) {
-        var t0 = performance.now();
-        return dispatchFn().then(function () {
-          return performance.now() - t0;
-        });
-      }
-
       function f32ToJs(arr) { var o = new Float64Array(arr.length); for (var i = 0; i < arr.length; i++) o[i] = arr[i]; return o; }
 
       var chain = Promise.resolve();
 
       // RMSNorm
       chain = chain.then(function () {
-        return timed(function () { return dispatchNamed(pipeNorm, bgNorm, ROWS); }).then(function (ms) {
-          return readbackF32(yB, xData.length * 4).then(function (out) {
-            var err = maxAbsDiff(f32ToJs(out), cpuNorm);
-            primRow('RMSNorm (row-wise, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
-          });
+        var t0 = performance.now();
+        return dispatchNamed(pipeNorm, bgNorm, ROWS).then(function () {
+          return readbackF32(yB, xData.length * 4);
+        }).then(function (out) {
+          var ms = performance.now() - t0;
+          var err = maxAbsDiff(f32ToJs(out), cpuNorm);
+          primRow('RMSNorm (row-wise, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
         });
       });
 
       // RoPE
       chain = chain.then(function () {
-        return timed(function () { return dispatchNamed(pipeRope, bgRope, ROWS); }).then(function (ms) {
-          return readbackF32(yB, xData.length * 4).then(function (out) {
-            var err = maxAbsDiff(f32ToJs(out), cpuRoPE);
-            primRow('RoPE (rotate-half, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
-          });
+        var t0 = performance.now();
+        return dispatchNamed(pipeRope, bgRope, ROWS).then(function () {
+          return readbackF32(yB, xData.length * 4);
+        }).then(function (out) {
+          var ms = performance.now() - t0;
+          var err = maxAbsDiff(f32ToJs(out), cpuRoPE);
+          primRow('RoPE (rotate-half, ' + ROWS + 'x' + DIM + ')', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
         });
       });
 
       // Attention: full 32 rows
       chain = chain.then(function () {
         setAParams(ROWS, 0);
-        return timed(function () { return dispatchNamed(pipeAtt, attBind(), ROWS); }).then(function (ms) {
-          return readbackF32(oB, ROWS * HD * 4).then(function (out) {
-            var err = maxAbsDiff(f32ToJs(out), cpuAtt);
-            primRow('Causal attention (full ' + ROWS + ' rows)', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
-          });
+        var t0 = performance.now();
+        return dispatchNamed(pipeAtt, attBind(), ROWS).then(function () {
+          return readbackF32(oB, ROWS * HD * 4);
+        }).then(function (out) {
+          var ms = performance.now() - t0;
+          var err = maxAbsDiff(f32ToJs(out), cpuAtt);
+          primRow('Causal attention (full ' + ROWS + ' rows)', ms, err, err < 1e-4 ? 'PASS vs CPU f64' : 'FAIL', err < 1e-4 ? 'pass' : 'fail');
         });
       });
 
       // KV-cache equivalence: decode row 31 from 31 cached keys + own row
       chain = chain.then(function () {
         setAParams(1, ROWS - 1);
-        return timed(function () { return dispatchNamed(pipeAtt, attBind(), 1); }).then(function (ms) {
-          return readbackF32(oB, ROWS * HD * 4).then(function (out) {
+        var t0 = performance.now();
+        return dispatchNamed(pipeAtt, attBind(), 1).then(function () {
+          return readbackF32(oB, ROWS * HD * 4);
+        }).then(function (out) {
+          var ms = performance.now() - t0;
             var decodeRow = out.subarray((ROWS - 1) * HD, ROWS * HD);
             var full31 = new Float64Array(HD);
             for (var d = 0; d < HD; d++) full31[d] = cpuAtt[(ROWS - 1) * HD + d];
             var err = maxAbsDiff(f32ToJs(decodeRow), full31);
             primRow('KV-cache decode (1 query row vs cache)', ms, err, err === 0 ? 'PASS: identical to full recomputation' : (err < 1e-5 ? 'PASS: identical to full recomputation' : 'FAIL'), err < 1e-5 ? 'pass' : 'fail');
-          });
         });
       });
 
@@ -1094,21 +1443,27 @@
       document.getElementById('prim-btn').addEventListener('click', function () {
         runPrimitives();
       });
+      document.getElementById('q-btn').addEventListener('click', function () {
+        var dim = parseInt(document.getElementById('dim-select').value, 10);
+        runQuantLadder(dim);
+      });
 
-      // auto-run the fast ladder once on load, then hold the load event
-      // briefly so headless verification captures the completed table.
-      setTimeout(function () {
+      // auto-run the fast ladder once the device is up, then the quantized
+      // ladder as soon as the fp32 one finishes
+      // poll for device readiness: adapter resolution can outrun any fixed
+      // delay on a loaded machine, so the poll lives until the ladder fires
+      var arm = setInterval(function () {
         if (!running && device) {
+          clearInterval(arm);
           runLadder(256);
-          try {
-            if (/127\.0\.0\.1/.test(location.hostname)) {
-              var x = new XMLHttpRequest();
-              x.open('GET', 'http://127.0.0.1:8767/hold.jpg', false);
-              x.send(null);
+          var retry = setInterval(function () {
+            if (!running && device) {
+              clearInterval(retry);
+              runQuantLadder(256);
             }
-          } catch (e) { /* dev-only hold */ }
+          }, 1000);
         }
-      }, 900);
+      }, 500);
     }
 
     if (document.readyState === 'loading') {
