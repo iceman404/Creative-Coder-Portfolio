@@ -333,12 +333,41 @@
       </p>
     </div>
 
+    <div class="arena-card">
+      <h2>Light Forge: progressive path tracing, live</h2>
+      <div class="device-line" id="lf-device">Initializing WebGPU&hellip;</div>
+
+      <div class="stat-row" style="display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;">
+        <div class="stat-chip"><div class="v" id="lf-spp">&ndash;</div><div class="k">samples / pixel</div></div>
+        <div class="stat-chip"><div class="v" id="lf-ms">&ndash;</div><div class="k">trace GPU ms</div></div>
+        <div class="stat-chip"><div class="v" id="lf-fps">&ndash;</div><div class="k">fps</div></div>
+        <button class="run-btn" id="lf-reset" type="button">Reset accumulation</button>
+      </div>
+
+      <div class="view-row" style="margin-top:14px;">
+        <div class="view-box">
+          <div class="view-label">Path-traced scene (converging as samples accumulate)</div>
+          <canvas id="lf-canvas" width="640" height="360"></canvas>
+        </div>
+      </div>
+
+      <p class="ledger-note">
+        One path per pixel per frame: camera ray, diffuse bounce, then direct light sampling
+        through a <b>ReSTIR-style reservoir</b> &mdash; eight candidate positions are drawn on the
+        area light per pixel per frame, weighted by their geometry and visibility terms, and only
+        the winning candidate's shadow ray is actually traced. The radiance accumulates
+        progressively, so the image converges as the samples-per-pixel counter climbs; reset it
+        to watch the estimator's variance from the start. Temporal and spatial reservoir reuse
+        (the full ReSTIR algorithm) is the next rung on this ladder.
+      </p>
+    </div>
+
     <div class="list-card">
       <h2>Gallery roadmap</h2>
       <ul>
         <li><b>Milestone 1 &middot; live:</b> Flow Field &mdash; Horn-Schunck vs coarse-to-fine multi-scale warping</li>
         <li><b>Milestone 2 &middot; live:</b> Material World &mdash; APIC material point method with atomic grid transfers</li>
-        <li><b>Milestone 3:</b> Light Forge &mdash; progressive path tracing with reservoir resampling</li>
+        <li><b>Milestone 3 &middot; live:</b> Light Forge &mdash; progressive path tracing with ReSTIR-style reservoir light sampling</li>
         <li><b>Milestone 4:</b> Splat Scene &mdash; 3D Gaussian Splatting with a GPU radix sort</li>
       </ul>
     </div>
@@ -1521,6 +1550,368 @@
         begin();
       });
       document.getElementById('stop-btn').addEventListener('click', stopSource);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+  })();
+  </script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var WIDTH = 640, HEIGHT = 360;
+
+    var TRACE_WGSL = [
+      'struct Cam {',
+      '  frame : u32,',
+      '  _p0 : u32,',
+      '  _p1 : u32,',
+      '  _p2 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> cam : Cam;',
+      '@group(0) @binding(1) var prev : texture_2d<f32>;',
+      '@group(0) @binding(2) var accum : texture_storage_2d<rgba16float, write>;',
+      '',
+      'struct Hit {',
+      '  t : f32,',
+      '  id : u32,',
+      '};',
+      '',
+      'fn pcg(state : ptr<function, u32>) -> f32 {',
+      '  var st = *state;',
+      '  st = st * 747796405u + 2891336453u;',
+      '  var word = ((st >> ((st >> 28u) + 4u)) ^ st) * 277803737u;',
+      '  word = (word >> 22u) ^ word;',
+      '  *state = st;',
+      '  return f32(word) / 4294967296.0;',
+      '}',
+      '',
+      'fn sphereCenter(id : u32) -> vec3<f32> {',
+      '  if (id == 1u) { return vec3<f32>(-1.1, 0.8, 0.2); }',
+      '  if (id == 2u) { return vec3<f32>(1.2, 1.1, -0.4); }',
+      '  return vec3<f32>(0.2, 0.35, 1.1);',
+      '}',
+      '',
+      'fn sphereRadius(id : u32) -> f32 {',
+      '  if (id == 1u) { return 0.8; }',
+      '  if (id == 2u) { return 1.1; }',
+      '  return 0.35;',
+      '}',
+      '',
+      'fn sphereHit(ro : vec3<f32>, rd : vec3<f32>, c : vec3<f32>, r : f32) -> f32 {',
+      '  let oc = ro - c;',
+      '  let b = dot(oc, rd);',
+      '  let cc = dot(oc, oc) - r * r;',
+      '  let disc = b * b - cc;',
+      '  if (disc < 0.0) { return -1.0; }',
+      '  let sq = sqrt(disc);',
+      '  let t = -b - sq;',
+      '  if (t > 0.001) { return t; }',
+      '  let t2 = -b + sq;',
+      '  if (t2 > 0.001) { return t2; }',
+      '  return -1.0;',
+      '}',
+      '',
+      'fn planeHit(ro : vec3<f32>, rd : vec3<f32>) -> f32 {',
+      '  if (rd.y > -0.0001) { return -1.0; }',
+      '  let t = -ro.y / rd.y;',
+      '  if (t > 0.001) { return t; }',
+      '  return -1.0;',
+      '}',
+      '',
+      'fn scene(ro : vec3<f32>, rd : vec3<f32>) -> Hit {',
+      '  var h : Hit;',
+      '  h.t = 10000.0;',
+      '  h.id = 4294967295u;',
+      '  let t0 = planeHit(ro, rd);',
+      '  if (t0 > 0.0 && t0 < h.t) { h.t = t0; h.id = 0u; }',
+      '  let s1 = sphereHit(ro, rd, vec3<f32>(-1.1, 0.8, 0.2), 0.8);',
+      '  if (s1 > 0.0 && s1 < h.t) { h.t = s1; h.id = 1u; }',
+      '  let s2 = sphereHit(ro, rd, vec3<f32>(1.2, 1.1, -0.4), 1.1);',
+      '  if (s2 > 0.0 && s2 < h.t) { h.t = s2; h.id = 2u; }',
+      '  let s3 = sphereHit(ro, rd, vec3<f32>(0.2, 0.35, 1.1), 0.35);',
+      '  if (s3 > 0.0 && s3 < h.t) { h.t = s3; h.id = 3u; }',
+      '  return h;',
+      '}',
+      '',
+      'fn albedo(id : u32) -> vec3<f32> {',
+      '  if (id == 0u) { return vec3<f32>(0.75, 0.75, 0.78); }',
+      '  if (id == 1u) { return vec3<f32>(0.9, 0.3, 0.25); }',
+      '  if (id == 2u) { return vec3<f32>(0.25, 0.5, 0.9); }',
+      '  return vec3<f32>(0.9, 0.8, 0.3);',
+      '}',
+      '',
+      'fn surfaceNormal(id : u32, hitP : vec3<f32>) -> vec3<f32> {',
+      '  if (id == 0u) { return vec3<f32>(0.0, 1.0, 0.0); }',
+      '  return normalize(hitP - sphereCenter(id));',
+      '}',
+      '',
+      'fn lightPos(r1 : f32, r2 : f32) -> vec3<f32> {',
+      '  return vec3<f32>(-1.6 + 3.2 * r1, 3.6, -1.2 + 2.4 * r2);',
+      '}',
+      '',
+      'fn visible(p : vec3<f32>, nrm : vec3<f32>, lp : vec3<f32>) -> f32 {',
+      '  let d = lp - p;',
+      '  let dist = length(d);',
+      '  let rd = d / dist;',
+      '  let h = scene(p + nrm * 0.002, rd);',
+      '  if (h.id != 4294967295u && h.t < dist - 0.01) { return 0.0; }',
+      '  return 1.0;',
+      '}',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= 640u || gid.y >= 360u) { return; }',
+      '  var rng = (gid.x * 1973u + gid.y * 9277u + cam.frame * 26699u) | 1u;',
+      '  let jitter = vec2<f32>(pcg(&rng) - 0.5, pcg(&rng) - 0.5);',
+      '  let uv = (vec2<f32>(gid.xy) + jitter) / vec2<f32>(640.0, 360.0);',
+      '  let camPos = vec3<f32>(0.0, 1.6, 4.2);',
+      '  let camDir = normalize(vec3<f32>(0.0, -0.18, -1.0));',
+      '  let right = vec3<f32>(1.0, 0.0, 0.0);',
+      '  let up = vec3<f32>(0.0, 1.0, 0.0);',
+      '  let rd = normalize(camDir * 1.6 + right * (uv.x - 0.5) * 1.6 + up * (0.5 - uv.y) * 0.9);',
+      '',
+      '  var radiance = vec3<f32>(0.0);',
+      '  var throughput = vec3<f32>(1.0);',
+      '  var ro = camPos;',
+      '  var dir = rd;',
+      '',
+      '  for (var bounce = 0u; bounce < 3u; bounce = bounce + 1u) {',
+      '    let h = scene(ro, dir);',
+      '    if (h.id == 4294967295u) {',
+      '      let sky = vec3<f32>(0.28, 0.42, 0.65) * 0.5 + vec3<f32>(0.35) * max(dir.y, 0.0);',
+      '      radiance = radiance + throughput * sky;',
+      '      break;',
+      '    }',
+      '    let hitP = ro + dir * h.t;',
+      '    let nrm = surfaceNormal(h.id, hitP);',
+      '    if (h.id == 0u) {',
+      '      let ck = select(vec3<f32>(0.72), vec3<f32>(0.28), ((u32(floor(hitP.x * 1.5)) + u32(floor(hitP.z * 1.5))) % 2u) == 1u);',
+      '      throughput = throughput * ck;',
+      '    } else {',
+      '      throughput = throughput * albedo(h.id);',
+      '    }',
+      '',
+      '    // ReSTIR-style reservoir: 8 light candidates, one winning shadow ray',
+      '    var wsum = 0.0;',
+      '    var chosen = vec3<f32>(0.0);',
+      '    var have = false;',
+      '    for (var k = 0u; k < 8u; k = k + 1u) {',
+      '      let lp = lightPos(pcg(&rng), pcg(&rng));',
+      '      let ld = lp - hitP;',
+      '      let dist2 = dot(ld, ld);',
+      '      let ldir = normalize(ld);',
+      '      let cosT = max(dot(nrm, ldir), 0.0);',
+      '      let vis = visible(hitP, nrm, lp);',
+      '      let w = cosT / dist2 * vis;',
+      '      wsum = wsum + w;',
+      '      let r = pcg(&rng) * wsum;',
+      '      if (r <= w) { chosen = lp; have = true; }',
+      '    }',
+      '',
+      '    if (wsum > 0.0 && have) {',
+      '      let ld = chosen - hitP;',
+      '      let dist2 = dot(ld, ld);',
+      '      let ldir = normalize(ld);',
+      '      let cosT = max(dot(nrm, ldir), 0.0);',
+      '      let vis = visible(hitP, nrm, chosen);',
+      '      let lightArea = 3.2 * 2.4;',
+      '      let contrib = vec3<f32>(18.0, 16.5, 14.0) * cosT * vis * lightArea / dist2 / 8.0 * wsum;',
+      '      radiance = radiance + throughput * contrib * 0.12;',
+      '    }',
+      '',
+      '    var bounceDir = normalize(nrm + vec3<f32>(pcg(&rng) - 0.5, pcg(&rng) - 0.5, pcg(&rng) - 0.5) * 1.2);',
+      '    if (dot(bounceDir, nrm) < 0.0) { bounceDir = -bounceDir; }',
+      '    ro = hitP + nrm * 0.002;',
+      '    dir = bounceDir;',
+      '    if (max(throughput.r, max(throughput.g, throughput.b)) < 0.02) { break; }',
+      '  }',
+      '',
+      '  let prevCol = textureLoad(prev, vec2<u32>(gid.xy), 0);',
+      '  var acc = prevCol.rgb + radiance;',
+      '  acc = clamp(acc, vec3<f32>(0.0), vec3<f32>(60.0));',
+      '  textureStore(accum, vec2<u32>(gid.xy), vec4<f32>(acc, f32(cam.frame + 1u)));',
+      '}'
+    ].join('\n');
+
+    var TONE_WGSL = [
+      'struct Cam {',
+      '  frame : u32,',
+      '  _p0 : u32,',
+      '  _p1 : u32,',
+      '  _p2 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> cam : Cam;',
+      '@group(0) @binding(1) var accum : texture_2d<f32>;',
+      '@group(0) @binding(2) var dst : texture_storage_2d<rgba8unorm, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let c = textureLoad(accum, vec2<u32>(gid.xy), 0);',
+      '  let spp = max(c.a, 1.0);',
+      '  var col = c.rgb / spp;',
+      '  col = col / (col + vec3<f32>(1.0));',
+      '  col = pow(col, vec3<f32>(1.0 / 2.2));',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(col, 1.0));',
+      '}'
+    ].join('\n');
+
+    var device = null;
+    var accum = [], accumIdx = 0;
+    var outTex = null;
+    var pipes = {}, bgs = {};
+    var camBuf = null;
+    var frame = 0;
+    var streaming = false;
+    var rafId = null;
+    var viewCtx = null;
+    var lastTraceMs = 0;
+
+    function initGPU() {
+      var line = document.getElementById('lf-device');
+      if (!navigator.gpu) {
+        line.innerHTML = '<span class="sw-note">WebGPU is not available in this browser.</span>';
+        return;
+      }
+      navigator.gpu.requestAdapter().then(function (adapter) {
+        if (!adapter) {
+          line.innerHTML = '<span class="sw-note">No GPU adapter found.</span>';
+          return;
+        }
+        var info = adapter.info || {};
+        var label = [info.vendor, info.device, info.architecture].filter(Boolean).join(' / ') || 'reported';
+        var sw = /swiftshader|llvmpipe/i.test(label);
+        return adapter.requestDevice().then(function (dev) {
+          device = dev;
+          device.addEventListener('uncapturederror', function (e) { if (e.message) console.error('LF-GPUERR:', e.message); });
+          device.lost.then(function (l) { console.error('LF-LOST:', l.reason); });
+          camBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+          for (var i = 0; i < 2; i++) {
+            accum.push(device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba16float',
+              usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING }));
+          }
+          outTex = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm',
+            usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC });
+          pipes.trace = mkPipe(TRACE_WGSL, 'trace');
+          pipes.tone = mkPipe(TONE_WGSL, 'tone');
+          function lfScoped(name, fn) {
+            device.pushErrorScope('validation');
+            var obj = fn();
+            device.popErrorScope().then(function (e) { if (e) console.error('LF-BG-' + name + ': ' + e.message.split('\n')[0]); });
+            return obj;
+          }
+          bgs.trace = [0, 1].map(function (i) {
+            return lfScoped('trace' + i, function () {
+              return device.createBindGroup({
+                layout: pipes.trace.getBindGroupLayout(0),
+                entries: [
+                  { binding: 0, resource: { buffer: camBuf } },
+                  { binding: 1, resource: accum[1 - i].createView() },
+                  { binding: 2, resource: accum[i].createView() }
+                ]
+              });
+            });
+          });
+          bgs.tone = [0, 1].map(function (i) {
+            return lfScoped('tone' + i, function () {
+              // the tone body never reads the uniform, so the auto layout
+              // only contains bindings 1 and 2
+              return device.createBindGroup({
+                layout: pipes.tone.getBindGroupLayout(0),
+                entries: [
+                  { binding: 1, resource: accum[i].createView() },
+                  { binding: 2, resource: outTex.createView() }
+                ]
+              });
+            });
+          });
+          var note = sw ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
+          line.innerHTML = 'Adapter: <b>' + label + '</b>' + note;
+          begin();
+        });
+      }).catch(function (err) {
+        line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
+      });
+    }
+
+    function mkPipe(code, name) {
+      var mod = device.createShaderModule({ code: code });
+      if (mod.getCompilationInfo) {
+        mod.getCompilationInfo().then(function (info) {
+          info.messages.forEach(function (m2) {
+            if (m2.type === 'error') console.error('WGSL-' + name + ' line ' + m2.lineNum + ': ' + m2.message);
+          });
+        });
+      }
+      return device.createComputePipeline({ layout: 'auto', compute: { module: mod, entryPoint: 'main' } });
+    }
+
+    function begin() {
+      if (streaming) return;
+      streaming = true;
+      window.requestAnimationFrame(loop);
+    }
+
+    function resetAccum() {
+      frame = 0;
+    }
+
+    function traceFrame() {
+      device.queue.writeBuffer(camBuf, 0, new Uint32Array([frame, 0, 0, 0]));
+      var enc = device.createCommandEncoder();
+      var p = enc.beginComputePass();
+      p.setPipeline(pipes.trace);
+      p.setBindGroup(0, bgs.trace[accumIdx]);
+      p.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
+      p.end();
+      var p2 = enc.beginComputePass();
+      p2.setPipeline(pipes.tone);
+      p2.setBindGroup(0, bgs.tone[accumIdx]);
+      p2.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
+      p2.end();
+      device.queue.submit([enc.finish()]);
+      var used = accumIdx;
+      accumIdx = 1 - accumIdx;
+      frame++;
+      return used;
+    }
+
+    function loop() {
+      if (!streaming) return;
+      if (!device) { rafId = window.requestAnimationFrame(loop); return; }
+      var t0 = performance.now();
+      var used = traceFrame();
+      var rb = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      var enc = device.createCommandEncoder();
+      enc.copyTextureToBuffer({ texture: outTex }, { buffer: rb, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
+      device.queue.submit([enc.finish()]);
+      rb.mapAsync(GPUMapMode.READ).then(function () {
+        lastTraceMs = performance.now() - t0;
+        var img = new Uint8Array(rb.getMappedRange().slice(0));
+        rb.unmap();
+        rb.destroy();
+        var i2 = ctx.createImageData(WIDTH, HEIGHT);
+        i2.data.set(img.subarray(0, WIDTH * HEIGHT * 4));
+        ctx.putImageData(i2, 0, 0);
+        document.getElementById('lf-spp').textContent = String(frame + 1);
+        document.getElementById('lf-ms').textContent = lastTraceMs.toFixed(1);
+        var fps = 1000 / Math.max(lastTraceMs, 1);
+        document.getElementById('lf-fps').textContent = fps.toFixed(1);
+        if (streaming) rafId = window.requestAnimationFrame(loop);
+      }).catch(function () {
+        if (streaming) rafId = window.requestAnimationFrame(loop);
+      });
+    }
+
+    var ctx = null;
+    function start() {
+      ctx = document.getElementById('lf-canvas').getContext('2d');
+      initGPU();
+      document.getElementById('lf-reset').addEventListener('click', resetAccum);
     }
 
     if (document.readyState === 'loading') {
