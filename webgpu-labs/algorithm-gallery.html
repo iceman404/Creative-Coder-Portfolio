@@ -283,6 +283,56 @@
       </p>
     </div>
 
+    <div class="arena-card">
+      <h2>Flow Field: variational optical flow, live</h2>
+      <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
+
+      <div class="controls">
+        <label for="src-select">Source:</label>
+        <select id="src-select">
+          <option value="pattern" selected>Test scene (no permission)</option>
+          <option value="camera">Webcam (asks permission)</option>
+        </select>
+        <button class="run-btn" id="stop-btn" type="button" style="display:none;">Stop</button>
+        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">starting on load&hellip;</span>
+      </div>
+
+      <div class="view-row" style="margin-top:14px;">
+        <div class="view-box">
+          <div class="view-label">Source</div>
+          <canvas id="view-src" width="640" height="360"></canvas>
+        </div>
+        <div class="view-box">
+          <div class="view-label">Horn-Schunck (base, single scale)</div>
+          <canvas id="view-hs" width="640" height="360"></canvas>
+        </div>
+        <div class="view-box">
+          <div class="view-label">Coarse-to-fine warping (multi-scale)</div>
+          <canvas id="view-ms" width="640" height="360"></canvas>
+        </div>
+      </div>
+
+      <div class="stat-row" style="display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;">
+        <div class="stat-chip"><div class="v" id="st-hs">&ndash;</div><div class="k">base GPU ms</div></div>
+        <div class="stat-chip"><div class="v" id="st-ms">&ndash;</div><div class="k">multi-scale GPU ms</div></div>
+        <div class="stat-chip"><div class="v" id="st-rhs">&ndash;</div><div class="k">base residual</div></div>
+        <div class="stat-chip"><div class="v" id="st-rms">&ndash;</div><div class="k">multi-scale residual</div></div>
+        <div class="stat-chip"><div class="v" id="st-fps">&ndash;</div><div class="k">fps</div></div>
+      </div>
+
+      <p class="ledger-note">
+        <b>Reading the race:</b> both tiers solve the same brightness-constancy problem on the
+        same frame pair. The <b>base tier</b> is classic Horn-Schunck: 16 Jacobi iterations of the
+        global smoothness-plus-data functional at full resolution. The <b>multi-scale tier</b>
+        builds a 4-level pyramid, warps the second frame by the upsampled flow, and runs 8
+        proximal iterations per level from coarse to fine &mdash; the standard coarse-to-fine
+        trick that catches large motions the base tier misses. Quality is the <b>photometric
+        residual</b>: the mean brightness difference |I&#8321;(x) &minus; I&#8322;(x + u)| over all
+        pixels, lower is better, and both tiers are scored by the same measure. Flow direction
+        maps to hue, magnitude to brightness.
+      </p>
+    </div>
+
     <div class="list-card">
       <h2>Gallery roadmap</h2>
       <ul>
@@ -734,6 +784,743 @@
     function start() {
       viewCtx = document.getElementById('view-mpm').getContext('2d');
       initGPU();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+  })();
+  </script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ================= WGSL ================= */
+
+    var WIDTH = 640, HEIGHT = 360, LEVELS = 4;
+    var HS_ITERS = 16, MS_ITERS = 8;
+
+    var FP_DECL = [
+      'struct FlowParams {',
+      '  width : u32,',
+      '  height : u32,',
+      '  lambda : f32,',
+      '  _pad : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> fp : FlowParams;',
+      '@group(0) @binding(1) var a : texture_2d<f32>;',
+      '@group(0) @binding(2) var b : texture_2d<f32>;'
+    ].join('\n');
+
+    // gray pyramid
+    var GRAY_WGSL = [
+      '@group(0) @binding(0) var src : texture_2d<f32>;',
+      '@group(0) @binding(1) var dst : texture_storage_2d<rgba16float, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let px = textureLoad(src, vec2<u32>(gid.xy), 0);',
+      '  let g = dot(px.rgb, vec3<f32>(0.299, 0.587, 0.114));',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(g, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    var DOWN_WGSL = [
+      'struct FlowParams {',
+      '  width : u32,',
+      '  height : u32,',
+      '  lambda : f32,',
+      '  _pad : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> fp : FlowParams;',
+      '@group(0) @binding(1) var a : texture_2d<f32>;',
+      '@group(0) @binding(2) var dst : texture_storage_2d<rgba16float, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let x = gid.x * 2u; let y = gid.y * 2u;',
+      '  let v00 = textureLoad(a, vec2<u32>(x, y), 0).r;',
+      '  let v10 = textureLoad(a, vec2<u32>(x + 1u, y), 0).r;',
+      '  let v01 = textureLoad(a, vec2<u32>(x, y + 1u), 0).r;',
+      '  let v11 = textureLoad(a, vec2<u32>(x + 1u, y + 1u), 0).r;',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>((v00 + v10 + v01 + v11) * 0.25, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    // Horn-Schunck / proximal iteration: uvin -> uvout (Jacobi ping-pong)
+    var ITER_WGSL = FP_DECL + '\n' + [
+      '@group(0) @binding(3) var uvin : texture_2d<f32>;',
+      '@group(0) @binding(4) var uvout : texture_storage_2d<rgba16float, write>;',
+      '',
+      'fn loadG(t : texture_2d<f32>, x : i32, y : i32) -> f32 {',
+      '  let xx = clamp(x, 0, i32(fp.width) - 1);',
+      '  let yy = clamp(y, 0, i32(fp.height) - 1);',
+      '  return textureLoad(t, vec2<u32>(u32(xx), u32(yy)), 0).r;',
+      '}',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= fp.width || gid.y >= fp.height) { return; }',
+      '  let x = i32(gid.x); let y = i32(gid.y);',
+      '  let uv0 = textureLoad(uvin, vec2<u32>(gid.xy), 0);',
+      '  let uL = textureLoad(uvin, vec2<u32>(gid.x - 1u, gid.y), 0);',
+      '  let uR = textureLoad(uvin, vec2<u32>(gid.x + 1u, gid.y), 0);',
+      '  let uU = textureLoad(uvin, vec2<u32>(gid.x, gid.y - 1u), 0);',
+      '  let uD = textureLoad(uvin, vec2<u32>(gid.x, gid.y + 1u), 0);',
+      '  let uN = (uL.r + uR.r + uU.r + uD.r) * 0.25;',
+      '  let vN = (uL.g + uR.g + uU.g + uD.g) * 0.25;',
+      '  let ix = (loadG(a, x + 1, y) - loadG(a, x - 1, y)) * 0.5;',
+      '  let iy = (loadG(a, x, y + 1) - loadG(a, x, y - 1)) * 0.5;',
+      '  let it = textureLoad(b, vec2<u32>(gid.xy), 0).r - textureLoad(a, vec2<u32>(gid.xy), 0).r;',
+      '  let n = ix * uN + iy * vN + it;',
+      '  let d = fp.lambda + ix * ix + iy * iy;',
+      '  textureStore(uvout, vec2<u32>(gid.xy), vec4<f32>(uN - ix * n / d, vN - iy * n / d, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    // warp: warpedB(x) = bilinear B(x + u(x))
+    var WARP_WGSL = [
+      'struct FlowParams {',
+      '  width : u32,',
+      '  height : u32,',
+      '  lambda : f32,',
+      '  _pad : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> fp : FlowParams;',
+      '@group(0) @binding(1) var b : texture_2d<f32>;',
+      '@group(0) @binding(2) var uvin : texture_2d<f32>;',
+      '@group(0) @binding(3) var warped : texture_storage_2d<rgba16float, write>;',
+      '',
+      'fn loadG(t : texture_2d<f32>, x : i32, y : i32) -> f32 {',
+      '  let xx = clamp(x, 0, i32(fp.width) - 1);',
+      '  let yy = clamp(y, 0, i32(fp.height) - 1);',
+      '  return textureLoad(t, vec2<u32>(u32(xx), u32(yy)), 0).r;',
+      '}',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= fp.width || gid.y >= fp.height) { return; }',
+      '  let uv = textureLoad(uvin, vec2<u32>(gid.xy), 0);',
+      '  let fx = f32(gid.x) + uv.r;',
+      '  let fy = f32(gid.y) + uv.g;',
+      '  let x0 = i32(floor(fx)); let y0 = i32(floor(fy));',
+      '  let tx = fx - floor(fx); let ty = fy - floor(fy);',
+      '  let v00 = loadG(b, x0, y0);',
+      '  let v10 = loadG(b, x0 + 1, y0);',
+      '  let v01 = loadG(b, x0, y0 + 1);',
+      '  let v11 = loadG(b, x0 + 1, y0 + 1);',
+      '  let v = mix(mix(v00, v10, tx), mix(v01, v11, tx), ty);',
+      '  textureStore(warped, vec2<u32>(gid.xy), vec4<f32>(v, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    // upsample: coarse uv -> fine uv (bilinear on the coarse grid, values x2)
+    var UP_WGSL = [
+      'struct FlowParams {',
+      '  width : u32,',
+      '  height : u32,',
+      '  lambda : f32,',
+      '  _pad : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> fp : FlowParams;',
+      '@group(0) @binding(1) var coarse : texture_2d<f32>;',
+      '@group(0) @binding(2) var fine : texture_storage_2d<rgba16float, write>;',
+      '',
+      'fn loadU(x : i32, y : i32) -> vec2<f32> {',
+      '  let xx = clamp(x, 0, i32(fp.width) - 1);',
+      '  let yy = clamp(y, 0, i32(fp.height) - 1);',
+      '  let v = textureLoad(coarse, vec2<u32>(u32(xx), u32(yy)), 0);',
+      '  return vec2<f32>(v.r, v.g);',
+      '}',
+      '',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= fp.width || gid.y >= fp.height) { return; }',
+      '  let fx = f32(gid.x) * 0.5 - 0.25;',
+      '  let fy = f32(gid.y) * 0.5 - 0.25;',
+      '  let x0 = i32(floor(fx)); let y0 = i32(floor(fy));',
+      '  let tx = fx - floor(fx); let ty = fy - floor(fy);',
+      '  let c00 = loadU(x0, y0);',
+      '  let c10 = loadU(x0 + 1, y0);',
+      '  let c01 = loadU(x0, y0 + 1);',
+      '  let c11 = loadU(x0 + 1, y0 + 1);',
+      '  let u = mix(mix(c00.r, c10.r, tx), mix(c01.r, c11.r, tx), ty) * 2.0;',
+      '  let v = mix(mix(c00.g, c10.g, tx), mix(c01.g, c11.g, tx), ty) * 2.0;',
+      '  textureStore(fine, vec2<u32>(gid.xy), vec4<f32>(u, v, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    // uv init to zero (the coarsest level restarts every frame)
+    var ZERO_WGSL = [
+      '@group(0) @binding(0) var dst : texture_storage_2d<rgba16float, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(0.0, 0.0, 0.0, 1.0));',
+      '}'
+    ].join('\n');
+
+    // colorize: hue = direction, brightness = magnitude
+    var COLOR_WGSL = [
+      '@group(0) @binding(0) var uvin : texture_2d<f32>;',
+      '@group(0) @binding(1) var dst : texture_storage_2d<rgba8unorm, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let uv = textureLoad(uvin, vec2<u32>(gid.xy), 0);',
+      '  let mag = length(vec2<f32>(uv.r, uv.g));',
+      '  var c = vec3<f32>(0.03, 0.04, 0.05);',
+      '  if (mag > 0.05) {',
+      '    var h = atan2(uv.g, uv.r) * 0.15915494 + 0.5;',
+      '    let c6 = vec3<f32>(abs(h * 6.0 - 3.0) - 1.0, 2.0 - abs(h * 6.0 - 2.0), 2.0 - abs(h * 6.0 - 4.0));',
+      '    c = clamp(c6, vec3<f32>(0.0), vec3<f32>(1.0)) * clamp(mag * 1.5, 0.0, 1.0);',
+      '  }',
+      '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(c, 1.0));',
+      '}'
+    ].join('\n');
+
+    // photometric residual: sum |a - warped| via one atomic counter
+    var RESID_WGSL = [
+      'struct RP { width : u32, height : u32, _pad0 : u32, _pad1 : u32 };',
+      '@group(0) @binding(0) var<uniform> rp : RP;',
+      '@group(0) @binding(1) var a : texture_2d<f32>;',
+      '@group(0) @binding(2) var w : texture_2d<f32>;',
+      '@group(0) @binding(3) var<storage, read_write> acc : array<atomic<u32>>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  if (gid.x >= rp.width || gid.y >= rp.height) { return; }',
+      '  let va = textureLoad(a, vec2<u32>(gid.xy), 0).r;',
+      '  let vw = textureLoad(w, vec2<u32>(gid.xy), 0).r;',
+      '  let d = abs(va - vw);',
+      '  atomicAdd(&acc[0], u32(d * 65536.0));',
+      '}'
+    ].join('\n');
+
+    /* ================= state ================= */
+
+    var device = null;
+    var adapterLabel = '';
+    var adapterSoftware = false;
+    var useTs = false;
+    var srcTex = null;
+    var grayA = [], grayB = [], warped = [];
+    var uvHS = [], uvMS = [];
+    var outHS = null, outMS = null;
+    var resBufHS = null, resBufMS = null, resReadHS = null, resReadMS = null;
+    var pipes = {};
+    var bgs = {};
+    var paramBuf = null;
+    var querySet = null, tsResolve = null, tsRead = null;
+    var sourceMode = 'pattern';
+    var streaming = false;
+    var rafId = null;
+    var video = null;
+    var frameCount = 0;
+    var fpsLast = 0;
+    var lastSetupMs = 0, lastHsMs = 0, lastMsMs = 0;
+    var viewSrcCtx = null, viewHsCtx = null, viewMsCtx = null;
+    var patternCanvasCache = null;
+    var LEVEL_SIZES = [];
+
+    /* ================= init ================= */
+
+    function initGPU() {
+      var line = document.getElementById('device-line');
+      if (!navigator.gpu) {
+        line.innerHTML = '<span class="sw-note">WebGPU is not available in this browser. The enablement guide is on the <a href="/webgpu-labs" style="color:var(--accent);">labs page</a>.</span>';
+        return;
+      }
+      navigator.gpu.requestAdapter().then(function (adapter) {
+        if (!adapter) {
+          line.innerHTML = '<span class="sw-note">No GPU adapter found.</span>';
+          return;
+        }
+        var info = adapter.info || {};
+        adapterLabel = [info.vendor, info.device, info.architecture].filter(Boolean).join(' / ') || 'reported';
+        adapterSoftware = /swiftshader|llvmpipe/i.test(adapterLabel);
+        useTs = adapter.features && adapter.features.has('timestamp-query');
+        return adapter.requestDevice({
+          requiredFeatures: useTs ? ['timestamp-query'] : []
+        }).then(function (dev) {
+          device = dev;
+          device.addEventListener('uncapturederror', function (e) { if (e.message) console.error('GPUERR:', e.message); });
+          device.lost.then(function (info) { console.error('DEVICELOST:', info.reason, info.message); });
+          buildResources();
+          var note = adapterSoftware ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
+          line.innerHTML = 'Adapter: <b>' + adapterLabel + '</b>' + note;
+          begin();
+        });
+      }).catch(function (err) {
+        line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
+      });
+    }
+
+    function buildResources() {
+      // pyramid sizes: level 0 = full res
+      LEVEL_SIZES = [];
+      for (var l = 0; l < LEVELS; l++) {
+        LEVEL_SIZES.push([WIDTH >> l, HEIGHT >> l]);
+      }
+      paramBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+
+      function texUsage() {
+        return GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST;
+      }
+      function uvTex(w, h) {
+        return device.createTexture({ size: [w, h], format: 'rgba16float', usage: texUsage() });
+      }
+
+      for (var l = 0; l < LEVELS; l++) {
+        var sz = LEVEL_SIZES[l];
+        grayA.push(device.createTexture({ size: sz, format: 'rgba16float', usage: texUsage() }));
+        grayB.push(device.createTexture({ size: sz, format: 'rgba16float', usage: texUsage() }));
+        warped.push(device.createTexture({ size: sz, format: 'rgba16float', usage: texUsage() }));
+        uvMS.push([uvTex(sz[0], sz[1]), uvTex(sz[0], sz[1])]);
+      }
+      uvHS = [uvTex(WIDTH, HEIGHT), uvTex(WIDTH, HEIGHT)];
+      outHS = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm', usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC });
+      outMS = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm', usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC });
+      // MAP_READ cannot share usage with STORAGE: atomic target + readback pair
+      resBufHS = device.createBuffer({ size: 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
+      resBufMS = device.createBuffer({ size: 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
+      resReadHS = device.createBuffer({ size: 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      resReadMS = device.createBuffer({ size: 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+
+      srcTex = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm',
+        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
+
+      // pipelines
+      pipes.gray = mkPipe(GRAY_WGSL, 'gray');
+      pipes.down = mkPipe(DOWN_WGSL, 'down');
+      pipes.iter = mkPipe(ITER_WGSL, 'iter');
+      pipes.warp = mkPipe(WARP_WGSL, 'warp');
+      pipes.up = mkPipe(UP_WGSL, 'up');
+      pipes.zero = mkPipe(ZERO_WGSL, 'zero');
+      pipes.color = mkPipe(COLOR_WGSL, 'color');
+      pipes.resid = mkPipe(RESID_WGSL, 'resid');
+
+      // params per level
+      bgs.param = [];
+      for (var l2 = 0; l2 < LEVELS; l2++) {
+        var pb = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+        device.queue.writeBuffer(pb, 0, new Uint32Array([LEVEL_SIZES[l2][0], LEVEL_SIZES[l2][1], 0, 0]));
+        device.queue.writeBuffer(pb, 8, new Float32Array([0.05, 0]));
+        bgs.param.push(pb);
+      }
+      bgs.baseParam = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+      device.queue.writeBuffer(bgs.baseParam, 0, new Uint32Array([WIDTH, HEIGHT, 0, 0]));
+      device.queue.writeBuffer(bgs.baseParam, 8, new Float32Array([0.05, 0]));
+
+      function bindGray(pipe, srcT, dstT) {
+        return device.createBindGroup({
+          layout: pipe.getBindGroupLayout(0),
+          entries: [
+            { binding: 0, resource: srcT.createView() },
+            { binding: 1, resource: dstT.createView() }
+          ]
+        });
+      }
+      function bindFlow(pipe, a, b, param, uvin, out) {
+        return device.createBindGroup({
+          layout: pipe.getBindGroupLayout(0),
+          entries: [
+            { binding: 0, resource: { buffer: param } },
+            { binding: 1, resource: a.createView() },
+            { binding: 2, resource: b.createView() },
+            { binding: 3, resource: uvin.createView() },
+            { binding: 4, resource: out.createView() }
+          ]
+        });
+      }
+
+      if (useTs) {
+        try {
+          querySet = device.createQuerySet({ type: 'timestamp', count: 120 });
+        } catch (e1) {
+          querySet = device.createQuerySet({ type: 'timestamp-query', count: 120 });
+        }
+        tsResolve = device.createBuffer({ size: 1024, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC });
+        tsRead = device.createBuffer({ size: 1024, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      }
+
+      bgs.gray = scoped('gray', function () { return bindGray(pipes.gray, srcTex, grayB[0]); });
+      bgs.downA = []; bgs.downB = [];
+      for (var d = 0; d < LEVELS - 1; d++) {
+        bgs.downA.push(scoped('downA' + d, function () { return bindDown(pipes.down, grayA[d], grayA[d + 1]); }));
+        bgs.downB.push(scoped('downB' + d, function () { return bindDown(pipes.down, grayB[d], grayB[d + 1]); }));
+      }
+      bgs.hsIter = [bindFlow(pipes.iter, grayA[0], grayB[0], bgs.baseParam, uvHS[0], uvHS[1]),
+                    bindFlow(pipes.iter, grayA[0], grayB[0], bgs.baseParam, uvHS[1], uvHS[0])];
+      bgs.hsWarp = bindWarp(pipes.warp, grayB[0], bgs.baseParam, uvHS[0], warped[0]);
+      bgs.hsColor = device.createBindGroup({
+        layout: pipes.color.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: uvHS[0].createView() },
+          { binding: 1, resource: outHS.createView() }
+        ]
+      });
+      bgs.hsResid = device.createBindGroup({
+        layout: pipes.resid.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: bgs.baseParam } },
+          { binding: 1, resource: grayA[0].createView() },
+          { binding: 2, resource: warped[0].createView() },
+          { binding: 3, resource: { buffer: resBufHS } }
+        ]
+      });
+      function scoped_unused(name, fn) {
+        device.pushErrorScope('validation');
+        var obj = fn();
+        device.popErrorScope().then(function (e) { if (e) console.error('BG-' + name + ': ' + e.message.split('\n')[0]); });
+        return obj;
+      }
+      bgs.msZero = scoped('msZero', function () {
+        return device.createBindGroup({
+          layout: pipes.zero.getBindGroupLayout(0),
+          entries: [{ binding: 0, resource: uvMS[LEVELS - 1][0].createView() }]
+        });
+      });
+      bgs.msWarp = []; bgs.msIter = []; bgs.msUp = [];
+      for (var m = 0; m < LEVELS; m++) {
+        bgs.msWarp.push(scoped('msWarp' + m, function () {
+          return bindWarp(pipes.warp, grayB[m], bgs.param[m], uvMS[m][0], warped[m]);
+        }));
+        bgs.msIter.push([
+          scoped('msIter' + m + 'a', function () {
+            return bindFlow(pipes.iter, grayA[m], warped[m], bgs.param[m], uvMS[m][0], uvMS[m][1]);
+          }),
+          scoped('msIter' + m + 'b', function () {
+            return bindFlow(pipes.iter, grayA[m], warped[m], bgs.param[m], uvMS[m][1], uvMS[m][0]);
+          })
+        ]);
+        if (m > 0) {
+          bgs.msUp.push(device.createBindGroup({
+            layout: pipes.up.getBindGroupLayout(0),
+            entries: [
+              { binding: 0, resource: { buffer: bgs.param[m - 1] } },
+              { binding: 1, resource: uvMS[m][0].createView() },
+              { binding: 2, resource: uvMS[m - 1][0].createView() }
+            ]
+          }));
+        }
+      }
+      bgs.msColor = device.createBindGroup({
+        layout: pipes.color.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: uvMS[0][0].createView() },
+          { binding: 1, resource: outMS.createView() }
+        ]
+      });
+      bgs.msResid = device.createBindGroup({
+        layout: pipes.resid.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: bgs.baseParam } },
+          { binding: 1, resource: grayA[0].createView() },
+          { binding: 2, resource: warped[0].createView() },
+          { binding: 3, resource: { buffer: resBufMS } }
+        ]
+      });
+    }
+
+    function scoped(name, fn) {
+      device.pushErrorScope('validation');
+      var obj = fn();
+      device.popErrorScope().then(function (e) { if (e) console.error('BG-' + name + ': ' + e.message.split('\n')[0]); });
+      return obj;
+    }
+    function mkPipe(code, name) {
+      var mod = device.createShaderModule({ code: code });
+      if (mod.getCompilationInfo) {
+        mod.getCompilationInfo().then(function (info) {
+          info.messages.forEach(function (m2) {
+            if (m2.type === 'error') console.error('WGSL-' + name + ' line ' + m2.lineNum + ': ' + m2.message);
+          });
+        });
+      }
+      return device.createComputePipeline({ layout: 'auto', compute: { module: mod, entryPoint: 'main' } });
+    }
+    function bindWarp(pipe, b, param, uvin, warped) {
+      return device.createBindGroup({
+        layout: pipe.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: param } },
+          { binding: 1, resource: b.createView() },
+          { binding: 2, resource: uvin.createView() },
+          { binding: 3, resource: warped.createView() }
+        ]
+      });
+    }
+    function bindDown(pipe, a, dst) {
+      // the downsample body never reads the uniform, so the auto layout
+      // only contains bindings 1 and 2
+      return device.createBindGroup({
+        layout: pipe.getBindGroupLayout(0),
+        entries: [
+          { binding: 1, resource: a.createView() },
+          { binding: 2, resource: dst.createView() }
+        ]
+      });
+    }
+
+    /* ================= sources ================= */
+
+    function patternCanvas() {
+      var c = document.createElement('canvas');
+      c.width = WIDTH; c.height = HEIGHT;
+      var g = c.getContext('2d');
+      var grad = g.createLinearGradient(0, 0, WIDTH, HEIGHT);
+      grad.addColorStop(0, '#1d3d52');
+      grad.addColorStop(1, '#6b4423');
+      g.fillStyle = grad;
+      g.fillRect(0, 0, WIDTH, HEIGHT);
+      g.fillStyle = 'rgba(230,180,80,0.9)';
+      g.beginPath();
+      g.arc(WIDTH / 2 + Math.sin(performance.now() / 1400) * 200, HEIGHT / 2, 40, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = 'rgba(90,200,180,0.85)';
+      g.beginPath();
+      g.arc(WIDTH / 2, HEIGHT / 2 + Math.cos(performance.now() / 1900) * 120, 28, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#0d1c26';
+      g.font = '700 30px monospace';
+      g.fillText('FLOW FIELD', 26, 48);
+      return c;
+    }
+
+    function currentSource() {
+      if (sourceMode === 'camera' && video && video.readyState >= 2) return video;
+      return patternCanvas();
+    }
+
+    function startSource() {
+      if (sourceMode === 'camera') {
+        video = document.createElement('video');
+        video.autoplay = true;
+        video.muted = true;
+        video.playsInline = true;
+        navigator.mediaDevices.getUserMedia({ video: { width: WIDTH, height: HEIGHT } }).then(function (stream) {
+          video.srcObject = stream;
+          video.play();
+        }).catch(function (err) {
+          document.getElementById('device-line').innerHTML += '<br><span class="sw-note">camera unavailable (' + err.name + '): falling back to the test scene</span>';
+          sourceMode = 'pattern';
+        });
+      }
+    }
+
+    function stopSource() {
+      streaming = false;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (video && video.srcObject) {
+        var tracks = video.srcObject.getTracks();
+        for (var i = 0; i < tracks.length; i++) tracks[i].stop();
+        video.srcObject = null;
+      }
+      document.getElementById('stop-btn').style.display = 'none';
+      document.getElementById('start-note').style.display = '';
+    }
+
+    function begin() {
+      if (streaming) return;
+      streaming = true;
+      document.getElementById('stop-btn').style.display = '';
+      document.getElementById('start-note').style.display = 'none';
+      startSource();
+      fpsLast = performance.now();
+      frameCount = 0;
+      window.requestAnimationFrame(loop);
+    }
+
+    /* ================= frame ================= */
+
+    function pushFrame() {
+      try {
+        device.queue.copyExternalImageToTexture(
+          { source: currentSource(), flipY: false },
+          { texture: srcTex },
+          [WIDTH, HEIGHT]
+        );
+      } catch (err) { /* frame not ready */ }
+    }
+
+    function dispatchFrame() {
+      var W16 = Math.ceil(WIDTH / 16), H16 = Math.ceil(HEIGHT / 16);
+      var stages = [];
+      var tsSetup = 0, tsHs = 14, tsMs = 56;
+
+      // stage 0: push the source, build grayB0, roll the previous frame into A
+      var enc0 = device.createCommandEncoder();
+      pushFrame();
+      // roll the PREVIOUS frame's gray into A before building the new B:
+      // copying after the gray pass would make A == B and the flow identically zero
+      enc0.copyTextureToTexture({ texture: grayB[0] }, { texture: grayA[0] }, [WIDTH, HEIGHT]);
+      pass(enc0, pipes.gray, bgs.gray, W16, H16, useTs ? 0 : null);
+      for (var d = 0; d < LEVELS - 1; d++) {
+        var sz = LEVEL_SIZES[d + 1];
+        pass(enc0, pipes.down, bgs.downA[d], Math.ceil(sz[0] / 16), Math.ceil(sz[1] / 16), useTs ? 2 + 2 * d : null);
+        pass(enc0, pipes.down, bgs.downB[d], Math.ceil(sz[0] / 16), Math.ceil(sz[1] / 16), useTs ? 8 + 2 * d : null);
+      }
+      device.queue.submit([enc0.finish()]);
+      var setupDone = device.queue.onSubmittedWorkDone();
+
+      // stage 1: Horn-Schunck chain (16 Jacobi iterations, ping-pong)
+      var hsDone = setupDone.then(function () {
+        var enc = device.createCommandEncoder();
+        for (var i = 0; i < HS_ITERS; i++) {
+          pass(enc, pipes.iter, bgs.hsIter[i % 2], W16, H16, useTs ? tsHs + 2 * i : null);
+        }
+        device.queue.submit([enc.finish()]);
+        return device.queue.onSubmittedWorkDone();
+      });
+
+      // stage 2: HS warp + colorize + residual
+      var hsDone2 = hsDone.then(function () {
+        var enc = device.createCommandEncoder();
+        pass(enc, pipes.warp, bgs.hsWarp, W16, H16, useTs ? tsHs + 2 * HS_ITERS : null);
+        pass(enc, pipes.color, bgs.hsColor, W16, H16, null);
+        pass(enc, pipes.resid, bgs.hsResid, W16, H16, null);
+        device.queue.submit([enc.finish()]);
+        return device.queue.onSubmittedWorkDone();
+      });
+
+      // stage 3: multi-scale chain, coarsest to finest
+      var msDone = hsDone2.then(function () {
+        var enc = device.createCommandEncoder();
+        var slot = tsMs;
+        pass(enc, pipes.zero, bgs.msZero, Math.ceil(LEVEL_SIZES[LEVELS - 1][0] / 16), Math.ceil(LEVEL_SIZES[LEVELS - 1][1] / 16), null);
+        for (var m = LEVELS - 1; m >= 0; m--) {
+          var sz = LEVEL_SIZES[m];
+          var gx = Math.ceil(sz[0] / 16), gy = Math.ceil(sz[1] / 16);
+          pass(enc, pipes.warp, bgs.msWarp[m], gx, gy, null);
+          for (var it = 0; it < MS_ITERS; it++) {
+            pass(enc, pipes.iter, bgs.msIter[m][it % 2], gx, gy, useTs ? slot + 2 * (m * MS_ITERS + it) : null);
+          }
+          if (m > 0) {
+            var upSz = LEVEL_SIZES[m - 1];
+            pass(enc, pipes.up, bgs.msUp[m - 1], Math.ceil(upSz[0] / 16), Math.ceil(upSz[1] / 16), null);
+          }
+        }
+        device.queue.submit([enc.finish()]);
+        return device.queue.onSubmittedWorkDone();
+      });
+
+      // stage 4: colorize + residual for the multi-scale tier
+      return msDone.then(function () {
+        var enc = device.createCommandEncoder();
+        pass(enc, pipes.color, bgs.msColor, W16, H16, null);
+        pass(enc, pipes.resid, bgs.msResid, W16, H16, null);
+        if (useTs) {
+          enc.resolveQuerySet(querySet, 0, 120, tsResolve, 0);
+          enc.copyBufferToBuffer(tsResolve, 0, tsRead, 0, 960);
+        }
+        device.queue.submit([enc.finish()]);
+        return device.queue.onSubmittedWorkDone();
+      });
+    }
+
+    function pass(enc, pipe, bg, gx, gy, tsBase) {
+      var pass = enc.beginComputePass((useTs && tsBase !== null && tsBase !== undefined) ? {
+        timestampWrites: { querySet: querySet, beginningOfPassWriteIndex: tsBase, endOfPassWriteIndex: tsBase + 1 }
+      } : undefined);
+      pass.setPipeline(pipe);
+      pass.setBindGroup(0, bg);
+      pass.dispatchWorkgroups(gx, gy);
+      pass.end();
+    }
+
+    /* ================= the loop ================= */
+
+    function loop() {
+      if (!streaming) return;
+      if (!device) { rafId = window.requestAnimationFrame(loop); return; }
+
+      viewSrcCtx.drawImage(currentSource(), 0, 0, WIDTH, HEIGHT);
+      device.queue.writeBuffer(resBufHS, 0, new Uint32Array([0]));
+      device.queue.writeBuffer(resBufMS, 0, new Uint32Array([0]));
+
+      dispatchFrame().then(function () {
+        frameCount++;
+        var fps = 1000 * frameCount / (performance.now() - fpsLast);
+        document.getElementById('st-fps').textContent = fps.toFixed(1);
+
+        // All maps complete and unmap before the next frame is scheduled:
+        // a writeBuffer into a pending-mapped buffer would fail validation.
+        var copyRes = device.createCommandEncoder();
+        copyRes.copyBufferToBuffer(resBufHS, 0, resReadHS, 0, 4);
+        copyRes.copyBufferToBuffer(resBufMS, 0, resReadMS, 0, 4);
+        device.queue.submit([copyRes.finish()]);
+        var readHS = resReadHS.mapAsync(GPUMapMode.READ).then(function () {
+          var v = new Uint32Array(resReadHS.getMappedRange())[0];
+          resReadHS.unmap();
+          return v;
+        });
+        var readMS = resReadMS.mapAsync(GPUMapMode.READ).then(function () {
+          var v = new Uint32Array(resReadMS.getMappedRange())[0];
+          resReadMS.unmap();
+          return v;
+        });
+        var imgHS = readback(outHS);
+        var imgMS = readback(outMS);
+
+        Promise.all([readHS, readMS, imgHS, imgMS]).then(function (r) {
+          var total = WIDTH * HEIGHT;
+          document.getElementById('st-rhs').textContent = (r[0] / 65536 / total).toFixed(4);
+          document.getElementById('st-rms').textContent = (r[1] / 65536 / total).toFixed(4);
+          drawToCanvas(r[2], viewHsCtx);
+          drawToCanvas(r[3], viewMsCtx);
+          if (useTs) readTimestamps();
+          if (streaming) rafId = window.requestAnimationFrame(loop);
+        }).catch(function () {
+          if (streaming) rafId = window.requestAnimationFrame(loop);
+        });
+      }).catch(function () {
+        if (streaming) rafId = window.requestAnimationFrame(loop);
+      });
+    }
+
+    function readback(tex) {
+      var rb = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      var enc = device.createCommandEncoder();
+      enc.copyTextureToBuffer({ texture: tex }, { buffer: rb, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
+      device.queue.submit([enc.finish()]);
+      return rb.mapAsync(GPUMapMode.READ).then(function () {
+        var out = new Uint8Array(rb.getMappedRange().slice(0));
+        rb.unmap();
+        rb.destroy();
+        return out;
+      });
+    }
+
+    function readTimestamps() {
+      tsRead.mapAsync(GPUMapMode.READ).then(function () {
+        var ts = new BigInt64Array(tsRead.getMappedRange());
+        var setup = 0, hs = 0, ms = 0;
+        for (var i = 0; i < 2 * LEVELS - 1; i++) setup += Number(ts[2 * i + 1] - ts[2 * i]) / 1e6;
+        for (var j = 0; j < HS_ITERS + 1; j++) hs += Number(ts[14 + 2 * j + 1] - ts[14 + 2 * j]) / 1e6;
+        for (var m = 0; m < MS_ITERS * LEVELS; m++) ms += Number(ts[56 + 2 * m + 1] - ts[56 + 2 * m]) / 1e6;
+        tsRead.unmap();
+        document.getElementById('st-hs').textContent = hs.toFixed(2);
+        document.getElementById('st-ms').textContent = ms.toFixed(2);
+      }).catch(function () { });
+    }
+
+    function drawToCanvas(bytes, ctx) {
+      var img = ctx.createImageData(WIDTH, HEIGHT);
+      img.data.set(bytes.subarray(0, WIDTH * HEIGHT * 4));
+      ctx.putImageData(img, 0, 0);
+    }
+
+    /* ================= entry ================= */
+
+    function start() {
+      viewSrcCtx = document.getElementById('view-src').getContext('2d');
+      viewHsCtx = document.getElementById('view-hs').getContext('2d');
+      viewMsCtx = document.getElementById('view-ms').getContext('2d');
+      initGPU();
+      document.getElementById('src-select').addEventListener('change', function (e) {
+        sourceMode = e.target.value;
+        stopSource();
+        begin();
+      });
+      document.getElementById('stop-btn').addEventListener('click', stopSource);
     }
 
     if (document.readyState === 'loading') {
