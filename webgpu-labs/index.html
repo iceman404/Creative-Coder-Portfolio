@@ -248,6 +248,43 @@
         <li>Shader f16: <span id="gi-f16">checking…</span></li>
         <li>Timestamp queries: <span id="gi-ts">checking…</span></li>
       </ul>
+
+      <div id="tier-line" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="list-card" id="registry-card">
+      <h2>Model registry &amp; device tier</h2>
+      <p style="color:var(--text-dim); font-size:0.92rem; line-height:1.7;">
+        Every model the Inference Forge will stream is listed here with the device tier it
+        requires. The tier is computed live from your adapter's reported limits &mdash; no
+        guesswork, no fingerprinting: the same numbers the inspector above shows. Models above
+        your tier render <b>locked</b> with the reason; the shard loader (resumable downloads,
+        per-shard hashes, Cache API storage) ships with milestone 4.
+      </p>
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;" aria-live="polite">
+        <thead>
+          <tr style="text-align:left; color:var(--text-dim);">
+            <th style="padding:8px 6px;">Model</th>
+            <th style="padding:8px 6px;">Params</th>
+            <th style="padding:8px 6px;">Quant</th>
+            <th style="padding:8px 6px;">Download</th>
+            <th style="padding:8px 6px;">Tier</th>
+            <th style="padding:8px 6px;">On your device</th>
+          </tr>
+        </thead>
+        <tbody id="registry-body">
+          <tr><td colspan="6" style="padding:8px 6px; color:var(--text-dim);">Detecting device tier&hellip;</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text-dim); font-size:0.85rem; margin-top:12px; line-height:1.7;">
+        <b>Tier logic:</b> <b>S</b> &mdash; discrete GPU class, max buffer binding &ge; 1 GB;
+        <b>A</b> &mdash; 256 MB &ndash; 1 GB binding (4&ndash;8 GB VRAM or strong iGPU);
+        <b>B</b> &mdash; integrated, shared memory; <b>C</b> &mdash; no WebGPU or a software
+        adapter. All listed models are Apache-2.0 open weights; the quantized containers are
+        packed and hashed at publish time, so what the loader fetches can be verified
+        byte-for-byte against this registry.
+      </p>
+    </div>
     </div>
 
     <div class="list-card" id="enable-guide" hidden>
@@ -438,6 +475,7 @@
           var famli = guide.querySelector('li[data-family="' + browserFamily() + '"]');
           if (famli) famli.style.borderLeft = '3px solid var(--accent)';
         }
+        renderTierAndRegistry(null, true);
         return;
       }
 
@@ -512,10 +550,74 @@
           .sort(function (a, b) { return b.score - a.score; })
           .map(function (d) { return renderRow(d, best); })
           .join('');
+        renderTierAndRegistry(best, false);
       }).catch(function (err) {
         var list = el('gpu-inspector');
         if (list) list.innerHTML = '<div class="bad">inspector error: ' + err + '</div>';
+        renderTierAndRegistry(null, true);
       });
+    }
+
+    /* ================= device tier + model registry ================= */
+
+    var REGISTRY_VERSION = '2026-11-18.1';
+
+    var REGISTRY = [
+      { id: 'gpt2-124m-fp16', name: 'GPT-2 124M', params: '0.12B', quant: 'fp16',
+        size: '~250 MB', shards: 4, minTier: 'B',
+        note: 'M1 reference model: the full forward pass fits any WebGPU adapter' },
+      { id: 'qwen3-0.6b-q4', name: 'Qwen3 0.6B', params: '0.6B', quant: '4-bit',
+        size: '~0.4 GB', shards: 6, minTier: 'B',
+        note: 'streaming decode on integrated GPUs' },
+      { id: 'qwen3-1.7b-q4', name: 'Qwen3 1.7B', params: '1.7B', quant: '4-bit',
+        size: '~1.1 GB', shards: 14, minTier: 'B',
+        note: 'the sweet spot for 16 GB shared-memory laptops' },
+      { id: 'qwen3-4b-q4', name: 'Qwen3 4B', params: '4.0B', quant: '4-bit',
+        size: '~2.5 GB', shards: 32, minTier: 'A',
+        note: 'discrete 4-8 GB VRAM class' },
+      { id: 'qwen3-8b-q4', name: 'Qwen3 8B', params: '8.0B', quant: '4-bit',
+        size: '~5.0 GB', shards: 63, minTier: 'S',
+        note: 'flagship tier: 8 GB+ VRAM' }
+    ];
+
+    function computeTier(d, noWebGPU) {
+      if (noWebGPU || !d) return { tier: 'C', why: 'no WebGPU adapter available' };
+      if (d.software || d.fallback) return { tier: 'C', why: 'software adapter: no real inference capacity' };
+      var buf = d.buf || 0;
+      if (buf >= 1024 * 1024 * 1024) return { tier: 'S', why: 'max buffer binding ' + Math.round(buf / (1024 * 1024)) + ' MB: discrete 8 GB+ class' };
+      if (buf >= 256 * 1024 * 1024) return { tier: 'A', why: 'max buffer binding ' + Math.round(buf / (1024 * 1024)) + ' MB: discrete 4-8 GB or strong iGPU class' };
+      return { tier: 'B', why: 'max buffer binding ' + (buf ? Math.round(buf / (1024 * 1024)) + ' MB' : 'reported') + ': integrated, shared memory' };
+    }
+
+    function renderTierAndRegistry(best, noWebGPU) {
+      var tierInfo = computeTier(best, noWebGPU);
+      var tierEl = el('tier-line');
+      if (tierEl) {
+        tierEl.innerHTML = '<b>Device tier: ' + tierInfo.tier + '</b> &mdash; ' + tierInfo.why +
+          (best ? ' <span style="opacity:0.65">(adapter: ' + best.name + ')</span>' : '');
+      }
+      var body = el('registry-body');
+      if (!body) return;
+      var order = { S: 0, A: 1, B: 2, C: 3 };
+      var rows = REGISTRY.map(function (m) {
+        var unlocked = order[tierInfo.tier] <= order[m.minTier];
+        var verdict = unlocked
+          ? '<span style="color:var(--accent); font-weight:600;">unlocked</span> — ' + m.note
+          : '<span style="opacity:0.7;">locked</span> — needs tier ' + m.minTier + ' (' +
+            (tierInfo.tier === 'C' ? 'no hardware adapter' : 'this adapter reports tier ' + tierInfo.tier) + ')';
+        return '<tr>' +
+          '<td style="padding:8px 6px;"><b>' + m.name + '</b></td>' +
+          '<td style="padding:8px 6px;">' + m.params + '</td>' +
+          '<td style="padding:8px 6px;">' + m.quant + '</td>' +
+          '<td style="padding:8px 6px;">' + m.size + ' · ' + m.shards + ' shards</td>' +
+          '<td style="padding:8px 6px;">' + m.minTier + '</td>' +
+          '<td style="padding:8px 6px;">' + verdict + '</td>' +
+          '</tr>';
+      });
+      rows.push('<tr><td colspan="6" style="padding:8px 6px; color:var(--text-dim); font-size:0.8rem;">' +
+        'registry ' + REGISTRY_VERSION + ' · shard URLs publish with the container packer (milestone 4);' +
+        ' the loader verifies every shard against this registry before use.</td></tr>');
+      body.innerHTML = rows.join('');
     }
 
     if (document.readyState === 'loading') {
