@@ -984,6 +984,7 @@
     var readNaive = null;
     var readTiled = null;
     var querySet = null;
+    var prevGrayTex = null;
     var tsResolve = null;
     var tsRead = null;
     var useTs = false;
@@ -1079,7 +1080,7 @@
           var edgeNb = storageTex('rgba8unorm');
           var edgeTa = storageTex('rgba8unorm');
           var edgeTb = storageTex('rgba8unorm');
-          var prevGrayTex = device.createTexture({
+          prevGrayTex = device.createTexture({
             size: [WIDTH, HEIGHT], format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC
           });
@@ -1213,8 +1214,55 @@
       return c;
     }
 
+    function textureCanvas() {
+      // full-frame texture: optical flow and Harris need gradients everywhere,
+      // a smooth gradient gives them nothing to lock onto
+      if (!textureCanvas.cache) {
+        var c = document.createElement('canvas');
+        c.width = WIDTH + 60; c.height = HEIGHT + 60;
+        var g = c.getContext('2d');
+        var grad = g.createLinearGradient(0, 0, WIDTH, HEIGHT);
+        grad.addColorStop(0, '#1d3d52');
+        grad.addColorStop(1, '#6b4423');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, c.width, c.height);
+        var rngState = 98765;
+        function rnd() {
+          rngState = (rngState * 1664525 + 1013904223) >>> 0;
+          return (rngState >>> 8) / 16777216;
+        }
+        for (var i = 0; i < 900; i++) {
+          var hue = rnd();
+          g.fillStyle = 'rgba(' + Math.round(120 + hue * 120) + ',' + Math.round(150 + hue * 80) + ',' + Math.round(90 + hue * 120) + ',0.9)';
+          g.beginPath();
+          g.arc(30 + rnd() * WIDTH, 30 + rnd() * HEIGHT, 3 + rnd() * 9, 0, Math.PI * 2);
+          g.fill();
+        }
+        textureCanvas.cache = c;
+      }
+      return textureCanvas.cache;
+    }
+
+    function flowSceneCanvas() {
+      var c = document.createElement('canvas');
+      c.width = WIDTH; c.height = HEIGHT;
+      var g = c.getContext('2d');
+      var t = performance.now() / 1000;
+      // the whole texture drifts at ~26 px/s: a motion every gradient can follow
+      var off = (t * 26) % 60;
+      g.drawImage(textureCanvas(), -30 - off, -30 - off);
+      var ballX = WIDTH / 2 + Math.sin(t * 0.9) * 150;
+      var ballY = HEIGHT / 2 + Math.cos(t * 1.3) * 90;
+      g.fillStyle = 'rgba(255,255,255,0.92)';
+      g.beginPath();
+      g.arc(ballX, ballY, 24, 0, Math.PI * 2);
+      g.fill();
+      return c;
+    }
+
     function currentSourceCanvas() {
       if (sourceMode === 'camera' && video && video.readyState >= 2) return video;
+      if (kernelMode === 'flow' || kernelMode === 'harris') return flowSceneCanvas();
       return patternCanvas();
     }
 
@@ -1333,7 +1381,7 @@
         var pre = !flowPrevReady;
         stageN.push(passDesc(pipes.flowN, bgs.flN, W8, H8, 2 + 2 * np++));
         stageT.push(passDesc(pipes.flowT, bgs.flT, W16, H16, 18 + 2 * tp++));
-        stages.push([stageN, stageT, pre]); // pre: seed prevGray with the current frame first
+        stages.push([stageN, stageT, pre, true]); // pre: seed prevGray first; true: roll this frame's gray into prev after the passes
         stageN = []; stageT = [];
         flowPrevReady = true;
       }
@@ -1348,6 +1396,10 @@
             var enc = device.createCommandEncoder();
             var group = stages[idx];
             if (group[2] === true) {
+              enc.copyTextureToTexture({ texture: grayTex }, { texture: prevGrayTex }, [WIDTH, HEIGHT]);
+            }
+            if (group[3] === true) {
+              // post-frame roll: the next flow frame compares against THIS frame
               enc.copyTextureToTexture({ texture: grayTex }, { texture: prevGrayTex }, [WIDTH, HEIGHT]);
             }
             for (var side = 0; side < 2; side++) {
