@@ -51,6 +51,18 @@
   }
   </script>
 
+  <script>
+  (function () {
+    'use strict';
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      var panel = btn.getAttribute('data-panel');
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === panel); });
+    });
+  })();
+  </script>
   <script>(function(){try{var t=localStorage.getItem('iceman404-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
