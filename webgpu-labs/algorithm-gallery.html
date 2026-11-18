@@ -221,6 +221,27 @@
       .page { padding: 165px 15px 40px; }
       .module-card { padding: 20px; }
     }
+  
+    /* dropdown contrast: native option popups do not always resolve CSS
+       variables, so dark and light themes get explicit colors */
+    select {
+      color-scheme: dark;
+      background: #12242c;
+      color: var(--text);
+      border: 1px solid rgba(var(--accent-rgb), 0.4);
+    }
+    select option, select optgroup {
+      background: #12242c;
+      color: #e0f4f7;
+    }
+    [data-theme="light"] select {
+      color-scheme: light;
+      background: #ffffff;
+    }
+    [data-theme="light"] select option, [data-theme="light"] select optgroup {
+      background: #ffffff;
+      color: #182a2f;
+    }
   </style>
 </head>
 <body>
@@ -256,34 +277,6 @@
     </header>
 
     <div class="arena-card">
-      <h2>Material World: material point method, live</h2>
-      <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
-
-      <div class="stat-row" style="display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;">
-        <div class="stat-chip"><div class="v" id="st-sim">&ndash;</div><div class="k">frame wall ms</div></div>
-        <div class="stat-chip"><div class="v" id="st-n">&ndash;</div><div class="k">particles</div></div>
-        <div class="stat-chip"><div class="v" id="st-avg">&ndash;</div><div class="k">settled %</div></div>
-        <div class="stat-chip"><div class="v" id="st-fps">&ndash;</div><div class="k">fps</div></div>
-      </div>
-
-      <div class="view-row" style="margin-top:14px;">
-        <div class="view-box">
-          <div class="view-label">MPM material (velocity-shaded, restarts every ~20 s)</div>
-          <canvas id="view-mpm" width="640" height="360"></canvas>
-        </div>
-      </div>
-
-      <p class="ledger-note">
-        <b>The loop</b> is the real material point method, in four GPU passes per frame:
-        particle-to-grid transfer (quadratic B-spline weights, fixed-point atomic scatter),
-        grid update (gravity + boundary conditions), grid-to-particle gather with the
-        <b>APIC affine velocity</b> (each particle carries a local velocity matrix so the
-        material keeps its spin and shear), and position advection. 32,768 particles,
-        128&times;72 grid, dt = 1/60. Brightness maps to speed, hue to velocity direction.
-      </p>
-    </div>
-
-    <div class="arena-card">
       <h2>Flow Field: variational optical flow, live</h2>
       <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
 
@@ -293,8 +286,8 @@
           <option value="pattern" selected>Test scene (no permission)</option>
           <option value="camera">Webcam (asks permission)</option>
         </select>
-        <button class="run-btn" id="stop-btn" type="button" style="display:none;">Stop</button>
-        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">starting on load&hellip;</span>
+        <button class="run-btn" id="ff-toggle" type="button">Start</button>
+        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">idle &mdash; press Start (uses a full CPU core)</span>
       </div>
 
       <div class="view-row" style="margin-top:14px;">
@@ -337,6 +330,7 @@
       <h2>Material World: material point method, live</h2>
       <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
 
+      <button class="run-btn" id="mpm-toggle" type="button">Start</button>
       <div class="stat-row" style="display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;">
         <div class="stat-chip"><div class="v" id="st-sim">&ndash;</div><div class="k">frame wall ms</div></div>
         <div class="stat-chip"><div class="v" id="st-n">&ndash;</div><div class="k">particles</div></div>
@@ -358,56 +352,6 @@
         <b>APIC affine velocity</b> (each particle carries a local velocity matrix so the
         material keeps its spin and shear), and position advection. 32,768 particles,
         128&times;72 grid, dt = 1/60. Brightness maps to speed, hue to velocity direction.
-      </p>
-    </div>
-
-    <div class="arena-card">
-      <h2>Flow Field: variational optical flow, live</h2>
-      <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
-
-      <div class="controls">
-        <label for="src-select">Source:</label>
-        <select id="src-select">
-          <option value="pattern" selected>Test scene (no permission)</option>
-          <option value="camera">Webcam (asks permission)</option>
-        </select>
-        <button class="run-btn" id="stop-btn" type="button" style="display:none;">Stop</button>
-        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">starting on load&hellip;</span>
-      </div>
-
-      <div class="view-row" style="margin-top:14px;">
-        <div class="view-box">
-          <div class="view-label">Source</div>
-          <canvas id="view-src" width="640" height="360"></canvas>
-        </div>
-        <div class="view-box">
-          <div class="view-label">Horn-Schunck (base, single scale)</div>
-          <canvas id="view-hs" width="640" height="360"></canvas>
-        </div>
-        <div class="view-box">
-          <div class="view-label">Coarse-to-fine warping (multi-scale)</div>
-          <canvas id="view-ms" width="640" height="360"></canvas>
-        </div>
-      </div>
-
-      <div class="stat-row" style="display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;">
-        <div class="stat-chip"><div class="v" id="st-hs">&ndash;</div><div class="k">base GPU ms</div></div>
-        <div class="stat-chip"><div class="v" id="st-ms">&ndash;</div><div class="k">multi-scale GPU ms</div></div>
-        <div class="stat-chip"><div class="v" id="st-rhs">&ndash;</div><div class="k">base residual</div></div>
-        <div class="stat-chip"><div class="v" id="st-rms">&ndash;</div><div class="k">multi-scale residual</div></div>
-        <div class="stat-chip"><div class="v" id="st-fps">&ndash;</div><div class="k">fps</div></div>
-      </div>
-
-      <p class="ledger-note">
-        <b>Reading the race:</b> both tiers solve the same brightness-constancy problem on the
-        same frame pair. The <b>base tier</b> is classic Horn-Schunck: 16 Jacobi iterations of the
-        global smoothness-plus-data functional at full resolution. The <b>multi-scale tier</b>
-        builds a 4-level pyramid, warps the second frame by the upsampled flow, and runs 8
-        proximal iterations per level from coarse to fine &mdash; the standard coarse-to-fine
-        trick that catches large motions the base tier misses. Quality is the <b>photometric
-        residual</b>: the mean brightness difference |I&#8321;(x) &minus; I&#8322;(x + u)| over all
-        pixels, lower is better, and both tiers are scored by the same measure. Flow direction
-        maps to hue, magnitude to brightness.
       </p>
     </div>
 
@@ -419,6 +363,7 @@
         <div class="stat-chip"><div class="v" id="lf-spp">&ndash;</div><div class="k">samples / pixel</div></div>
         <div class="stat-chip"><div class="v" id="lf-ms">&ndash;</div><div class="k">trace GPU ms</div></div>
         <div class="stat-chip"><div class="v" id="lf-fps">&ndash;</div><div class="k">fps</div></div>
+        <button class="run-btn" id="lf-toggle" type="button">Start</button>
         <button class="run-btn" id="lf-reset" type="button">Reset accumulation</button>
       </div>
 
@@ -444,6 +389,7 @@
       <h2>Splat Scene: 3D Gaussian Splatting, live</h2>
       <div class="device-line" id="ss-device">Initializing WebGPU&hellip;</div>
 
+      <button class="run-btn" id="ss-toggle" type="button">Start</button>
       <div class="stat-row" style="display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;">
         <div class="stat-chip"><div class="v" id="ss-n">&ndash;</div><div class="k">splats</div></div>
         <div class="stat-chip"><div class="v" id="ss-sort">&ndash;</div><div class="k">sort stages</div></div>
@@ -469,7 +415,7 @@
       </p>
     </div>
 
-        <div class="list-card">
+            <div class="list-card">
       <h2>Gallery roadmap</h2>
       <ul>
         <li><b>Milestone 1 &middot; live:</b> Flow Field &mdash; Horn-Schunck vs coarse-to-fine multi-scale warping</li>
@@ -741,7 +687,6 @@
           buildResources();
           var note = adapterSoftware ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
           line.innerHTML = 'Adapter: <b>' + adapterLabel + '</b>' + note;
-          begin();
         });
       }).catch(function (err) {
         line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
@@ -1009,15 +954,19 @@
         for (var i = 0; i < tracks.length; i++) tracks[i].stop();
         video.srcObject = null;
       }
-      document.getElementById('stop-btn').style.display = 'none';
-      document.getElementById('start-note').style.display = '';
+      document.getElementById('ff-toggle').textContent = 'Start';
+      document.getElementById('start-note').textContent = 'idle — press Start (uses a full CPU core)';
+    }
+
+    function halt() {
+      stopSource();
     }
 
     function begin() {
       if (streaming) return;
       streaming = true;
-      document.getElementById('stop-btn').style.display = '';
-      document.getElementById('start-note').style.display = 'none';
+      document.getElementById('ff-toggle').textContent = 'Stop';
+      document.getElementById('start-note').textContent = 'running';
       startSource();
       fpsLast = performance.now();
       frameCount = 0;
@@ -1205,17 +1154,35 @@
 
     /* ================= entry ================= */
 
+    function drawHint(ctx, sub) {
+      ctx.fillStyle = '#0a0f11';
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      ctx.fillStyle = '#7fb5be';
+      ctx.font = '600 22px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Press Start', WIDTH / 2, HEIGHT / 2 - 12);
+      ctx.font = '400 14px monospace';
+      ctx.fillText(sub, WIDTH / 2, HEIGHT / 2 + 14);
+      ctx.textAlign = 'left';
+    }
+
     function start() {
       viewSrcCtx = document.getElementById('view-src').getContext('2d');
       viewHsCtx = document.getElementById('view-hs').getContext('2d');
       viewMsCtx = document.getElementById('view-ms').getContext('2d');
+      drawHint(viewSrcCtx, 'the test scene or your webcam');
+      drawHint(viewHsCtx, 'Horn-Schunck: single scale');
+      drawHint(viewMsCtx, 'coarse-to-fine: catches large motion');
       initGPU();
+      document.getElementById('ff-toggle').addEventListener('click', function () {
+        if (streaming) { halt(); } else { begin(); }
+      });
       document.getElementById('src-select').addEventListener('change', function (e) {
+        var wasRunning = streaming;
+        if (wasRunning) halt();
         sourceMode = e.target.value;
-        stopSource();
-        begin();
+        if (wasRunning) begin();
       });
-      document.getElementById('stop-btn').addEventListener('click', stopSource);
     }
 
     if (document.readyState === 'loading') {
@@ -1436,7 +1403,6 @@
           document.getElementById('st-n').textContent = String(N);
           var note = adapterSoftware ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
           line.innerHTML = 'Adapter: <b>' + label + '</b>' + note;
-          begin();
         });
       }).catch(function (err) {
         line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
@@ -1653,9 +1619,30 @@
 
     /* ================= entry ================= */
 
+    function haltMpm() {
+      streaming = false;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      document.getElementById('mpm-toggle').textContent = 'Start';
+    }
+
     function start() {
       viewCtx = document.getElementById('view-mpm').getContext('2d');
+      viewCtx.fillStyle = '#0a0f11';
+      viewCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      viewCtx.fillStyle = '#7fb5be';
+      viewCtx.font = '600 22px monospace';
+      viewCtx.textAlign = 'center';
+      viewCtx.fillText('Press Start', WIDTH / 2, HEIGHT / 2 - 12);
+      viewCtx.font = '400 14px monospace';
+      viewCtx.fillText('32,768 particles of falling material', WIDTH / 2, HEIGHT / 2 + 14);
+      viewCtx.textAlign = 'left';
       initGPU();
+      document.getElementById('mpm-toggle').addEventListener('click', function () {
+        if (streaming) { haltMpm(); } else {
+          document.getElementById('mpm-toggle').textContent = 'Stop';
+          begin();
+        }
+      });
     }
 
     if (document.readyState === 'loading') {
@@ -1669,195 +1656,217 @@
   (function () {
     'use strict';
 
-    /* ================= WGSL ================= */
-
     var WIDTH = 640, HEIGHT = 360;
-    var GW = 160, GH = 90;          // simulation grid cells
-    var N = 32768;                  // particles
-    var FIXED = 65536;              // fixed-point scale for atomic grid transfers
-    var RESTART_FRAMES = 1200;      // ~20 s at 60 Hz sim time
 
-    var P2G_WGSL = [
-      'struct SP { np : u32, gw : u32, gh : u32, dt : f32 };',
-      '@group(0) @binding(0) var<uniform> sp : SP;',
-      '@group(0) @binding(1) var<storage, read> pos : array<f32>;',
-      '@group(0) @binding(2) var<storage, read> vel : array<f32>;',
-      '@group(0) @binding(3) var<storage, read> cpt : array<f32>;',
-      '@group(0) @binding(4) var<storage, read_write> gmass : array<atomic<i32>>;',
-      '@group(0) @binding(5) var<storage, read_write> gvel : array<atomic<i32>>;',
+    var TRACE_WGSL = [
+      'struct Cam {',
+      '  frame : u32,',
+      '  _p0 : u32,',
+      '  _p1 : u32,',
+      '  _p2 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> cam : Cam;',
+      '@group(0) @binding(1) var prev : texture_2d<f32>;',
+      '@group(0) @binding(2) var accum : texture_storage_2d<rgba16float, write>;',
       '',
-      'fn wq(d : f32) -> f32 {',
-      '  let a = abs(d);',
-      '  if (a < 0.5) { return 0.75 - a * a; }',
-      '  if (a < 1.5) { return 0.5 * (1.5 - a) * (1.5 - a); }',
-      '  return 0.0;',
+      'struct Hit {',
+      '  t : f32,',
+      '  id : u32,',
+      '};',
+      '',
+      'fn pcg(state : ptr<function, u32>) -> f32 {',
+      '  var st = *state;',
+      '  st = st * 747796405u + 2891336453u;',
+      '  var word = ((st >> ((st >> 28u) + 4u)) ^ st) * 277803737u;',
+      '  word = (word >> 22u) ^ word;',
+      '  *state = st;',
+      '  return f32(word) / 4294967296.0;',
       '}',
       '',
-      '@compute @workgroup_size(64)',
-      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
-      '  let p = gid.x;',
-      '  if (p >= sp.np) { return; }',
-      '  let px = pos[p * 2u]; let py = pos[p * 2u + 1u];',
-      '  let vx = vel[p * 2u]; let vy = vel[p * 2u + 1u];',
-      '  let bx = floor(px); let by = floor(py);',
-      '  for (var j = -1; j <= 1; j = j + 1) {',
-      '    for (var i = -1; i <= 1; i = i + 1) {',
-      '      let cx = bx + f32(i); let cy = by + f32(j);',
-      '      if (cx < 0.0 || cy < 0.0 || cx >= f32(sp.gw) || cy >= f32(sp.gh)) { continue; }',
-      '      let wx = wq(px - cx); let wy = wq(py - cy);',
-      '      let w = wx * wy;',
-      '      let gi = u32(cy) * sp.gw + u32(cx);',
-      '      // affine (APIC) velocity at the cell: v + C * (x_cell - x_particle)',
-      '      let dx = cx + 0.5 - px;',
-      '      let dy = cy + 0.5 - py;',
-      '      let cvx = vx + cpt[p * 4u] * dx + cpt[p * 4u + 2u] * dy;',
-      '      let cvy = vy + cpt[p * 4u + 1u] * dx + cpt[p * 4u + 3u] * dy;',
-      '      atomicAdd(&gmass[gi], i32(w * 65536.0));',
-      '      atomicAdd(&gvel[gi * 2u], i32(w * cvx * 65536.0));',
-      '      atomicAdd(&gvel[gi * 2u + 1u], i32(w * cvy * 65536.0));',
-      '    }',
-      '  }',
-      '}'
-    ].join('\n');
-
-    var GRID_WGSL = [
-      'struct SP { np : u32, gw : u32, gh : u32, dt : f32 };',
-      '@group(0) @binding(0) var<uniform> sp : SP;',
-      '@group(0) @binding(1) var<storage, read_write> gmass : array<i32>;',
-      '@group(0) @binding(2) var<storage, read_write> gvel : array<i32>;',
-      '@compute @workgroup_size(64)',
-      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
-      '  let c = gid.x;',
-      '  if (c >= sp.gw * sp.gh) { return; }',
-      '  let m = f32(gmass[c]) / f32(' + String(FIXED) + ');',
-      '  if (m <= 0.0) { return; }',
-      '  var vx = f32(gvel[c * 2u]) / f32(' + String(FIXED) + ') / m;',
-      '  var vy = f32(gvel[c * 2u + 1u]) / f32(' + String(FIXED) + ') / m;',
-      '  vy = vy + 320.0 * sp.dt; // +y is down in this grid: gravity pulls toward larger y',
-      '  vx = clamp(vx, -40.0, 40.0);',
-      '  vy = clamp(vy, -40.0, 40.0);',
-      '  let cx = f32(c % sp.gw); let cy = f32(c / sp.gw);',
-      '  if (cx < 2.0) { vx = max(vx, 0.0); }',
-      '  if (cx >= f32(sp.gw) - 2.0) { vx = min(vx, 0.0); }',
-      '  if (cy >= f32(sp.gh) - 2.0) { vy = min(vy, 0.0); }',
-      '  if (cy < 2.0) { vy = max(vy, 0.0); }',
-      '  gvel[c * 2u] = i32(vx * f32(' + String(FIXED) + '));',
-      '  gvel[c * 2u + 1u] = i32(vy * f32(' + String(FIXED) + '));',
-      '}'
-    ].join('\n');
-
-    var G2P_WGSL = [
-      'struct SP { np : u32, gw : u32, gh : u32, dt : f32 };',
-      '@group(0) @binding(0) var<uniform> sp : SP;',
-      '@group(0) @binding(1) var<storage, read_write> pos : array<f32>;',
-      '@group(0) @binding(2) var<storage, read_write> vel : array<f32>;',
-      '@group(0) @binding(3) var<storage, read_write> cpt : array<f32>;',
-      '@group(0) @binding(4) var<storage, read> gvel : array<i32>;',
-      '',
-      'fn wq(d : f32) -> f32 {',
-      '  let a = abs(d);',
-      '  if (a < 0.5) { return 0.75 - a * a; }',
-      '  if (a < 1.5) { return 0.5 * (1.5 - a) * (1.5 - a); }',
-      '  return 0.0;',
+      'fn sphereCenter(id : u32) -> vec3<f32> {',
+      '  if (id == 1u) { return vec3<f32>(-1.1, 0.8, 0.2); }',
+      '  if (id == 2u) { return vec3<f32>(1.2, 1.1, -0.4); }',
+      '  return vec3<f32>(0.2, 0.35, 1.1);',
       '}',
       '',
-      '@compute @workgroup_size(64)',
-      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
-      '  let p = gid.x;',
-      '  if (p >= sp.np) { return; }',
-      '  let px = pos[p * 2u]; let py = pos[p * 2u + 1u];',
-      '  let bx = floor(px); let by = floor(py);',
-      '  var vx = 0.0; var vy = 0.0;',
-      '  var c00 = 0.0; var c01 = 0.0; var c10 = 0.0; var c11 = 0.0;',
-      '  for (var j = -1; j <= 1; j = j + 1) {',
-      '    for (var i = -1; i <= 1; i = i + 1) {',
-      '      let cx = bx + f32(i); let cy = by + f32(j);',
-      '      if (cx < 0.0 || cy < 0.0 || cx >= f32(sp.gw) || cy >= f32(sp.gh)) { continue; }',
-      '      let wx = wq(px - cx); let wy = wq(py - cy);',
-      '      let w = wx * wy;',
-      '      let gi = u32(cy) * sp.gw + u32(cx);',
-      '      let gv = vec2<f32>(f32(gvel[gi * 2u]) / f32(' + String(FIXED) + '), f32(gvel[gi * 2u + 1u]) / f32(' + String(FIXED) + '));',
-      '      vx = vx + w * gv.x; vy = vy + w * gv.y;',
-      '      let dx = cx + 0.5 - px; let dy = cy + 0.5 - py;',
-      '      c00 = c00 + 4.0 * w * gv.x * dx;',
-      '      c01 = c01 + 4.0 * w * gv.x * dy;',
-      '      c10 = c10 + 4.0 * w * gv.y * dx;',
-      '      c11 = c11 + 4.0 * w * gv.y * dy;',
-      '    }',
-      '  }',
-      '  vel[p * 2u] = vx; vel[p * 2u + 1u] = vy;',
-      '  cpt[p * 4u] = c00; cpt[p * 4u + 1u] = c01; cpt[p * 4u + 2u] = c10; cpt[p * 4u + 3u] = c11;',
-      '  var nx = px + vx * sp.dt; var ny = py + vy * sp.dt;',
-      '  nx = clamp(nx, 1.5, f32(sp.gw) - 1.5);',
-      '  ny = clamp(ny, 1.5, f32(sp.gh) - 1.5);',
-      '  pos[p * 2u] = nx; pos[p * 2u + 1u] = ny;',
-      '}'
-    ].join('\n');
-
-    var SPLAT_WGSL = [
-      'struct SP { np : u32, gw : u32, gh : u32, dt : f32 };',
-      '@group(0) @binding(0) var<uniform> sp : SP;',
-      '@group(0) @binding(1) var<storage, read> pos : array<f32>;',
-      '@group(0) @binding(2) var<storage, read> vel : array<f32>;',
-      '@group(0) @binding(3) var<storage, read_write> covCount : array<atomic<u32>>;',
-      '@group(0) @binding(4) var<storage, read_write> covSpeed : array<atomic<u32>>;',
-      '@compute @workgroup_size(64)',
-      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
-      '  let p = gid.x;',
-      '  if (p >= sp.np) { return; }',
-      '  let x = u32(pos[p * 2u] * 4.0);',
-      '  let y = u32(pos[p * 2u + 1u] * 4.0);',
-      '  if (x >= sp.gw * 4u || y >= sp.gh * 4u) { return; }',
-      '  let speed = length(vec2<f32>(vel[p * 2u], vel[p * 2u + 1u]));',
-      '  let bucket = min(u32(speed * 4.0), 15u);',
-      '  let ci = (y / 4u) * sp.gw + (x / 4u);',
-      '  atomicAdd(&covCount[ci], 1u);',
-      '  atomicAdd(&covSpeed[ci], bucket + 1u);',
-      '}'
-    ].join('\n');
-
-    var SHADE_WGSL = [
-      'struct SP { np : u32, gw : u32, gh : u32, dt : f32 };',
-      '@group(0) @binding(0) var<uniform> sp : SP;',
-      '@group(0) @binding(1) var<storage, read> covCount : array<u32>;',
-      '@group(0) @binding(2) var<storage, read> covSpeed : array<u32>;',
-      '@group(0) @binding(3) var dst : texture_storage_2d<rgba8unorm, write>;',
+      'fn sphereRadius(id : u32) -> f32 {',
+      '  if (id == 1u) { return 0.8; }',
+      '  if (id == 2u) { return 1.1; }',
+      '  return 0.35;',
+      '}',
+      '',
+      'fn sphereHit(ro : vec3<f32>, rd : vec3<f32>, c : vec3<f32>, r : f32) -> f32 {',
+      '  let oc = ro - c;',
+      '  let b = dot(oc, rd);',
+      '  let cc = dot(oc, oc) - r * r;',
+      '  let disc = b * b - cc;',
+      '  if (disc < 0.0) { return -1.0; }',
+      '  let sq = sqrt(disc);',
+      '  let t = -b - sq;',
+      '  if (t > 0.001) { return t; }',
+      '  let t2 = -b + sq;',
+      '  if (t2 > 0.001) { return t2; }',
+      '  return -1.0;',
+      '}',
+      '',
+      'fn planeHit(ro : vec3<f32>, rd : vec3<f32>) -> f32 {',
+      '  if (rd.y > -0.0001) { return -1.0; }',
+      '  let t = -ro.y / rd.y;',
+      '  if (t > 0.001) { return t; }',
+      '  return -1.0;',
+      '}',
+      '',
+      'fn scene(ro : vec3<f32>, rd : vec3<f32>) -> Hit {',
+      '  var h : Hit;',
+      '  h.t = 10000.0;',
+      '  h.id = 4294967295u;',
+      '  let t0 = planeHit(ro, rd);',
+      '  if (t0 > 0.0 && t0 < h.t) { h.t = t0; h.id = 0u; }',
+      '  let s1 = sphereHit(ro, rd, vec3<f32>(-1.1, 0.8, 0.2), 0.8);',
+      '  if (s1 > 0.0 && s1 < h.t) { h.t = s1; h.id = 1u; }',
+      '  let s2 = sphereHit(ro, rd, vec3<f32>(1.2, 1.1, -0.4), 1.1);',
+      '  if (s2 > 0.0 && s2 < h.t) { h.t = s2; h.id = 2u; }',
+      '  let s3 = sphereHit(ro, rd, vec3<f32>(0.2, 0.35, 1.1), 0.35);',
+      '  if (s3 > 0.0 && s3 < h.t) { h.t = s3; h.id = 3u; }',
+      '  return h;',
+      '}',
+      '',
+      'fn albedo(id : u32) -> vec3<f32> {',
+      '  if (id == 0u) { return vec3<f32>(0.75, 0.75, 0.78); }',
+      '  if (id == 1u) { return vec3<f32>(0.9, 0.3, 0.25); }',
+      '  if (id == 2u) { return vec3<f32>(0.25, 0.5, 0.9); }',
+      '  return vec3<f32>(0.9, 0.8, 0.3);',
+      '}',
+      '',
+      'fn surfaceNormal(id : u32, hitP : vec3<f32>) -> vec3<f32> {',
+      '  if (id == 0u) { return vec3<f32>(0.0, 1.0, 0.0); }',
+      '  return normalize(hitP - sphereCenter(id));',
+      '}',
+      '',
+      'fn lightPos(r1 : f32, r2 : f32) -> vec3<f32> {',
+      '  return vec3<f32>(-1.6 + 3.2 * r1, 3.6, -1.2 + 2.4 * r2);',
+      '}',
+      '',
+      'fn visible(p : vec3<f32>, nrm : vec3<f32>, lp : vec3<f32>) -> f32 {',
+      '  let d = lp - p;',
+      '  let dist = length(d);',
+      '  let rd = d / dist;',
+      '  let h = scene(p + nrm * 0.002, rd);',
+      '  if (h.id != 4294967295u && h.t < dist - 0.01) { return 0.0; }',
+      '  return 1.0;',
+      '}',
+      '',
       '@compute @workgroup_size(16, 16)',
       'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
-      // the output canvas is 4x the grid resolution: map the pixel to its cell
-      '  let count = covCount[(gid.y / 4u) * sp.gw + (gid.x / 4u)];',
-      '  let speedSum = covSpeed[(gid.y / 4u) * sp.gw + (gid.x / 4u)];',
-      '  var col = vec3<f32>(0.03, 0.04, 0.06);',
-      '  if (count > 0u) {',
-      '    let avgSpeed = f32(speedSum) / f32(count);',
-      '    let heat = clamp(f32(count) * 0.3, 0.0, 1.0);',
-      '    let hue = vec3<f32>(0.55, 0.75, 1.0) - vec3<f32>(0.45, 0.35, 0.2) * clamp(avgSpeed * 0.45, 0.0, 1.0);',
-      '    col = clamp(hue * clamp(heat + 0.15, 0.0, 1.6), vec3<f32>(0.0), vec3<f32>(1.0));',
+      '  if (gid.x >= 640u || gid.y >= 360u) { return; }',
+      '  var rng = (gid.x * 1973u + gid.y * 9277u + cam.frame * 26699u) | 1u;',
+      '  let jitter = vec2<f32>(pcg(&rng) - 0.5, pcg(&rng) - 0.5);',
+      '  let uv = (vec2<f32>(gid.xy) + jitter) / vec2<f32>(640.0, 360.0);',
+      '  let camPos = vec3<f32>(0.0, 1.6, 4.2);',
+      '  let camDir = normalize(vec3<f32>(0.0, -0.18, -1.0));',
+      '  let right = vec3<f32>(1.0, 0.0, 0.0);',
+      '  let up = vec3<f32>(0.0, 1.0, 0.0);',
+      '  let rd = normalize(camDir * 1.6 + right * (uv.x - 0.5) * 1.6 + up * (0.5 - uv.y) * 0.9);',
+      '',
+      '  var radiance = vec3<f32>(0.0);',
+      '  var throughput = vec3<f32>(1.0);',
+      '  var ro = camPos;',
+      '  var dir = rd;',
+      '',
+      '  for (var bounce = 0u; bounce < 3u; bounce = bounce + 1u) {',
+      '    let h = scene(ro, dir);',
+      '    if (h.id == 4294967295u) {',
+      '      let sky = vec3<f32>(0.28, 0.42, 0.65) * 0.5 + vec3<f32>(0.35) * max(dir.y, 0.0);',
+      '      radiance = radiance + throughput * sky;',
+      '      break;',
+      '    }',
+      '    let hitP = ro + dir * h.t;',
+      '    let nrm = surfaceNormal(h.id, hitP);',
+      '    if (h.id == 0u) {',
+      '      let ck = select(vec3<f32>(0.72), vec3<f32>(0.28), ((u32(floor(hitP.x * 1.5)) + u32(floor(hitP.z * 1.5))) % 2u) == 1u);',
+      '      throughput = throughput * ck;',
+      '    } else {',
+      '      throughput = throughput * albedo(h.id);',
+      '    }',
+      '',
+      '    // ReSTIR-style reservoir: 8 light candidates, one winning shadow ray',
+      '    var wsum = 0.0;',
+      '    var chosen = vec3<f32>(0.0);',
+      '    var have = false;',
+      '    for (var k = 0u; k < 8u; k = k + 1u) {',
+      '      let lp = lightPos(pcg(&rng), pcg(&rng));',
+      '      let ld = lp - hitP;',
+      '      let dist2 = dot(ld, ld);',
+      '      let ldir = normalize(ld);',
+      '      let cosT = max(dot(nrm, ldir), 0.0);',
+      '      let vis = visible(hitP, nrm, lp);',
+      '      let w = cosT / dist2 * vis;',
+      '      wsum = wsum + w;',
+      '      let r = pcg(&rng) * wsum;',
+      '      if (r <= w) { chosen = lp; have = true; }',
+      '    }',
+      '',
+      '    if (wsum > 0.0 && have) {',
+      '      let ld = chosen - hitP;',
+      '      let dist2 = dot(ld, ld);',
+      '      let ldir = normalize(ld);',
+      '      let cosT = max(dot(nrm, ldir), 0.0);',
+      '      let vis = visible(hitP, nrm, chosen);',
+      '      let lightArea = 3.2 * 2.4;',
+      '      let contrib = vec3<f32>(18.0, 16.5, 14.0) * cosT * vis * lightArea / dist2 / 8.0 * wsum;',
+      '      radiance = radiance + throughput * contrib * 0.12;',
+      '    }',
+      '',
+      '    var bounceDir = normalize(nrm + vec3<f32>(pcg(&rng) - 0.5, pcg(&rng) - 0.5, pcg(&rng) - 0.5) * 1.2);',
+      '    if (dot(bounceDir, nrm) < 0.0) { bounceDir = -bounceDir; }',
+      '    ro = hitP + nrm * 0.002;',
+      '    dir = bounceDir;',
+      '    if (max(throughput.r, max(throughput.g, throughput.b)) < 0.02) { break; }',
       '  }',
+      '',
+      '  let prevCol = textureLoad(prev, vec2<u32>(gid.xy), 0);',
+      '  var acc = prevCol.rgb + radiance;',
+      '  acc = clamp(acc, vec3<f32>(0.0), vec3<f32>(60.0));',
+      '  textureStore(accum, vec2<u32>(gid.xy), vec4<f32>(acc, f32(cam.frame + 1u)));',
+      '}'
+    ].join('\n');
+
+    var TONE_WGSL = [
+      'struct Cam {',
+      '  frame : u32,',
+      '  _p0 : u32,',
+      '  _p1 : u32,',
+      '  _p2 : u32,',
+      '};',
+      '@group(0) @binding(0) var<uniform> cam : Cam;',
+      '@group(0) @binding(1) var accum : texture_2d<f32>;',
+      '@group(0) @binding(2) var dst : texture_storage_2d<rgba8unorm, write>;',
+      '@compute @workgroup_size(16, 16)',
+      'fn main(@builtin(global_invocation_id) gid : vec3<u32>) {',
+      '  let c = textureLoad(accum, vec2<u32>(gid.xy), 0);',
+      '  let spp = max(c.a, 1.0);',
+      '  var col = c.rgb / spp;',
+      '  col = col / (col + vec3<f32>(1.0));',
+      '  col = pow(col, vec3<f32>(1.0 / 2.2));',
       '  textureStore(dst, vec2<u32>(gid.xy), vec4<f32>(col, 1.0));',
       '}'
     ].join('\n');
 
-    /* ================= state ================= */
-
     var device = null;
-    var adapterSoftware = false;
-    var posBuf = null, velBuf = null, cptBuf = null;
-    var gmassBuf = null, gvelBuf = null, covCountBuf = null, covSpeedBuf = null, covReadBuf = null;
-    var outTex = null, spBuf = null;
+    var accum = [], accumIdx = 0;
+    var outTex = null;
     var pipes = {}, bgs = {};
+    var camBuf = null;
+    var frame = 0;
     var streaming = false;
     var rafId = null;
-    var frameCount = 0, fpsLast = 0;
     var viewCtx = null;
-    var simFrames = 0;
-
-    /* ================= init ================= */
+    var lastTraceMs = 0;
 
     function initGPU() {
-      var line = document.getElementById('device-line');
+      var line = document.getElementById('lf-device');
       if (!navigator.gpu) {
-        line.innerHTML = '<span class="sw-note">WebGPU is not available in this browser. The enablement guide is on the <a href="/webgpu-labs" style="color:var(--accent);">labs page</a>.</span>';
+        line.innerHTML = '<span class="sw-note">WebGPU is not available in this browser.</span>';
         return;
       }
       navigator.gpu.requestAdapter().then(function (adapter) {
@@ -1867,113 +1876,57 @@
         }
         var info = adapter.info || {};
         var label = [info.vendor, info.device, info.architecture].filter(Boolean).join(' / ') || 'reported';
-        adapterSoftware = /swiftshader|llvmpipe/i.test(label);
+        var sw = /swiftshader|llvmpipe/i.test(label);
         return adapter.requestDevice().then(function (dev) {
           device = dev;
-          device.addEventListener('uncapturederror', function (e) { if (e.message) console.error('GPUERR:', e.message); });
-          device.lost.then(function (l) { console.error('DEVICELOST:', l.reason, l.message); });
-          buildResources();
-          document.getElementById('st-n').textContent = String(N);
-          var note = adapterSoftware ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
+          device.addEventListener('uncapturederror', function (e) { if (e.message) console.error('LF-GPUERR:', e.message); });
+          device.lost.then(function (l) { console.error('LF-LOST:', l.reason); });
+          camBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+          for (var i = 0; i < 2; i++) {
+            accum.push(device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba16float',
+              usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING }));
+          }
+          outTex = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm',
+            usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC });
+          pipes.trace = mkPipe(TRACE_WGSL, 'trace');
+          pipes.tone = mkPipe(TONE_WGSL, 'tone');
+          function lfScoped(name, fn) {
+            device.pushErrorScope('validation');
+            var obj = fn();
+            device.popErrorScope().then(function (e) { if (e) console.error('LF-BG-' + name + ': ' + e.message.split('\n')[0]); });
+            return obj;
+          }
+          bgs.trace = [0, 1].map(function (i) {
+            return lfScoped('trace' + i, function () {
+              return device.createBindGroup({
+                layout: pipes.trace.getBindGroupLayout(0),
+                entries: [
+                  { binding: 0, resource: { buffer: camBuf } },
+                  { binding: 1, resource: accum[1 - i].createView() },
+                  { binding: 2, resource: accum[i].createView() }
+                ]
+              });
+            });
+          });
+          bgs.tone = [0, 1].map(function (i) {
+            return lfScoped('tone' + i, function () {
+              // the tone body never reads the uniform, so the auto layout
+              // only contains bindings 1 and 2
+              return device.createBindGroup({
+                layout: pipes.tone.getBindGroupLayout(0),
+                entries: [
+                  { binding: 1, resource: accum[i].createView() },
+                  { binding: 2, resource: outTex.createView() }
+                ]
+              });
+            });
+          });
+          var note = sw ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
           line.innerHTML = 'Adapter: <b>' + label + '</b>' + note;
-          begin();
         });
       }).catch(function (err) {
         line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
       });
-    }
-
-    function buildResources() {
-      spBuf = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-      writeSP();
-      posBuf = device.createBuffer({ size: N * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
-      velBuf = device.createBuffer({ size: N * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
-      cptBuf = device.createBuffer({ size: N * 16, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
-      gmassBuf = device.createBuffer({ size: GW * GH * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
-      gvelBuf = device.createBuffer({ size: GW * GH * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
-      covCountBuf = device.createBuffer({ size: GW * GH * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
-      covSpeedBuf = device.createBuffer({ size: GW * GH * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
-      covReadBuf = device.createBuffer({ size: GW * GH * 8, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
-      outTex = device.createTexture({ size: [WIDTH, HEIGHT], format: 'rgba8unorm',
-        usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.COPY_SRC });
-
-      pipes.p2g = mkPipe(P2G_WGSL, 'p2g');
-      pipes.grid = mkPipe(GRID_WGSL, 'grid');
-      pipes.g2p = mkPipe(G2P_WGSL, 'g2p');
-      pipes.splat = mkPipe(SPLAT_WGSL, 'splat');
-      pipes.shade = mkPipe(SHADE_WGSL, 'shade');
-
-      bgs.p2g = device.createBindGroup({
-        layout: pipes.p2g.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: spBuf } },
-          { binding: 1, resource: { buffer: posBuf } },
-          { binding: 2, resource: { buffer: velBuf } },
-          { binding: 3, resource: { buffer: cptBuf } },
-          { binding: 4, resource: { buffer: gmassBuf } },
-          { binding: 5, resource: { buffer: gvelBuf } }
-        ]
-      });
-      bgs.grid = device.createBindGroup({
-        layout: pipes.grid.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: spBuf } },
-          { binding: 1, resource: { buffer: gmassBuf } },
-          { binding: 2, resource: { buffer: gvelBuf } }
-        ]
-      });
-      bgs.g2p = device.createBindGroup({
-        layout: pipes.g2p.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: spBuf } },
-          { binding: 1, resource: { buffer: posBuf } },
-          { binding: 2, resource: { buffer: velBuf } },
-          { binding: 3, resource: { buffer: cptBuf } },
-          { binding: 4, resource: { buffer: gvelBuf } }
-        ]
-      });
-      bgs.splat = device.createBindGroup({
-        layout: pipes.splat.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: spBuf } },
-          { binding: 1, resource: { buffer: posBuf } },
-          { binding: 2, resource: { buffer: velBuf } },
-          { binding: 3, resource: { buffer: covCountBuf } },
-          { binding: 4, resource: { buffer: covSpeedBuf } }
-        ]
-      });
-      bgs.shade = device.createBindGroup({
-        layout: pipes.shade.getBindGroupLayout(0),
-        entries: [
-          { binding: 0, resource: { buffer: spBuf } },
-          { binding: 1, resource: { buffer: covCountBuf } },
-          { binding: 2, resource: { buffer: covSpeedBuf } },
-          { binding: 3, resource: outTex.createView() }
-        ]
-      });
-      resetParticles();
-    }
-
-    function writeSP() {
-      device.queue.writeBuffer(spBuf, 0, new Uint32Array([N, GW, GH, 0]));
-      device.queue.writeBuffer(spBuf, 12, new Float32Array([1 / 60]));
-    }
-
-    function resetParticles() {
-      // a block of material falling into a pile on the floor
-      var pos = new Float32Array(N * 2);
-      var vel = new Float32Array(N * 2);
-      var i = 0;
-      while (i < N) {
-        var x = 20 + (i % 220) * 0.55 + (Math.random() - 0.5) * 0.4;
-        var y = 6 + Math.floor(i / 220) * 0.55 + (Math.random() - 0.5) * 0.4;
-        if (y > 40) { y = 6 + Math.random() * 4; }
-        pos[i * 2] = x; pos[i * 2 + 1] = y;
-        i++;
-      }
-      device.queue.writeBuffer(posBuf, 0, pos);
-      device.queue.writeBuffer(velBuf, 0, vel);
-      device.queue.writeBuffer(cptBuf, 0, new Float32Array(N * 4));
     }
 
     function mkPipe(code, name) {
@@ -1988,114 +1941,90 @@
       return device.createComputePipeline({ layout: 'auto', compute: { module: mod, entryPoint: 'main' } });
     }
 
-    /* ================= frame ================= */
-
     function begin() {
       if (streaming) return;
       streaming = true;
-      fpsLast = performance.now();
-      frameCount = 0;
       window.requestAnimationFrame(loop);
     }
 
-    function dispatchFrame() {
-      var pg = Math.ceil(N / 64), gc = Math.ceil(GW * GH / 64);
-      device.queue.writeBuffer(gmassBuf, 0, new Uint32Array(GW * GH));
-      device.queue.writeBuffer(gvelBuf, 0, new Uint32Array(GW * GH * 2));
-      device.queue.writeBuffer(covCountBuf, 0, new Uint32Array(GW * GH));
-      device.queue.writeBuffer(covSpeedBuf, 0, new Uint32Array(GW * GH));
-
-      var enc = device.createCommandEncoder();
-      function pass(pipe, bg, gx, gy) {
-        var p = enc.beginComputePass();
-        p.setPipeline(pipe);
-        p.setBindGroup(0, bg);
-        p.dispatchWorkgroups(gx, gy || 1);
-        p.end();
-      }
-      pass(pipes.p2g, bgs.p2g, pg);
-      pass(pipes.grid, bgs.grid, gc);
-      pass(pipes.g2p, bgs.g2p, pg);
-      pass(pipes.splat, bgs.splat, pg);
-      pass(pipes.shade, bgs.shade, Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
-      device.queue.submit([enc.finish()]);
-      simFrames++;
-      if (simFrames >= RESTART_FRAMES) {
-        simFrames = 0;
-        resetParticles();
-      }
-      return device.queue.onSubmittedWorkDone();
+    function resetAccum() {
+      frame = 0;
     }
 
-    /* ================= the loop ================= */
+    function traceFrame() {
+      device.queue.writeBuffer(camBuf, 0, new Uint32Array([frame, 0, 0, 0]));
+      var enc = device.createCommandEncoder();
+      var p = enc.beginComputePass();
+      p.setPipeline(pipes.trace);
+      p.setBindGroup(0, bgs.trace[accumIdx]);
+      p.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
+      p.end();
+      var p2 = enc.beginComputePass();
+      p2.setPipeline(pipes.tone);
+      p2.setBindGroup(0, bgs.tone[accumIdx]);
+      p2.dispatchWorkgroups(Math.ceil(WIDTH / 16), Math.ceil(HEIGHT / 16));
+      p2.end();
+      device.queue.submit([enc.finish()]);
+      var used = accumIdx;
+      accumIdx = 1 - accumIdx;
+      frame++;
+      return used;
+    }
 
     function loop() {
       if (!streaming) return;
       if (!device) { rafId = window.requestAnimationFrame(loop); return; }
-
       var t0 = performance.now();
-      dispatchFrame().then(function () {
-        frameCount++;
-        var fps = 1000 * frameCount / (performance.now() - fpsLast);
-        document.getElementById('st-fps').textContent = fps.toFixed(1);
-
-        // copy both coverage buffers into one map-read buffer (counts | speeds)
-        var copyEnc = device.createCommandEncoder();
-        copyEnc.copyBufferToBuffer(covCountBuf, 0, covReadBuf, 0, GW * GH * 4);
-        copyEnc.copyBufferToBuffer(covSpeedBuf, 0, covReadBuf, GW * GH * 4, GW * GH * 4);
-        device.queue.submit([copyEnc.finish()]);
-
-        var readCov = covReadBuf.mapAsync(GPUMapMode.READ).then(function () {
-          var cov = new Uint32Array(covReadBuf.getMappedRange().slice(0));
-          covReadBuf.unmap();
-          return cov;
-        });
-        var img = readback(outTex);
-
-        Promise.all([readCov, img]).then(function (r) {
-          document.getElementById('st-sim').textContent = (performance.now() - t0).toFixed(1);
-          drawToCanvas(r[1], viewCtx);
-          // settled %: particle count in the lower third over all covered cells
-          var counts = r[0].subarray(0, GW * GH);
-          var lower = 0, all = 0;
-          for (var c = 0; c < GW * GH; c++) {
-            all += counts[c];
-            if (c >= Math.floor(GH * 0.66) * GW) lower += counts[c];
-          }
-          document.getElementById('st-avg').textContent = (100 * lower / (all || 1)).toFixed(0) + '%';
-          if (streaming) rafId = window.requestAnimationFrame(loop);
-        }).catch(function () {
-          if (streaming) rafId = window.requestAnimationFrame(loop);
-        });
+      var used = traceFrame();
+      var rb = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+      var enc = device.createCommandEncoder();
+      enc.copyTextureToBuffer({ texture: outTex }, { buffer: rb, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
+      device.queue.submit([enc.finish()]);
+      rb.mapAsync(GPUMapMode.READ).then(function () {
+        lastTraceMs = performance.now() - t0;
+        var img = new Uint8Array(rb.getMappedRange().slice(0));
+        rb.unmap();
+        rb.destroy();
+        var i2 = ctx.createImageData(WIDTH, HEIGHT);
+        i2.data.set(img.subarray(0, WIDTH * HEIGHT * 4));
+        ctx.putImageData(i2, 0, 0);
+        document.getElementById('lf-spp').textContent = String(frame + 1);
+        document.getElementById('lf-ms').textContent = lastTraceMs.toFixed(1);
+        var fps = 1000 / Math.max(lastTraceMs, 1);
+        document.getElementById('lf-fps').textContent = fps.toFixed(1);
+        if (streaming) rafId = window.requestAnimationFrame(loop);
       }).catch(function () {
         if (streaming) rafId = window.requestAnimationFrame(loop);
       });
     }
 
-    function readback(tex) {
-      var rb = device.createBuffer({ size: WIDTH * HEIGHT * 4, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
-      var enc = device.createCommandEncoder();
-      enc.copyTextureToBuffer({ texture: tex }, { buffer: rb, bytesPerRow: WIDTH * 4, rowsPerImage: HEIGHT }, [WIDTH, HEIGHT]);
-      device.queue.submit([enc.finish()]);
-      return rb.mapAsync(GPUMapMode.READ).then(function () {
-        var out = new Uint8Array(rb.getMappedRange().slice(0));
-        rb.unmap();
-        rb.destroy();
-        return out;
-      });
-    }
+    var ctx = null;
 
-    function drawToCanvas(bytes, ctx) {
-      var img = ctx.createImageData(WIDTH, HEIGHT);
-      img.data.set(bytes.subarray(0, WIDTH * HEIGHT * 4));
-      ctx.putImageData(img, 0, 0);
+    function haltLf() {
+      streaming = false;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      document.getElementById('lf-toggle').textContent = 'Start';
     }
-
-    /* ================= entry ================= */
 
     function start() {
-      viewCtx = document.getElementById('view-mpm').getContext('2d');
+      ctx = document.getElementById('lf-canvas').getContext('2d');
+      ctx.fillStyle = '#0a0f11';
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      ctx.fillStyle = '#7fb5be';
+      ctx.font = '600 22px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Press Start', WIDTH / 2, HEIGHT / 2 - 12);
+      ctx.font = '400 14px monospace';
+      ctx.fillText('the image converges as samples accumulate', WIDTH / 2, HEIGHT / 2 + 14);
+      ctx.textAlign = 'left';
       initGPU();
+      document.getElementById('lf-toggle').addEventListener('click', function () {
+        if (streaming) { haltLf(); } else {
+          document.getElementById('lf-toggle').textContent = 'Stop';
+          begin();
+        }
+      });
+      document.getElementById('lf-reset').addEventListener('click', resetAccum);
     }
 
     if (document.readyState === 'loading') {
@@ -2345,7 +2274,6 @@
           document.getElementById('ss-n').textContent = String(NSPLAT);
           var note = sw ? ' <span class="sw-note">(software renderer: timings are CPU-class)</span>' : '';
           line.innerHTML = 'Adapter: <b>' + label + '</b>' + note;
-          begin();
         });
       }).catch(function (err) {
         line.innerHTML = '<span class="sw-note">Adapter error: ' + err + '</span>';
@@ -2606,9 +2534,30 @@
       ctx.putImageData(img, 0, 0);
     }
 
+    function haltSs() {
+      streaming = false;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      document.getElementById('ss-toggle').textContent = 'Start';
+    }
+
     function start() {
       viewCtx = document.getElementById('ss-canvas').getContext('2d');
+      viewCtx.fillStyle = '#0a0f11';
+      viewCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      viewCtx.fillStyle = '#7fb5be';
+      viewCtx.font = '600 22px monospace';
+      viewCtx.textAlign = 'center';
+      viewCtx.fillText('Press Start', WIDTH / 2, HEIGHT / 2 - 12);
+      viewCtx.font = '400 14px monospace';
+      viewCtx.fillText('16,384 splats, a 105-stage GPU sort per frame', WIDTH / 2, HEIGHT / 2 + 14);
+      viewCtx.textAlign = 'left';
       initGPU();
+      document.getElementById('ss-toggle').addEventListener('click', function () {
+        if (streaming) { haltSs(); } else {
+          document.getElementById('ss-toggle').textContent = 'Stop';
+          begin();
+        }
+      });
     }
 
     if (document.readyState === 'loading') {

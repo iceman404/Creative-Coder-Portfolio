@@ -251,6 +251,27 @@
       .arena-card { padding: 20px; }
       .results td, .results th { padding: 7px 8px; font-size: 0.84rem; }
     }
+  
+    /* dropdown contrast: native option popups do not always resolve CSS
+       variables, so dark and light themes get explicit colors */
+    select {
+      color-scheme: dark;
+      background: #12242c;
+      color: var(--text);
+      border: 1px solid rgba(var(--accent-rgb), 0.4);
+    }
+    select option, select optgroup {
+      background: #12242c;
+      color: #e0f4f7;
+    }
+    [data-theme="light"] select {
+      color-scheme: light;
+      background: #ffffff;
+    }
+    [data-theme="light"] select option, [data-theme="light"] select optgroup {
+      background: #ffffff;
+      color: #182a2f;
+    }
   </style>
 </head>
 <body>
@@ -759,6 +780,7 @@
           }
           line.innerHTML = 'Adapter: <b>' + adapterLabel + '</b>' +
             (adapterSoftware ? ' <span class="sw-note">(software renderer)</span>' : '') +
+            ' <span class="sw-note">press Run when ready - each benchmark saturates a core while it runs</span>' +
             (note ? '<br>' + note : '');
           document.getElementById('run-btn').disabled = false;
           document.getElementById('q-btn').disabled = false;
@@ -1448,22 +1470,8 @@
         runQuantLadder(dim);
       });
 
-      // auto-run the fast ladder once the device is up, then the quantized
-      // ladder as soon as the fp32 one finishes
-      // poll for device readiness: adapter resolution can outrun any fixed
-      // delay on a loaded machine, so the poll lives until the ladder fires
-      var arm = setInterval(function () {
-        if (!running && device) {
-          clearInterval(arm);
-          runLadder(256);
-          var retry = setInterval(function () {
-            if (!running && device) {
-              clearInterval(retry);
-              runQuantLadder(256);
-            }
-          }, 1000);
-        }
-      }, 500);
+      // the ladders run only when the visitor presses Run: each pass
+      // saturates a CPU core for the duration on software adapters
     }
 
     if (document.readyState === 'loading') {
