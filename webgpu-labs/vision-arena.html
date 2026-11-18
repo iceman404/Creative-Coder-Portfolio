@@ -337,6 +337,12 @@
         <div class="stat-chip"><div class="v" id="st-fps">&ndash;</div><div class="k">frames / second</div></div>
       </div>
 
+      <div id="algo-panel" style="margin-top:14px; padding:14px 18px; border-radius:12px; background:rgba(var(--wash-rgb), 0.12); border:1px solid rgba(var(--accent-rgb), 0.3);">
+        <b id="algo-name" style="color:var(--accent);">&mdash;</b>
+        <p id="algo-desc" style="font-size:0.88rem; color:var(--text-dim); line-height:1.7; margin-top:6px;">&mdash;</p>
+        <p id="algo-insight" style="font-size:0.85rem; color:var(--text-dim); line-height:1.7; margin-top:4px;"><b>Naive vs tiled:</b> &mdash;</p>
+      </div>
+
       <div class="view-row">
         <div class="view-box">
           <div class="view-label">Source</div>
@@ -1055,6 +1061,8 @@
 
           pipeLum = makePipeline(LUM_WGSL);
           bgLum = makeBindGroup(pipeLum, srcTex, grayTex);
+          bgs.lumN = makeBindGroup(pipeLum, srcTex, outNaiveTex);
+          bgs.lumT = makeBindGroup(pipeLum, srcTex, outTiledTex);
 
           pipes.gaussN = makePipeline(GAUSS_NAIVE_WGSL);
           pipes.gaussT = makePipeline(GAUSS_TILED_WGSL);
@@ -1332,6 +1340,10 @@
 
       // stage 0: luminance reference
       stageN.push(passDesc(pipeLum, bgLum, W16, H16, 0));
+      if (kernelMode === 'lum') {
+        stageN.push(passDesc(pipeLum, bgs.lumN, W16, H16, null));
+        stageT.push(passDesc(pipeLum, bgs.lumT, W16, H16, null));
+      }
 
       if (kernelMode === 'gauss' || kernelMode === 'sobel') {
         var kn = (kernelMode === 'sobel') ? 'sobelN' : 'gaussN';
@@ -1549,13 +1561,56 @@
         stopSource();
         begin();
       });
+      var ALGO_INFO = {
+        lum: {
+          name: 'Luminance (reference pass)',
+          desc: 'Converts RGB to grayscale with Rec.601 eye-sensitivity weights (0.299 R + 0.587 G + 0.114 B). This is the shared first pass that feeds every other algorithm.',
+          insight: 'Naive and tiled are identical here: every thread reads only its own texel, so there are no neighbors to share and tiling has nothing to save. This is the baseline that shows what tiling actually buys for the other algorithms.'
+        },
+        gauss: {
+          name: 'Gaussian 5\u00d75 blur',
+          desc: 'Replaces each pixel with a weighted average of its 5\u00d75 neighborhood. Closer neighbors count more (the Gaussian weight). Used before edge detection to suppress noise.',
+          insight: 'Naive: every thread loads 25 texels from global memory, and border threads redundantly load the same texels. Tiled: the workgroup stages its 20\u00d720 patch in shared memory once (256 threads load 400 texels cooperatively), then reads from shared memory. Same answer, ~2\u00d7 fewer global reads.'
+        },
+        sobel: {
+          name: 'Sobel edge detection',
+          desc: 'Computes the horizontal and vertical gradients with two 3\u00d73 kernels, then combines them into the gradient magnitude. Bright = strong edge.',
+          insight: 'Same trade as Gaussian but with a 3\u00d73 kernel: 9 global loads per thread become 9 shared-memory reads per workgroup. The smaller kernel means less redundancy, so the tiling win is smaller.'
+        },
+        canny: {
+          name: 'Canny edge detection (multi-pass chain)',
+          desc: 'Four stages: Gaussian blur \u2192 Sobel gradients \u2192 non-maximum suppression + double threshold (thin edges, keep only the strongest per direction) \u2192 hysteresis (4 passes: weak edges connected to strong edges become edges). The most complete edge detector classical CV has.',
+          insight: 'Every stage has a tiled variant that stages its neighborhood in shared memory. The chain amplifies the tiling win: each pass saves the same fraction of global reads, and there are 8 passes per frame.'
+        },
+        harris: {
+          name: 'Harris corner detection',
+          desc: 'Computes the structure tensor (Ix\u00b2, Iy\u00b2, IxIy summed over a 5\u00d75 window), then the corner response R = det \u2212 k\u00b7trace\u00b2. Bright red = a corner. A corner is where the image changes in EVERY direction, not just one.',
+          insight: 'The gradient pass feeds the structure tensor pass. Tiled: the 20\u00d720 gradient tile is staged in shared memory so each thread\u2019s 25 reads come from shared rather than global. The measured speedup shows the shared-memory win at this window size.'
+        },
+        flow: {
+          name: 'Lucas-Kanade optical flow',
+          desc: 'Solves a 2\u00d72 linear system per pixel from the spatial and temporal gradients over a 7\u00d77 window, giving the velocity (u, v) that best explains the brightness change. Hue = direction, brightness = speed. Black = no motion detected.',
+          insight: 'Naive: each thread loads ~35 texels (7\u00d77 window, both frames, \u00b11 for gradients). Tiled: both frames\u2019 24\u00d724 patches are staged in shared memory, so the 35 loads become shared-memory reads. The textured test scene gives every gradient something to track; a smooth gradient would give zero flow everywhere.'
+        }
+      };
       document.getElementById('kernel-select').addEventListener('change', function (e) {
         kernelMode = e.target.value;
         flowPrevReady = false; // re-seed the previous-frame texture on the first flow frame
         var lbl = (kernelMode === 'canny') ? 'chain GPU ms' : 'GPU ms';
         document.getElementById('k-naive').textContent = 'naive ' + lbl;
         document.getElementById('k-tiled').textContent = 'tiled ' + lbl;
+        var info = ALGO_INFO[kernelMode];
+        if (info) {
+          document.getElementById('algo-name').textContent = info.name;
+          document.getElementById('algo-desc').textContent = info.desc;
+          document.getElementById('algo-insight').innerHTML = '<b>Naive vs tiled:</b> ' + info.insight;
+        }
       });
+      // show the default mode's description on load
+      var def = ALGO_INFO['gauss'];
+      document.getElementById('algo-name').textContent = def.name;
+      document.getElementById('algo-desc').textContent = def.desc;
+      document.getElementById('algo-insight').innerHTML = '<b>Naive vs tiled:</b> ' + def.insight;
     }
 
     function begin() {
