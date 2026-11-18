@@ -323,6 +323,7 @@
           <option value="2048">2048</option>
         </select>
         <button class="run-btn" id="run-btn" type="button">Run ladder</button>
+        <button class="run-btn" id="stop-btn" type="button" style="display:none;">Stop</button>
       </div>
 
       <table class="results" aria-live="polite">
@@ -357,6 +358,7 @@
       <div class="device-line">seq 32 &middot; hidden 64 &middot; single head &middot; f32 &middot; verified against float64 CPU references</div>
 
       <button class="run-btn" id="prim-btn" type="button">Run primitive suite</button>
+      <button class="run-btn" id="prim-stop" type="button" style="display:none;">Stop</button>
 
       <table class="results" style="margin-top:18px;" aria-live="polite">
         <thead>
@@ -386,6 +388,7 @@
       <div class="device-line">4-bit packed weights &middot; group size 32 &middot; symmetric quant &middot; dequantize-on-load &middot; same matrix as the ladder above</div>
 
       <button class="run-btn" id="q-btn" type="button">Run quantized ladder</button>
+      <button class="run-btn" id="q-stop" type="button" style="display:none;">Stop</button>
 
       <table class="results" style="margin-top:18px;" aria-live="polite">
         <thead>
@@ -728,6 +731,11 @@
     var adapterLabel = '';
     var adapterSoftware = false;
     var running = false;
+    var stopRequested = false;
+
+    function requestStop() {
+      stopRequested = true;
+    }
     var pipeNaive = null;
     var pipeTiled = null;
     var pipeDims = 0;
@@ -872,7 +880,14 @@
       copyEnc.copyBufferToBuffer(oBuf, 0, readBuf, 0, bytes);
       device.queue.submit([copyEnc.finish()]);
 
-      return readBuf.mapAsync(GPUMapMode.READ).then(function () {
+      // watchdog: a stalled queue (SwiftShader under load) must not wedge the UI
+      var watchdog = new Promise(function (resolve, reject) {
+        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 45 s')); }, 45000);
+      });
+      return Promise.race([
+        readBuf.mapAsync(GPUMapMode.READ).then(function () { return readBuf; }),
+        watchdog
+      ]).then(function (rb) {
         var perRunMs = (performance.now() - t0) / iterations;
         var gflops = (2 * dim * dim * dim) / (perRunMs / 1000) / 1e9;
         var out = new Float32Array(readBuf.getMappedRange().slice(0));
@@ -946,6 +961,7 @@
       if (!cpuPromise) addRow('reference (CPU float64)', 0, 0, 0, 'skipped: size too large for a CPU pass', '');
 
       runTier(dim, false, iterations, dataA, dataB).then(function (rNaive) {
+        if (stopRequested) throw new Error('stopped by visitor');
         addRow('naive (global reads)', rNaive.perRunMs, rNaive.gflops, null, 'timed', '');
         return runTier(dim, true, iterations, dataA, dataB).then(function (rTiled) {
           addRow('tiled (workgroup memory)', rTiled.perRunMs, rTiled.gflops, null, 'timed', '');
@@ -1075,7 +1091,13 @@
       copyEnc.copyBufferToBuffer(oBuf, 0, readBuf, 0, bytesOut);
       device.queue.submit([copyEnc.finish()]);
 
-      return readBuf.mapAsync(GPUMapMode.READ).then(function () {
+      var watchdog = new Promise(function (resolve, reject) {
+        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 45 s')); }, 45000);
+      });
+      return Promise.race([
+        readBuf.mapAsync(GPUMapMode.READ).then(function () { return readBuf; }),
+        watchdog
+      ]).then(function (rb) {
         var perRunMs = (performance.now() - t0) / iterations;
         var gflops = (2 * dim * dim * dim) / (perRunMs / 1000) / 1e9;
         var out = new Float32Array(readBuf.getMappedRange().slice(0));
@@ -1133,6 +1155,7 @@
 
       // fp32 tiled reference tier (the M1 champion) for the delta comparison
       chain = chain.then(function () {
+        if (stopRequested) throw new Error('stopped by visitor');
         return runTier(dim, true, iterations, dataA, dataB).then(function (r) {
           fp32Out = r.out;
           qRow('fp32 tiled (M1)', r.perRunMs, r.gflops, fp32Bytes, null, 'fp32 reference tier', '');
@@ -1142,6 +1165,7 @@
 
       // Q4 naive
       chain = chain.then(function (rT) {
+        if (stopRequested) throw new Error('stopped by visitor');
         return runQ4Tier(dim, false, iterations, dataA, q).then(function (r) {
           fp32Out = rT ? rT.out : fp32Out;
           return { r: r, rT: rT };
@@ -1150,6 +1174,7 @@
 
       // Q4 tiled
       chain = chain.then(function (prev) {
+        if (stopRequested) throw new Error('stopped by visitor');
         return runQ4Tier(dim, true, iterations, dataA, q).then(function (r) {
           return { rN: prev.r, rT: prev.rT, rQ: r };
         });
@@ -1189,13 +1214,23 @@
 
       chain.then(function () {
         running = false;
+        stopRequested = false;
         btn.disabled = false;
         btn.textContent = 'Run quantized ladder';
+        document.getElementById('q-stop').style.display = 'none';
+        document.getElementById('q-btn').style.display = '';
       }).catch(function (err) {
-        qRow('ladder error', 0, 0, 0, null, String(err.message || err), 'fail');
+        if (String(err.message || err).indexOf('stopped') !== -1) {
+          qRow('ladder stopped', 0, 0, 0, null, 'stopped by visitor (completed tiers kept)', '');
+        } else {
+          qRow('ladder error', 0, 0, 0, null, String(err.message || err), 'fail');
+        }
         running = false;
+        stopRequested = false;
         btn.disabled = false;
         btn.textContent = 'Run quantized ladder';
+        document.getElementById('q-stop').style.display = 'none';
+        document.getElementById('q-btn').style.display = '';
       });
     }
 
@@ -1444,13 +1479,19 @@
       chain = chain.then(function () {
         [xB, wB, yB, qB, kB, vB, oB, sB, npBuf, rpBuf, apBuf].forEach(function (b) { try { b.destroy(); } catch (e) {} });
         running = false;
+        stopRequested = false;
         btn.disabled = false;
         btn.textContent = 'Run primitive suite';
+        document.getElementById('prim-stop').style.display = 'none';
+        document.getElementById('prim-btn').style.display = '';
       }).catch(function (err) {
         primRow('suite error', 0, null, String(err.message || err), 'fail');
         running = false;
+        stopRequested = false;
         btn.disabled = false;
         btn.textContent = 'Run primitive suite';
+        document.getElementById('prim-stop').style.display = 'none';
+        document.getElementById('prim-btn').style.display = '';
       });
     }
 
@@ -1460,14 +1501,29 @@
       initGPU();
       document.getElementById('run-btn').addEventListener('click', function () {
         var dim = parseInt(document.getElementById('dim-select').value, 10);
+        document.getElementById('run-btn').style.display = 'none';
+        document.getElementById('stop-btn').style.display = '';
         runLadder(dim);
       });
+      document.getElementById('stop-btn').addEventListener('click', function () {
+        stopRequested = true;
+      });
       document.getElementById('prim-btn').addEventListener('click', function () {
+        document.getElementById('prim-btn').style.display = 'none';
+        document.getElementById('prim-stop').style.display = '';
         runPrimitives();
+      });
+      document.getElementById('prim-stop').addEventListener('click', function () {
+        stopRequested = true;
       });
       document.getElementById('q-btn').addEventListener('click', function () {
         var dim = parseInt(document.getElementById('dim-select').value, 10);
+        document.getElementById('q-btn').style.display = 'none';
+        document.getElementById('q-stop').style.display = '';
         runQuantLadder(dim);
+      });
+      document.getElementById('q-stop').addEventListener('click', function () {
+        stopRequested = true;
       });
 
       // the ladders run only when the visitor presses Run: each pass
