@@ -242,6 +242,65 @@
       background: #ffffff;
       color: #182a2f;
     }
+
+    .arena-card {
+      background: rgba(var(--bg-rgb), 0.8);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 28px;
+      backdrop-filter: blur(8px);
+    }
+    .arena-card h2 {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      color: var(--accent); font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .arena-card .device-line {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+      color: var(--text-dim); margin-bottom: 14px;
+    }
+    .arena-card .run-btn {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      padding: 8px 22px; border-radius: 8px; cursor: pointer;
+      background: rgba(var(--accent-rgb), 0.15); border: 1px solid rgba(var(--accent-rgb), 0.5);
+      color: var(--accent); transition: all 0.2s ease;
+    }
+    .arena-card .run-btn:hover:not(:disabled) {
+      background: rgba(var(--accent-rgb), 0.3); border-color: rgba(var(--accent-rgb), 0.7);
+    }
+    .arena-card .run-btn:disabled { opacity: 0.5; cursor: wait; }
+    .arena-card canvas {
+      display: block; border-radius: 12px;
+      border: 1px solid rgba(var(--accent-rgb), 0.25);
+      background: #0a0f11; max-width: 100%;
+    }
+    .arena-card .stat-chip {
+      display: inline-block; margin-right: 12px; margin-top: 8px;
+      padding: 8px 16px; border-radius: 10px;
+      background: rgba(var(--wash-rgb), 0.15); border: 1px solid rgba(var(--accent-rgb), 0.25);
+    }
+    .arena-card .stat-chip .v {
+      font-family: 'JetBrains Mono', monospace; font-size: 1.1rem;
+      color: var(--accent); font-weight: 600;
+    }
+    .arena-card .stat-chip .v.pass { color: #4fae6a; }
+    .arena-card .stat-chip .k {
+      font-family: 'Inter', sans-serif; font-size: 0.72rem;
+      color: var(--text-dim); margin-top: 2px;
+    }
+    .arena-card .ledger-note {
+      font-size: 0.85rem; color: var(--text-dim); line-height: 1.8;
+      margin-top: 16px; padding-top: 14px;
+      border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+    }
+    .arena-card .controls {
+      display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .arena-card select {
+      padding: 6px 12px; border-radius: 8px; font-size: 0.85rem;
+      background: #12242c; color: var(--text); border: 1px solid rgba(var(--accent-rgb), 0.4);
+    }
+    [data-theme="light"] .arena-card canvas { background: #f0f4f5; }
   </style>
 </head>
 <body>
