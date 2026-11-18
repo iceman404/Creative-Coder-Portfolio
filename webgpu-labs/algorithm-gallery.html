@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Live WebGPU algorithm laboratories: hand-written quantized LLM inference, computer vision kernel races, 3D Gaussian Splatting, and AR/VR research.">
   <meta name="twitter:image" content="https://www.iceman404.com/og/og-main.jpg">
 
+  <script defer src="../js/site-common.js?v=2"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -236,23 +237,25 @@
   
     /* dropdown contrast: native option popups do not always resolve CSS
        variables, so dark and light themes get explicit colors */
+    :root {
+      --select-bg: #12242c;
+      --select-color: #e0f4f7;
+      --select-scheme: dark;
+    }
+    [data-theme="light"] {
+      --select-bg: #ffffff;
+      --select-color: #182a2f;
+      --select-scheme: light;
+    }
     select {
-      color-scheme: dark;
-      background: #12242c;
-      color: var(--text);
+      color-scheme: var(--select-scheme);
+      background: var(--select-bg);
+      color: var(--select-color);
       border: 1px solid rgba(var(--accent-rgb), 0.4);
     }
     select option, select optgroup {
-      background: #12242c;
-      color: #e0f4f7;
-    }
-    [data-theme="light"] select {
-      color-scheme: light;
-      background: #ffffff;
-    }
-    [data-theme="light"] select option, [data-theme="light"] select optgroup {
-      background: #ffffff;
-      color: #182a2f;
+      background: var(--select-bg);
+      color: var(--select-color);
     }
 
     .arena-card {
@@ -310,7 +313,7 @@
     }
     .arena-card select {
       padding: 6px 12px; border-radius: 8px; font-size: 0.85rem;
-      background: #12242c; color: var(--text); border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border: 1px solid rgba(var(--accent-rgb), 0.4);
     }
     [data-theme="light"] .arena-card canvas { background: #f0f4f5; }
 

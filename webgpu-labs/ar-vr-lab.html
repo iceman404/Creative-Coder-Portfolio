@@ -224,23 +224,25 @@
   
     /* dropdown contrast: native option popups do not always resolve CSS
        variables, so dark and light themes get explicit colors */
+    :root {
+      --select-bg: #12242c;
+      --select-color: #e0f4f7;
+      --select-scheme: dark;
+    }
+    [data-theme="light"] {
+      --select-bg: #ffffff;
+      --select-color: #182a2f;
+      --select-scheme: light;
+    }
     select {
-      color-scheme: dark;
-      background: #12242c;
-      color: var(--text);
+      color-scheme: var(--select-scheme);
+      background: var(--select-bg);
+      color: var(--select-color);
       border: 1px solid rgba(var(--accent-rgb), 0.4);
     }
     select option, select optgroup {
-      background: #12242c;
-      color: #e0f4f7;
-    }
-    [data-theme="light"] select {
-      color-scheme: light;
-      background: #ffffff;
-    }
-    [data-theme="light"] select option, [data-theme="light"] select optgroup {
-      background: #ffffff;
-      color: #182a2f;
+      background: var(--select-bg);
+      color: var(--select-color);
     }
   </style>
 </head>
