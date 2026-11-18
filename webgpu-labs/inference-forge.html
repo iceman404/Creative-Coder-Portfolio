@@ -882,7 +882,7 @@
 
       // watchdog: a stalled queue (SwiftShader under load) must not wedge the UI
       var watchdog = new Promise(function (resolve, reject) {
-        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 45 s')); }, 45000);
+        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 15 s')); }, 15000);
       });
       return Promise.race([
         readBuf.mapAsync(GPUMapMode.READ).then(function () { return readBuf; }),
@@ -946,6 +946,7 @@
       var btn = document.getElementById('run-btn');
       btn.disabled = true;
       btn.textContent = 'Running…';
+      progress('live-progress', 'dispatching naive tier…');
       document.getElementById('results-body').innerHTML = '';
 
       var iterations = dim <= 256 ? 10 : dim <= 512 ? 6 : dim <= 1024 ? 3 : 1;
@@ -962,8 +963,11 @@
 
       runTier(dim, false, iterations, dataA, dataB).then(function (rNaive) {
         if (stopRequested) throw new Error('stopped by visitor');
+        progress('live-progress', 'naive ✓ ' + rNaive.perRunMs.toFixed(1) + 'ms — dispatching tiled…');
         addRow('naive (global reads)', rNaive.perRunMs, rNaive.gflops, null, 'timed', '');
+        progress('live-progress', 'dispatching tiled tier…');
         return runTier(dim, true, iterations, dataA, dataB).then(function (rTiled) {
+          progress('live-progress', 'tiled ✓ ' + rTiled.perRunMs.toFixed(1) + 'ms — checking correctness…');
           addRow('tiled (workgroup memory)', rTiled.perRunMs, rTiled.gflops, null, 'timed', '');
           addRow('tiled vs naive', rTiled.perRunMs, rTiled.gflops,
             maxAbsDiff(rTiled.out, rNaive.out), 'PASS', 'pass');
@@ -1092,7 +1096,7 @@
       device.queue.submit([copyEnc.finish()]);
 
       var watchdog = new Promise(function (resolve, reject) {
-        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 45 s')); }, 45000);
+        setTimeout(function () { reject(new Error('tier timeout: the GPU queue did not complete in 15 s')); }, 15000);
       });
       return Promise.race([
         readBuf.mapAsync(GPUMapMode.READ).then(function () { return readBuf; }),
@@ -1129,6 +1133,8 @@
       running = true;
       var btn = document.getElementById('q-btn');
       btn.disabled = true;
+      btn.textContent = 'Running…';
+      progress('q-progress', 'dispatching fp32 reference…');
       btn.textContent = 'Running ' + dim + '\u00b7' + dim + ' quantized ladder\u2026';
       var body = document.getElementById('quant-body');
       var ph = document.getElementById('quant-placeholder');
@@ -1158,6 +1164,7 @@
         if (stopRequested) throw new Error('stopped by visitor');
         return runTier(dim, true, iterations, dataA, dataB).then(function (r) {
           fp32Out = r.out;
+          progress('q-progress', 'fp32 ✓ — dispatching Q4 naive…');
           qRow('fp32 tiled (M1)', r.perRunMs, r.gflops, fp32Bytes, null, 'fp32 reference tier', '');
           return r;
         });
@@ -1167,6 +1174,7 @@
       chain = chain.then(function (rT) {
         if (stopRequested) throw new Error('stopped by visitor');
         return runQ4Tier(dim, false, iterations, dataA, q).then(function (r) {
+          progress('q-progress', 'Q4 naive ✓ — dispatching Q4 tiled…');
           fp32Out = rT ? rT.out : fp32Out;
           return { r: r, rT: rT };
         });
@@ -1216,6 +1224,7 @@
         running = false;
         stopRequested = false;
         btn.disabled = false;
+        progress('q-progress', '');
         btn.textContent = 'Run quantized ladder';
         document.getElementById('q-stop').style.display = 'none';
         document.getElementById('q-btn').style.display = '';
@@ -1423,6 +1432,7 @@
 
       var chain = Promise.resolve();
 
+      progress('prim-progress', 'dispatching RMSNorm…');
       // RMSNorm
       chain = chain.then(function () {
         var t0 = performance.now();
@@ -1435,6 +1445,7 @@
         });
       });
 
+      progress('prim-progress', 'RMSNorm ✓ — dispatching RoPE…');
       // RoPE
       chain = chain.then(function () {
         var t0 = performance.now();
@@ -1447,6 +1458,7 @@
         });
       });
 
+      progress('prim-progress', 'RoPE ✓ — dispatching attention…');
       // Attention: full 32 rows
       chain = chain.then(function () {
         setAParams(ROWS, 0);
@@ -1460,6 +1472,7 @@
         });
       });
 
+      progress('prim-progress', 'attention ✓ — dispatching KV-cache decode…');
       // KV-cache equivalence: decode row 31 from 31 cached keys + own row
       chain = chain.then(function () {
         setAParams(1, ROWS - 1);
@@ -1489,6 +1502,7 @@
         running = false;
         stopRequested = false;
         btn.disabled = false;
+        progress('prim-progress', '');
         btn.textContent = 'Run primitive suite';
         document.getElementById('prim-stop').style.display = 'none';
         document.getElementById('prim-btn').style.display = '';
