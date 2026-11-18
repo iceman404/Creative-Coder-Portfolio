@@ -301,6 +301,32 @@
       background: #12242c; color: var(--text); border: 1px solid rgba(var(--accent-rgb), 0.4);
     }
     [data-theme="light"] .arena-card canvas { background: #f0f4f5; }
+
+    /* tab navigation */
+    .tab-bar {
+      display: flex; gap: 0; margin-top: 20px; margin-bottom: 0;
+      border-bottom: 2px solid rgba(var(--accent-rgb), 0.3);
+    }
+    .tab-btn {
+      font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+      padding: 12px 24px; cursor: pointer;
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      color: var(--text-dim); transition: all 0.2s ease;
+      margin-bottom: -2px;
+    }
+    .tab-btn.active {
+      color: var(--accent); border-bottom-color: var(--accent);
+    }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .tab-desc {
+      font-size: 0.85rem; color: var(--text-dim); line-height: 1.7;
+      padding: 12px 18px; margin-top: -2px;
+      background: rgba(var(--wash-rgb), 0.08);
+      border-left: 3px solid rgba(var(--accent-rgb), 0.4);
+    }
+    .tab-desc b { color: var(--text); }
   </style>
 </head>
 <body>
@@ -335,6 +361,14 @@
       input, with the measured numbers on screen.</p>
     </header>
 
+    <div class="tab-bar">
+      <button class="tab-btn active" data-panel="panel-flow" type="button">Flow Field</button>
+      <button class="tab-btn" data-panel="panel-material" type="button">Material World</button>
+      <button class="tab-btn" data-panel="panel-lightforge" type="button">Light Forge</button>
+      <button class="tab-btn" data-panel="panel-splat" type="button">Splat Scene</button>
+    </div>
+
+    <div id="panel-flow" class="tab-panel active">
     <div class="arena-card">
       <h2>Flow Field: variational optical flow, live</h2>
       <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
@@ -346,7 +380,7 @@
           <option value="camera">Webcam (asks permission)</option>
         </select>
         <button class="run-btn" id="ff-toggle" type="button">Start</button>
-        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">idle &mdash; press Start (uses a full CPU core)</span>
+        <span id="start-note" style="color:var(--text-dim); font-size:0.85rem;">idle &ndash; press Start (uses a full CPU core)</span>
       </div>
 
       <div class="view-row" style="margin-top:14px;">
@@ -377,7 +411,7 @@
         same frame pair. The <b>base tier</b> is classic Horn-Schunck: 16 Jacobi iterations of the
         global smoothness-plus-data functional at full resolution. The <b>multi-scale tier</b>
         builds a 4-level pyramid, warps the second frame by the upsampled flow, and runs 8
-        proximal iterations per level from coarse to fine &mdash; the standard coarse-to-fine
+        proximal iterations per level from coarse to fine &ndash; the standard coarse-to-fine
         trick that catches large motions the base tier misses. Quality is the <b>photometric
         residual</b>: the mean brightness difference |I&#8321;(x) &minus; I&#8322;(x + u)| over all
         pixels, lower is better, and both tiers are scored by the same measure. Flow direction
@@ -385,6 +419,9 @@
       </p>
     </div>
 
+    </div>
+
+    <div id="panel-material" class="tab-panel">
     <div class="arena-card">
       <h2>Material World: material point method, live</h2>
       <div class="device-line" id="device-line">Initializing WebGPU&hellip;</div>
@@ -414,6 +451,9 @@
       </p>
     </div>
 
+    </div>
+
+    <div id="panel-lightforge" class="tab-panel">
     <div class="arena-card">
       <h2>Light Forge: progressive path tracing, live</h2>
       <div class="device-line" id="lf-device">Initializing WebGPU&hellip;</div>
@@ -435,7 +475,7 @@
 
       <p class="ledger-note">
         One path per pixel per frame: camera ray, diffuse bounce, then direct light sampling
-        through a <b>ReSTIR-style reservoir</b> &mdash; eight candidate positions are drawn on the
+        through a <b>ReSTIR-style reservoir</b> &ndash; eight candidate positions are drawn on the
         area light per pixel per frame, weighted by their geometry and visibility terms, and only
         the winning candidate's shadow ray is actually traced. The radiance accumulates
         progressively, so the image converges as the samples-per-pixel counter climbs; reset it
@@ -444,6 +484,9 @@
       </p>
     </div>
 
+    </div>
+
+    <div id="panel-splat" class="tab-panel">
     <div class="arena-card">
       <h2>Splat Scene: 3D Gaussian Splatting, live</h2>
       <div class="device-line" id="ss-device">Initializing WebGPU&hellip;</div>
@@ -474,13 +517,15 @@
       </p>
     </div>
 
-            <div class="list-card">
+            </div>
+
+    <div class="list-card">
       <h2>Gallery roadmap</h2>
       <ul>
-        <li><b>Milestone 1 &middot; live:</b> Flow Field &mdash; Horn-Schunck vs coarse-to-fine multi-scale warping</li>
-        <li><b>Milestone 2 &middot; live:</b> Material World &mdash; APIC material point method with atomic grid transfers</li>
-        <li><b>Milestone 3 &middot; live:</b> Light Forge &mdash; progressive path tracing with ReSTIR-style reservoir light sampling</li>
-        <li><b>Milestone 4 &middot; live:</b> Splat Scene &mdash; 3D Gaussian Splatting with a packed-key GPU bitonic sort</li>
+        <li><b>Milestone 1 &middot; live:</b> Flow Field &ndash; Horn-Schunck vs coarse-to-fine multi-scale warping</li>
+        <li><b>Milestone 2 &middot; live:</b> Material World &ndash; APIC material point method with atomic grid transfers</li>
+        <li><b>Milestone 3 &middot; live:</b> Light Forge &ndash; progressive path tracing with ReSTIR-style reservoir light sampling</li>
+        <li><b>Milestone 4 &middot; live:</b> Splat Scene &ndash; 3D Gaussian Splatting with a packed-key GPU bitonic sort</li>
       </ul>
     </div>
 
@@ -1014,7 +1059,7 @@
         video.srcObject = null;
       }
       document.getElementById('ff-toggle').textContent = 'Start';
-      document.getElementById('start-note').textContent = 'idle — press Start (uses a full CPU core)';
+      document.getElementById('start-note').textContent = 'idle  –  press Start (uses a full CPU core)';
     }
 
     function halt() {

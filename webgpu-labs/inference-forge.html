@@ -411,7 +411,7 @@
       <p class="ledger-note">
         <b>The quantization trade:</b> weights are packed two 4-bit values per byte
         (symmetric, per-32-element scales), so a run streams <b>0.625 &times; N&sup2; bytes</b>
-        of weights instead of 4 &times; N&sup2; &mdash; 6.4&times; less memory traffic for the
+        of weights instead of 4 &times; N&sup2; &ndash; 6.4&times; less memory traffic for the
         same arithmetic. <b>Max abs error</b> here is measured against the dequantized-weight
         reference: it is the honest price of quantization, and the status column checks it
         stays inside the per-block scale bound rather than pretending it is zero. The two
@@ -441,7 +441,7 @@
     <div class="list-card">
       <h2>What the full engine will demonstrate</h2>
       <ul>
-        <li><b>Packed 4-bit weight GEMM</b> with dequantize-on-load, benchmarked against the fp32 tier &mdash; <i>live above</i></li>
+        <li><b>Packed 4-bit weight GEMM</b> with dequantize-on-load, benchmarked against the fp32 tier &ndash; <i>live above</i></li>
         <li><b>RoPE and RMSNorm</b> as fused WGSL passes</li>
         <li><b>Causal attention</b> with a persistent KV cache, visualized as it fills</li>
         <li><b>Top-p sampling</b> with a live token stream</li>
@@ -454,7 +454,7 @@
       <ul>
         <li><b>Milestone 1:</b> fp16 forward pass of a GPT-2 class model, correctness ledger vs fp32, live on this page</li>
         <li><b>Milestone 2:</b> causal attention with a persistent KV cache</li>
-        <li><b>Milestone 3:</b> 4-bit quantized kernels and packed weight loading &mdash; <i>live above</i></li>
+        <li><b>Milestone 3:</b> 4-bit quantized kernels and packed weight loading &ndash; <i>live above</i></li>
         <li><b>Milestone 4:</b> streaming UI with per-kernel instrumentation</li>
         <li><b>The honest benchmark:</b> memory-bound decode within striking distance of llama.cpp, on every GPU vendor, from a single URL, with the numbers published here unedited</li>
       </ul>

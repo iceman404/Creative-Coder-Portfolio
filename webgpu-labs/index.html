@@ -277,7 +277,7 @@
       <h2>Model registry &amp; device tier</h2>
       <p style="color:var(--text-dim); font-size:0.92rem; line-height:1.7;">
         Every model the Inference Forge will stream is listed here with the device tier it
-        requires. The tier is computed live from your adapter's reported limits &mdash; no
+        requires. The tier is computed live from your adapter's reported limits &ndash; no
         guesswork, no fingerprinting: the same numbers the inspector above shows. Models above
         your tier render <b>locked</b> with the reason; the shard loader (resumable downloads,
         per-shard hashes, Cache API storage) ships with milestone 4.
@@ -298,9 +298,9 @@
         </tbody>
       </table>
       <p style="color:var(--text-dim); font-size:0.85rem; margin-top:12px; line-height:1.7;">
-        <b>Tier logic:</b> <b>S</b> &mdash; discrete GPU class, max buffer binding &ge; 1 GB;
-        <b>A</b> &mdash; 256 MB &ndash; 1 GB binding (4&ndash;8 GB VRAM or strong iGPU);
-        <b>B</b> &mdash; integrated, shared memory; <b>C</b> &mdash; no WebGPU or a software
+        <b>Tier logic:</b> <b>S</b> &ndash; discrete GPU class, max buffer binding &ge; 1 GB;
+        <b>A</b> &ndash; 256 MB &ndash; 1 GB binding (4&ndash;8 GB VRAM or strong iGPU);
+        <b>B</b> &ndash; integrated, shared memory; <b>C</b> &ndash; no WebGPU or a software
         adapter. All listed models are Apache-2.0 open weights; the quantized containers are
         packed and hashed at publish time, so what the loader fetches can be verified
         byte-for-byte against this registry.
@@ -614,7 +614,7 @@
       var tierInfo = computeTier(best, noWebGPU);
       var tierEl = el('tier-line');
       if (tierEl) {
-        tierEl.innerHTML = '<b>Device tier: ' + tierInfo.tier + '</b> &mdash; ' + tierInfo.why +
+        tierEl.innerHTML = '<b>Device tier: ' + tierInfo.tier + '</b> &ndash; ' + tierInfo.why +
           (best ? ' <span style="opacity:0.65">(adapter: ' + best.name + ')</span>' : '');
       }
       var body = el('registry-body');
@@ -623,8 +623,8 @@
       var rows = REGISTRY.map(function (m) {
         var unlocked = order[tierInfo.tier] <= order[m.minTier];
         var verdict = unlocked
-          ? '<span style="color:var(--accent); font-weight:600;">unlocked</span> — ' + m.note
-          : '<span style="opacity:0.7;">locked</span> — needs tier ' + m.minTier + ' (' +
+          ? '<span style="color:var(--accent); font-weight:600;">unlocked</span>  –  ' + m.note
+          : '<span style="opacity:0.7;">locked</span>  –  needs tier ' + m.minTier + ' (' +
             (tierInfo.tier === 'C' ? 'no hardware adapter' : 'this adapter reports tier ' + tierInfo.tier) + ')';
         return '<tr>' +
           '<td style="padding:8px 6px;"><b>' + m.name + '</b></td>' +
